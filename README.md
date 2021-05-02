@@ -1,6 +1,7 @@
 # Kotlinter Gradle
 
 [![Build Status](https://api.travis-ci.org/jeremymailen/kotlinter-gradle.svg?branch=master)](https://travis-ci.org/jeremymailen/kotlinter-gradle)
+[![version](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/jmailen/gradle/kotlinter-gradle/maven-metadata.xml?label=gradle)](https://plugins.gradle.org/search?term=com.starter)
 
 Painless Gradle plugin for linting and formatting Kotlin source files using the awesome [ktlint](https://ktlint.github.io) engine.
 
@@ -44,11 +45,7 @@ Root `build.gradle.kts`
 
 ```kotlin
 buildscript {
-    repositories {
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
-    }
+    repositories.gradlePluginPortal()
     dependencies {
         classpath("org.jmailen.gradle:kotlinter-gradle:3.4.4")
     }
@@ -69,11 +66,7 @@ Root `build.gradle`
 
 ```groovy
 buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
+    repositories.gradlePluginPortal()
     dependencies {
         classpath "org.jmailen.gradle:kotlinter-gradle:3.4.4"
     }
@@ -129,7 +122,7 @@ To install the hook automatically when someone runs the build, add this to your 
 <summary>Kotlin</summary>
 
 ```kotlin
-tasks.check {
+tasks.named("check") {
     dependsOn("installKotlinterPrePushHook")
 }
 ```
@@ -140,7 +133,7 @@ tasks.check {
 <summary>Groovy</summary>
 
 ```groovy
-check {
+tasks.named("check") {
     dependsOn "installKotlinterPrePushHook"
 }
 ```
@@ -212,10 +205,8 @@ so you can customize includes, excludes, and source.
 ```kotlin
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
-tasks {
-    "lintKotlinMain"(LintTask::class) {
-        exclude("**/*Generated.kt")
-    }
+tasks.named<LintTask>("lintKotlinMain") {
+    exclude("**/*Generated.kt")
 }
 ```
 
@@ -225,7 +216,7 @@ tasks {
 <summary>Groovy</summary>
 
 ```groovy
-lintKotlinMain {
+tasks.named("lintKotlinMain") {
     exclude '**/*Generated.kt'
 }
 ```
@@ -243,7 +234,7 @@ If you aren't using autoconfiguration from a supported plugin or otherwise need 
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 
-tasks.create<LintTask>("ktLint") {
+tasks.register<LintTask>("ktLint") {
     group = "verification"
     source(files("src"))
     reports = mapOf(
@@ -252,7 +243,7 @@ tasks.create<LintTask>("ktLint") {
     )
 }
 
-tasks.create<FormatTask>("ktFormat") {
+tasks.register<FormatTask>("ktFormat") {
     group = "formatting"
     source(files("src"))
     report = file("build/format-report.txt")
@@ -268,7 +259,8 @@ tasks.create<FormatTask>("ktFormat") {
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 
-task ktLint(type: LintTask, group: 'verification') {
+tasks.register("ktLint", LintTask) {
+    group 'verification'
     source files('src')
     reports = [
             'plain': file('build/lint-report.txt'),
@@ -277,7 +269,8 @@ task ktLint(type: LintTask, group: 'verification') {
     disabledRules = ["import-ordering"]
 }
 
-task ktFormat(type: FormatTask, group: 'formatting') {
+tasks.register("ktFormat", FormatTask) {
+    group 'formatting'
     source files('src')
     report = file('build/format-report.txt')
     disabledRules = ["import-ordering"]
