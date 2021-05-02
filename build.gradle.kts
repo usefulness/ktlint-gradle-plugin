@@ -52,6 +52,14 @@ dependencies {
     testImplementation("org.jetbrains:annotations:${Versions.jetbrainsAnnotations}")
 }
 
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin")) {
+            useVersion("1.4.32")
+        }
+    }
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
