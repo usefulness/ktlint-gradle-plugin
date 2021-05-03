@@ -2,7 +2,6 @@ package org.jmailen.gradle.kotlinter.functional
 
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.intellij.lang.annotations.Language
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -77,7 +76,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
     fun `formatKotlin reports formatted and unformatted files`() {
         settingsFile()
         buildFile()
-        @Language("kotlin")
+        // language=kotlin
         val kotlinClass =
             """
             import System.*
@@ -121,7 +120,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
     }
 
     private fun buildFile() = buildFile.apply {
-        @Language("groovy")
+        // language=groovy
         val buildscript =
             """
             plugins {
