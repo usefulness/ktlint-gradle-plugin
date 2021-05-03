@@ -61,6 +61,7 @@ configurations.configureEach {
 }
 
 java {
+    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
@@ -96,14 +97,6 @@ tasks {
     }
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-    dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-    group = JavaBasePlugin.DOCUMENTATION_GROUP
-    description = "Assembles sources JAR"
-    archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
-}
-
 gradlePlugin {
     plugins {
         create("kotlinterPlugin") {
@@ -126,13 +119,9 @@ pluginBundle {
     }
 }
 
-artifacts {
-    add(configurations.archives.name, sourcesJar)
-}
-
 publishing {
-    publications.withType<MavenPublication> {
-        artifact(sourcesJar.get())
+    publications.register<MavenPublication>("mavenJava") {
+        from(components.getByName("java"))
 
         pom {
             name.set(project.name)
