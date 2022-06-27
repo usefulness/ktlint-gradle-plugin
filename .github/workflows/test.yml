@@ -1,0 +1,21 @@
+name: Release Plugin
+
+on:
+ push:
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update README.md content
+        run:
+          sed -i '' -E 's/version "[[:digit:]]+.[[:digit:]]+.[[:digit:]]+"/version "3.12.0"/g' README.md
+
+      - run:
+          git status
+
+
+      - run:
+          git diff
