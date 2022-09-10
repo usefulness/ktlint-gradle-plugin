@@ -14,3 +14,7 @@ android {
         }
     }
 }
+
+dependencies {
+    ktlintRuleSet(project(":custom-ktlint-rules"))
+}
