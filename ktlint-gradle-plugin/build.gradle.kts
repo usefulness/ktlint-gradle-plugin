@@ -60,7 +60,7 @@ tasks {
                 version = $projectVersion
                 ktlint_version = ${Versions.ktlint}
                 
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
     }
@@ -69,15 +69,10 @@ tasks {
         dependsOn(generateVersionProperties)
     }
 
-    val targetJavaVersion = JavaVersion.VERSION_11
-    withType<JavaCompile>().configureEach {
-        options.release.set(targetJavaVersion.majorVersion.toInt())
-    }
     withType<KotlinCompile>().configureEach {
         kotlinOptions {
             apiVersion = "1.4"
             languageVersion = "1.4"
-            jvmTarget = targetJavaVersion.toString()
         }
     }
     withType<Test>().configureEach {

@@ -111,7 +111,7 @@ jobs:
       fail-fast: false
       matrix:
         gradle: [ current ]
-        java: [ 17, 19 ]
+        java: [ 17 ]
         agp: ${{ fromJSON(needs.provide-agp-version-matrix.outputs.agp-versions) }}
         exclude:
           - gradle: current
