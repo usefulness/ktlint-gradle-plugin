@@ -28,7 +28,7 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
             logger = logger,
         )
         logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
-        logger.info("$name - executing against ${files.size} file(s)")
+        logger.info("$name - executing against ${files.count()} file(s)")
 
         val fixes = mutableListOf<String>()
         try {
