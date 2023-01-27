@@ -25,4 +25,11 @@ allprojects {
             jvmToolchain(17)
         }
     }
+    pluginManager.withPlugin("java") {
+        if (project.hasProperty("skipJarVersion")) {
+            tasks.named("jar") {
+                archiveFile.set(new File(project.buildDir, "libs/${project.name}.jar"))
+            }
+        }
+    }
 }
