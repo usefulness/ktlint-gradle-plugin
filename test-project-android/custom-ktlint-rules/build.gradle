@@ -1,0 +1,7 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+}
+
+dependencies {
+    compileOnly("com.pinterest.ktlint:ktlint-core:0.48.2")
+}

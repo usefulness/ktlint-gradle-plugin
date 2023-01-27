@@ -1,0 +1,34 @@
+import org.gradle.api.initialization.resolve.RepositoriesMode
+
+pluginManagement {
+    repositories { // https://github.com/gradle/gradle/issues/20866
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+    dependencyResolutionManagement {
+        repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+        repositories {
+            mavenCentral()
+            gradlePluginPortal()
+        }
+    }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.4.0"
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+
+rootProject.name = "io.github.usefulness"
+include ":ktlint-gradle-plugin"
+
+includeBuild("gradle/plugins")

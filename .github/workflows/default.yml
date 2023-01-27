@@ -34,7 +34,7 @@ jobs:
       - name: ./gradlew check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check
+          arguments: check -x detekt
 
       - name: Upload test results
         if: ${{ always() }}

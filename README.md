@@ -1,17 +1,13 @@
-# Kotlinter Gradle
+# ktlint-gradle-plugin
 
-[![Build Status](https://github.com/jeremymailen/kotlinter-gradle/workflows/Build%20Project/badge.svg)](https://github.com/jeremymailen/kotlinter-gradle/actions)
-[![Latest Version](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/jmailen/gradle/kotlinter-gradle/maven-metadata.xml?label=gradle)](https://plugins.gradle.org/plugin/org.jmailen.kotlinter)
+[![Build Status](https://github.com/usefulness/ktlint-gradle-plugin/workflows/Build%20Project/badge.svg)](https://github.com/usefulness/ktlint-gradle-plugin/actions)
+[![Latest Version](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/usefulness/ktlin-gradle-plugin/maven-metadata.xml?label=gradle)](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
 
-Painless Gradle plugin for linting and formatting Kotlin source files using the awesome [ktlint](https://ktlint.github.io) engine.
-
-It aims to be easy to set up with _zero_ required configuration and behaves as you'd expect out of the box.
-
-It's also fast because it integrates the ktlint _engine_ directly with Gradle's incremental build and uses the Worker API to parallelize work.
+Simple and
 
 ### Installation
 
-Available on the Gradle Plugins Portal: https://plugins.gradle.org/plugin/org.jmailen.kotlinter
+Available on the Gradle Plugin Portal: https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin
 
 #### Single module
 
@@ -20,75 +16,16 @@ Available on the Gradle Plugins Portal: https://plugins.gradle.org/plugin/org.jm
 
 ```kotlin
 plugins {
-    id("org.jmailen.kotlinter") version "3.13.0"
+    id("io.github.usefulness.ktlint-gradle-plugin") version "3.13.0"
 }
 ```
 
-</details>
-
-<details>
-<summary>Groovy</summary>
-
-```groovy
-plugins {
-    id "org.jmailen.kotlinter" version "3.13.0"
-}
-```
-
-</details>
-
-#### Multi-module and Android
-
-<details open>
-<summary>Kotlin</summary>
-Root `build.gradle.kts`
-
-```kotlin
-plugins {
-    id("org.jmailen.kotlinter") version "3.13.0" apply false
-}
-```
-
-Each module `build.gradle.kts` with Kotlin source
-
-```kotlin
-plugins {
-    id("org.jmailen.kotlinter")
-}
-```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
-Root `build.gradle`
-
-```groovy
-plugins {
-    id 'org.jmailen.kotlinter' version "3.13.0" apply false
-}
-```
-
-Each module `build.gradle` with Kotlin source
-
-```groovy
-plugins {
-    id 'org.jmailen.kotlinter'
-}
-```
-
-</details>
 
 ### Compatibility
 
-| kotlinter version  | min kotlin version | max kotlin version | min gradle version |
-|--------------------|--------------------|--------------------|--------------------|
-| 3.11.0+            | 1.7.0              | -                  | 7.0                |
-| 3.10.0+            | 1.6.20             | 1.6.21             | 7.0                |
-| 3.7.0+             | 1.5.31             | 1.6.10             | 7.0                |
-| 3.5.0+             | 1.5.0              | 1.5.30             | 6.8                |
-| 3.0.0+             | 1.4.0              | 1.4.30             | 6.8                |
-| 2.0.0+             | 1.3.0              | 1.3.30             | -                  |
+| plugin version | min gradle version | min ktlint version |
+|----------------|--------------------|--------------------|
+| 3.14.0+        | 7.6                | 0.48.0             |
 
 ### Features
 
@@ -96,6 +33,7 @@ plugins {
   - [JVM](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm)
   - [Multiplatform](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.multiplatform)
   - [Android](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.android)
+  - [JS](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.js)
 - Supports `.kt` and `.kts` files
 - Standalone `LintTask` and `FormatTask` types for defining custom tasks
 - Incremental build support and fast parallelization with Gradle Worker API
@@ -104,7 +42,7 @@ plugins {
 
 ### Tasks
 
-When your project uses one of the supported Kotlin Gradle plugins, Kotlinter adds these tasks:
+When your project uses one of the supported Kotlin Gradle plugins, the plugin adds these tasks:
 
 `formatKotlin`: format Kotlin source code according to `ktlint` rules or warn when auto-format not possible.
 
@@ -114,45 +52,14 @@ Also `check` becomes dependent on `lintKotlin`.
 
 Granular tasks are added for each source set in the project: `formatKotlin`*`SourceSet`* and `lintKotlin`*`SourceSet`*.
 
-### Git Hooks
-
-Kotlinter can install a hook to run pre-push (`installKotlinterPrePushHook`). The hook runs `lintKotlin` and, if there are errors, `formatKotlin` and exits non-zero leaving changed files to be committed.
-
-You *must* apply the kotlinter plugin to your root project to make this task available. If using `git worktree` you must install the hook from the parent git directory.
-
-To install the hook automatically when someone runs the build, add this to your root project `build.gradle.kts`:
-
-<details open>
-<summary>Kotlin</summary>
-
-```kotlin
-tasks.check {
-    dependsOn("installKotlinterPrePushHook")
-}
-```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
-
-```groovy
-tasks.named('check') {
-    dependsOn 'installKotlinterPrePushHook'
-}
-```
-
-</details>
-
-
 ### Configuration
-Options are configured in the `kotlinter` extension. Defaults shown (you may omit the configuration block entirely if you want these defaults).
+Options are configured in the `ktlin` extension. Defaults shown (you may omit the configuration block entirely if you want these defaults).
 
 <details open>
 <summary>Kotlin</summary>
 
 ```kotlin
-kotlinter {
+ktlint {
     ignoreFailures = false
     reporters = arrayOf("checkstyle", "plain")
     experimentalRules = false
@@ -167,7 +74,7 @@ kotlinter {
 <summary>Groovy</summary>
 
 ```groovy
-kotlinter {
+ktlint {
     ignoreFailures = false
     reporters = ['checkstyle', 'plain']
     experimentalRules = false
@@ -191,15 +98,7 @@ disabledRules = ["no-wildcard-imports"]
 You must prefix rule ids not part of the standard rule set with `<rule-set-id>:<rule-id>`. For example `experimental:annotation`.
 
 There is a basic support for overriding `ktlintVersion`, but the plugin doesn't guarantee backwards compatibility with all `ktlint` versions.
-Errors like `java.lang.NoSuchMethodError:` or `com/pinterest/ktlint/core/KtLint$Params` can be thrown if provided `ktlint` version isn't compatible with the latest ktlint apis.   
-
-### Editorconfig
-
-Kotlinter will configure itself using an `.editorconfig` file if one is present.
-
-If a non-empty `disabledRules` value is specified in the `kotlinter` extension, it will take precedence over any `disabled_rules` in `.editorconfig`.
-
-See [Ktlint editorconfig](https://github.com/pinterest/ktlint#editorconfig) for supported values.
+Errors like `java.lang.NoSuchMethodError:` or `com/pinterest/ktlint/core/KtLint$Params` can be thrown if provided `ktlint` version isn't compatible with the latest ktlint apis.
 
 ### Customizing Tasks
 
@@ -231,12 +130,12 @@ tasks.named('lintKotlinMain') {
 Note that exclude paths are relative to the package root.
 
 #### Advanced
-By default, `Kotlinter` Gradle workers will use 256MB of heap size. To adjust this setting use:
+By default, Gradle workers will use 256MB of heap size. To adjust this setting use:
 <details>
 <summary>Kotlin</summary>
 
 ```kotlin
-import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
+import io.github.usefulness.tasks.ConfigurableKtLintTask
 
 tasks.withType<ConfigurableKtLintTask> {
   workerMaxHeapSize.set("512m")
@@ -249,7 +148,7 @@ tasks.withType<ConfigurableKtLintTask> {
 <summary>Groovy</summary>
 
 ```groovy
-import org.jmailen.gradle.kotlinter.tasks.ConfigurableKtLintTask
+import io.github.usefulness.tasks.ConfigurableKtLintTask
 
 tasks.withType(ConfigurableKtLintTask::class).configureEach {
   workerMaxHeapSize.set("512m")
@@ -266,8 +165,8 @@ If you aren't using autoconfiguration from a supported plugin or otherwise need 
 <summary>Kotlin</summary>
 
 ```kotlin
-import org.jmailen.gradle.kotlinter.tasks.LintTask
-import org.jmailen.gradle.kotlinter.tasks.FormatTask
+import io.github.usefulness.tasks.LintTask
+import io.github.usefulness.tasks.FormatTask
 
 tasks.register<LintTask>("ktLint") {
     group = "verification"
@@ -293,8 +192,8 @@ tasks.register<FormatTask>("ktFormat") {
 <summary>Groovy</summary>
 
 ```groovy
-import org.jmailen.gradle.kotlinter.tasks.LintTask
-import org.jmailen.gradle.kotlinter.tasks.FormatTask
+import io.github.usefulness.tasks.LintTask
+import io.github.usefulness.tasks.FormatTask
 
 tasks.register('ktLint', LintTask) {
     group 'verification'

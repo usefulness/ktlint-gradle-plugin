@@ -1,8 +1,6 @@
-package org.jmailen.gradle.kotlinter.customrules
+package io.github.usefulness.customrules
 
 import com.pinterest.ktlint.core.RuleProvider
-import com.pinterest.ktlint.core.RuleSet
-import com.pinterest.ktlint.core.RuleSetProvider
 import com.pinterest.ktlint.core.RuleSetProviderV2
 
 class CustomRuleSetProvider : RuleSetProviderV2(

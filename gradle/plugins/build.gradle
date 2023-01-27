@@ -1,0 +1,22 @@
+plugins {
+    id 'java-gradle-plugin'
+    alias(libs.plugins.jmailen.kotlinter)
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(libs.kotlin.gradle)
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+gradlePlugin {
+    plugins {
+        publishingPlugin {
+            id = 'com.starter.publishing'
+            implementationClass = 'PublishingPlugin'
+        }
+    }
+}
