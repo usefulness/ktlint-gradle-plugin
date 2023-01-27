@@ -1,4 +1,4 @@
-package org.jmailen.gradle.kotlinter.sample
+package io.github.usefulness.sample
 
 class CustomRuleTest {
     fun test():

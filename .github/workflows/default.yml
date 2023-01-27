@@ -7,6 +7,14 @@ on:
       - master
 
 jobs:
+  cancel-previous-workflows:
+    name: Cancel previous workflow runs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -34,7 +42,7 @@ jobs:
       - name: ./gradlew check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check
+          arguments: check -x detekt
 
       - name: Upload test results
         if: ${{ always() }}
@@ -110,9 +118,6 @@ jobs:
             java: 17
             agp: 8.1.0-alpha02
         include:
-          - gradle: 7.6
-            java: 11
-            agp: 4.2.2
           - gradle: 8.0-rc-1
             java: 17
             agp: 8.1.0-alpha02

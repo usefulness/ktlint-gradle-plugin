@@ -1,0 +1,35 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapperKt
+
+plugins {
+    alias(libs.plugins.starter.config)
+    alias(libs.plugins.starter.versioning)
+    alias(libs.plugins.starter.library.kotlin) apply false
+}
+
+commonConfig {
+    javaFilesAllowed false
+    javaVersion JavaVersion.VERSION_11
+}
+
+allprojects {
+    pluginManager.withPlugin("kotlin") { plugin ->
+        def kotlinVersion = KotlinPluginWrapperKt.getKotlinPluginVersion(project)
+        configurations.configureEach {
+            resolutionStrategy.eachDependency {
+                if (requested.group == 'org.jetbrains.kotlin' && requested.name.startsWith("kotlin")) {
+                    useVersion kotlinVersion
+                }
+            }
+        }
+        kotlin {
+            jvmToolchain(17)
+        }
+    }
+    pluginManager.withPlugin("java") {
+        if (project.hasProperty("skipJarVersion")) {
+            tasks.named("jar") {
+                archiveFile.set(new File(project.buildDir, "libs/${project.name}.jar"))
+            }
+        }
+    }
+}

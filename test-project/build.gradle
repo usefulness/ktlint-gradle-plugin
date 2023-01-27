@@ -1,0 +1,4 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+    id("io.github.usefulness.ktlint-gradle-plugin")
+}

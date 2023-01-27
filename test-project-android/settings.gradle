@@ -1,0 +1,32 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+    }
+    def agpVersion = settings.agpVersion
+    logger.quiet("AGP version=$agpVersion")
+    resolutionStrategy.eachPlugin {
+        if (requested.id.id == "com.android.library") {
+            useModule("com.android.tools.build:gradle:$agpVersion")
+        }
+    }
+    plugins {
+        id("org.jetbrains.kotlin.android") version "1.8.0"
+        id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.4.0"
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+include("app")
+include("custom-ktlint-rules")
+includeBuild("..")

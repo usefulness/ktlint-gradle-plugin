@@ -1,4 +1,4 @@
-package org.jmailen.gradle.kotlinter.customrules
+package io.github.usefulness.customrules
 
 import com.pinterest.ktlint.core.Rule
 import com.pinterest.ktlint.core.api.EditorConfigProperties
