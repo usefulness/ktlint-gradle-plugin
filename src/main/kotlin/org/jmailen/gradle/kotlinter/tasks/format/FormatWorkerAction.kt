@@ -27,6 +27,8 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
             changedEditorconfigFiles = parameters.changedEditorConfigFiles,
             logger = logger,
         )
+        logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
+        logger.info("$name - executing against ${files.size} file(s)")
 
         val fixes = mutableListOf<String>()
         try {
@@ -34,7 +36,7 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
                 val sourceText = file.readText()
                 val relativePath = file.toRelativeString(projectDirectory)
 
-                logger.log(LogLevel.DEBUG, "$name checking format: $relativePath")
+                logger.debug("$name checking format: $relativePath")
 
                 if (file.extension !in supportedExtensions) {
                     logger.log(LogLevel.DEBUG, "$name ignoring non Kotlin file: $relativePath")
@@ -55,7 +57,7 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
                 }
             }
         } catch (t: Throwable) {
-            throw KotlinterError("format worker execution error", t)
+            throw KotlinterError.WorkerError("format worker execution error", t)
         }
 
         output?.writeText(
