@@ -4,7 +4,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import io.github.usefulness.functional.utils.androidManifest
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -81,6 +81,9 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 resolve("src/test/kotlin/TestSourceSet.kt") {
                     writeText(kotlinClass("TestSourceSet"))
                 }
+                resolve("src/androidTest/kotlin/AndroidTestSourceSet.kt") {
+                    writeText(kotlinClass("AndroidTestSourceSet"))
+                }
                 resolve("src/customFolder/kotlin/CustomSourceSet.kt") {
                     writeText(kotlinClass("CustomSourceSet"))
                 }
@@ -92,6 +95,7 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                         """
                         plugins {
                             id 'kotlin'
+                            id 'java-test-fixtures'
                             id 'io.github.usefulness.ktlint-gradle-plugin'
                         }
                         
@@ -113,6 +117,9 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 resolve("src/individuallyCustomized/kotlin/CustomSourceSet.kt") {
                     writeText(kotlinClass("CustomSourceSet"))
                 }
+                resolve("src/testFixtures/kotlin/TestFixturesSourceSet.kt") {
+                    writeText(kotlinClass("TestFixturesSourceSet"))
+                }
             }
         }
     }
@@ -120,14 +127,16 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
     @Test
     fun `plugin detects sources in all sourcesets`() {
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinMain")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinDebug")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinTest")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinFlavorOne")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlin")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":kotlinproject:lintKotlinMain")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":kotlinproject:lintKotlinTest")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":kotlinproject:lintKotlinIndividuallyCustomized")?.outcome)
+            assertThat(task(":androidproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":androidproject:lintKotlinDebug")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":androidproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":androidproject:lintKotlinFlavorOne")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":androidproject:lintKotlinAndroidTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":kotlinproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":kotlinproject:lintKotlinTestFixtures")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":kotlinproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":kotlinproject:lintKotlinIndividuallyCustomized")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -136,14 +145,16 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
         build("lintKotlin")
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":androidproject:lintKotlinMain")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":androidproject:lintKotlinDebug")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":androidproject:lintKotlinTest")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":androidproject:lintKotlinFlavorOne")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":androidproject:lintKotlin")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":kotlinproject:lintKotlinMain")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":kotlinproject:lintKotlinTest")?.outcome)
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":kotlinproject:lintKotlinIndividuallyCustomized")?.outcome)
+            assertThat(task(":androidproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":androidproject:lintKotlinDebug")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":androidproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":androidproject:lintKotlinFlavorOne")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":androidproject:lintKotlinAndroidTest")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":kotlinproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":kotlinproject:lintKotlinTestFixtures")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":kotlinproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":kotlinproject:lintKotlinIndividuallyCustomized")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 

@@ -50,13 +50,8 @@ open class LintTask @Inject constructor(
             p.changedEditorConfigFiles.from(getChangedEditorconfigFiles(inputChanges))
         }
 
-        try {
-            workQueue.await()
-        } catch (e: Throwable) {
-            if (!ignoreFailures.get()) {
-                throw e
-            }
-        }
+        runCatching { workQueue.await() }
+            .onFailure { if (!ignoreFailures.get()) throw it }
     }
 
     private fun getReports() = reports.get()

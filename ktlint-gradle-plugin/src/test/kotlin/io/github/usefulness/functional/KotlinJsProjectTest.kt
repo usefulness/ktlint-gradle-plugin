@@ -1,11 +1,10 @@
 package io.github.usefulness.functional
 
-import org.gradle.testkit.runner.TaskOutcome
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -51,8 +50,8 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinTest")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -66,10 +65,10 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin", "--continue").apply {
-            assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome)
-            assertTrue(output.contains("Lint error > [filename] File 'FixtureFileName.kt' contains a single top level declaration"))
-            assertEquals(TaskOutcome.FAILED, task(":lintKotlinTest")?.outcome)
-            assertTrue(output.contains("Lint error > [filename] File 'FixtureTestFileName.kt' contains a single top level declaration"))
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Lint error > [filename] File 'FixtureFileName.kt' contains a single top level declaration")
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Lint error > [filename] File 'FixtureTestFileName.kt' contains a single top level declaration")
         }
     }
 
@@ -104,12 +103,12 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass)
         }
         build("formatKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":formatKotlinMain")?.outcome)
-            assertTrue(output.contains("FixtureClass.kt:3:19: Format fixed > [curly-spacing] Missing spacing before \"{\""))
-            assertTrue(output.contains("FixtureClass.kt:1:1: Format could not fix > [no-wildcard-imports] Wildcard import"))
-            assertEquals(TaskOutcome.SUCCESS, task(":formatKotlinTest")?.outcome)
-            assertTrue(output.contains("FixtureTestClass.kt:3:23: Format fixed > [curly-spacing] Missing spacing before \"{\""))
-            assertTrue(output.contains("FixtureTestClass.kt:1:1: Format could not fix > [no-wildcard-imports] Wildcard import"))
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("FixtureClass.kt:3:19: Format fixed > [curly-spacing] Missing spacing before \"{\"")
+            assertThat(output).contains("FixtureClass.kt:1:1: Format could not fix > [no-wildcard-imports] Wildcard import")
+            assertThat(task(":formatKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("FixtureTestClass.kt:3:23: Format fixed > [curly-spacing] Missing spacing before \"{\"")
+            assertThat(output).contains("FixtureTestClass.kt:1:1: Format could not fix > [no-wildcard-imports] Wildcard import")
         }
     }
 }
