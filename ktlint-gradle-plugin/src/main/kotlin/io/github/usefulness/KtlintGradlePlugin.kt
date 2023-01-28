@@ -46,7 +46,6 @@ class KtlintGradlePlugin : Plugin<Project> {
                 sourceResolver.applyToAll(this) { id, resolvedSources ->
                     val lintTaskPerSourceSet = tasks.register("lintKotlin${id.capitalize()}", LintTask::class.java) { lintTask ->
                         lintTask.source(resolvedSources)
-                        lintTask.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
                         lintTask.reports.set(
                             provider {
                                 pluginExtension.reporters.associateWith { reporterId ->
@@ -55,6 +54,7 @@ class KtlintGradlePlugin : Plugin<Project> {
                                 }
                             },
                         )
+                        lintTask.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
                         lintTask.experimentalRules.set(provider { pluginExtension.experimentalRules })
                         lintTask.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
                     }

@@ -2,12 +2,12 @@ package io.github.usefulness.tasks
 
 import io.github.usefulness.tasks.format.FormatWorkerAction
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.InputChanges
+import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ open class FormatTask @Inject constructor(
 
     @OutputFile
     @Optional
-    val report: RegularFileProperty = objectFactory.fileProperty()
+    val report = objectFactory.fileProperty()
 
     init {
         outputs.upToDateWhen { false }
@@ -47,6 +47,12 @@ open class FormatTask @Inject constructor(
             p.changedEditorConfigFiles.from(getChangedEditorconfigFiles(inputChanges))
         }
 
-        workQueue.await()
+        runCatching { workQueue.await() }
+            .onFailure { failure ->
+                when (failure) {
+                    is WorkerExecutionException -> throw failure.cause ?: failure
+                    else -> throw failure
+                }
+            }
     }
 }

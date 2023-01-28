@@ -1,13 +1,11 @@
 package io.github.usefulness
 
-import io.github.usefulness.support.ReporterType
 import io.github.usefulness.support.versionProperties
 
 open class KtlintGradleExtension {
-    companion object {
+    internal companion object {
         const val DEFAULT_IGNORE_FAILURES = false
         const val DEFAULT_EXPERIMENTAL_RULES = false
-        val DEFAULT_REPORTER = ReporterType.Checkstyle.id
         val DEFAULT_DISABLED_RULES = emptyArray<String>()
     }
 

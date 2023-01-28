@@ -134,6 +134,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
                 val filePath = pathPattern.find(line)?.groups?.get(1)?.value.orEmpty()
                 assertThat(File(filePath)).exists()
             }
+            assertThat(output).contains("Format failed to autocorrect")
         }
     }
 

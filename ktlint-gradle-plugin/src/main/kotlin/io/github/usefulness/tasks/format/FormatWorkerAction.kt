@@ -29,9 +29,9 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
         logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
         logger.info("$name - executing against ${files.count()} file(s)")
 
+        var notFixedFiles = 0
         val fixes = mutableListOf<String>()
         files.sorted().forEach { file ->
-            val sourceText = file.readText()
             val relativePath = file.toRelativeString(projectDirectory)
 
             logger.debug("$name checking format: $relativePath")
@@ -41,17 +41,23 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
                 return@forEach
             }
 
-            val formattedText = ktLintEngine.format(Code.CodeFile(file)) { error, corrected ->
+            var fileFixed = false
+            val fixedContent = ktLintEngine.format(code = Code.CodeFile(file = file)) { error, corrected ->
                 val msg = when (corrected) {
                     true -> "${file.path}:${error.line}:${error.col}: Format fixed > [${error.ruleId}] ${error.detail}"
                     false -> "${file.path}:${error.line}:${error.col}: Format could not fix > [${error.ruleId}] ${error.detail}"
                 }
                 logger.log(LogLevel.QUIET, msg)
                 fixes.add(msg)
+                if (corrected) {
+                    fileFixed = true
+                } else {
+                    notFixedFiles++
+                }
             }
-            if (!formattedText.contentEquals(sourceText)) {
-                logger.log(LogLevel.QUIET, "${file.path}: Format fixed")
-                file.writeText(formattedText)
+
+            if (fileFixed) {
+                file.writeText(fixedContent)
             }
         }
 
@@ -61,6 +67,9 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
                 false -> fixes.joinToString("\n")
             },
         )
+        if (notFixedFiles > 0) {
+            logger.warn("Format failed to autocorrect $notFixedFiles file(s)")
+        }
     }
 }
 

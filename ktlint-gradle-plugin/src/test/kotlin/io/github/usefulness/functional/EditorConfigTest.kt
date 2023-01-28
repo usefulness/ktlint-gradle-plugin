@@ -163,7 +163,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
     }
 
     @Test
-    fun `editorconfig changes do not clear ktlint caches for format task re-runs`() {
+    fun `editorconfig changes clear ktlint caches on format task re-runs`() {
         projectRoot.resolve(".editorconfig") {
             writeText(editorConfig)
         }
@@ -188,6 +188,21 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("formatKotlin", "--info").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).doesNotContain("Format could not fix")
+            assertThat(output).contains("resetting KtLint caches")
+        }
+
+        projectRoot.resolve(".editorconfig") {
+            writeText(
+                // language=editorconfig
+                """
+                    [*.{kt,kts}]
+                    indent_size = 2
+                """.trimIndent(),
+            )
+        }
+        build("formatKotlin", "--info").apply {
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Format could not fix")
             assertThat(output).contains("resetting KtLint caches")
         }
     }
