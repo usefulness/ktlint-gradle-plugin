@@ -9,12 +9,6 @@ plugins {
 
 description = "Lint and formatting for Kotlin using ktlint with configuration-free setup on JVM and Android projects"
 
-object Versions {
-    const val androidTools = "7.4.0"
-    const val junit = "5.9.1"
-    const val ktlint = "0.48.2"
-}
-
 configurations {
     register("testRuntimeDependencies") {
         extendsFrom(compileOnly.get())
@@ -34,13 +28,13 @@ configurations {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin")
-    compileOnly("com.android.tools.build:gradle:${Versions.androidTools}")
-    compileOnly("com.pinterest.ktlint:ktlint-core:${Versions.ktlint}")
+    compileOnly(libs.kotlin.gradle)
+    compileOnly(libs.agp.gradle)
+    compileOnly(libs.ktlint.core)
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
-    testImplementation("commons-io:commons-io:2.11.0")
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.commons.io)
 }
 
 kotlin {
@@ -58,7 +52,7 @@ tasks {
             propertiesFile.writeText(
                 """
                 version = $projectVersion
-                ktlint_version = ${Versions.ktlint}
+                ktlint_version = ${libs.versions.maven.ktlint.get()}
                 
                 """.trimIndent(),
             )
