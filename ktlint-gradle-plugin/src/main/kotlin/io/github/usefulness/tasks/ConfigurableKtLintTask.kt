@@ -4,7 +4,6 @@ import groovy.lang.Closure
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.ProjectLayout
@@ -36,26 +35,26 @@ abstract class ConfigurableKtLintTask(
 ) : DefaultTask(), PatternFilterable {
 
     @Input
-    val experimentalRules: Property<Boolean> = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
+    val experimentalRules = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
 
     @Input
-    val disabledRules: ListProperty<String> = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES.toList())
+    val disabledRules = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES.toList())
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:Incremental
-    internal val editorconfigFiles: FileCollection = objectFactory.fileCollection().apply {
+    internal val editorconfigFiles = objectFactory.fileCollection().apply {
         from(projectLayout.findApplicableEditorConfigFiles().toList())
     }
 
     @Input
-    val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
+    val workerMaxHeapSize = objectFactory.property(default = "256m")
 
     @Classpath
-    val ktlintClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
+    val ktlintClasspath = objectFactory.fileCollection()
 
     @Classpath
-    val ruleSetsClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
+    val ruleSetsClasspath = objectFactory.fileCollection()
 
     private val allSourceFiles = project.objects.fileCollection()
 
@@ -115,11 +114,7 @@ internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Ma
     }
 
 internal fun ConfigurableKtLintTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
-    if (inputChanges.isIncremental) {
-        inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
-    } else {
-        emptyList()
-    }
+    inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
 
 internal fun ConfigurableKtLintTask.getChangedSources(inputChanges: InputChanges) =
     if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {

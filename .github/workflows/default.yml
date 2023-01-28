@@ -44,7 +44,7 @@ jobs:
 
       - run: ./gradlew assemble
 
-      - run: ./gradlew check -x detekt
+      - run: ./gradlew check
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}

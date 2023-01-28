@@ -5,9 +5,7 @@ import io.github.usefulness.functional.utils.editorConfig
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
@@ -79,7 +77,7 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         build("ktLint").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":ktLint")?.outcome)
+            assertThat(task(":ktLint")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -100,7 +98,7 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         build("minimalCustomTask").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":minimalCustomTask")?.outcome)
+            assertThat(task(":minimalCustomTask")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -128,7 +126,7 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         build("customizedLintTask").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":customizedLintTask")?.outcome)
+            assertThat(task(":customizedLintTask")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -154,7 +152,7 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         build("customizedFormatTask").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":customizedFormatTask")?.outcome)
+            assertThat(task(":customizedFormatTask")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -188,14 +186,14 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("reportsEmpty").apply {
-            assertEquals(TaskOutcome.FAILED, task(":reportsEmpty")?.outcome)
-            assertTrue(output.contains("[final-newline] File must end with a newline (\\n)"))
-            assertArrayEquals(emptyArray<String>(), projectRoot.resolve("build/reports/ktlint").list().orEmpty())
+            assertThat(task(":reportsEmpty")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("[final-newline] File must end with a newline (\\n)")
+            assertThat(projectRoot.resolve("build/reports/ktlint")).doesNotExist()
         }
         buildAndFail("reportsNotConfigured").apply {
-            assertEquals(TaskOutcome.FAILED, task(":reportsNotConfigured")?.outcome)
-            assertTrue(output.contains("[final-newline] File must end with a newline (\\n)"))
-            assertArrayEquals(emptyArray<String>(), projectRoot.resolve("build/reports/ktlint").list().orEmpty())
+            assertThat(task(":reportsNotConfigured")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("[final-newline] File must end with a newline (\\n)")
+            assertThat(projectRoot.resolve("build/reports/ktlint")).doesNotExist()
         }
     }
 
@@ -221,16 +219,16 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         build("reportsEmpty").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":reportsEmpty")?.outcome)
+            assertThat(task(":reportsEmpty")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build("reportsEmpty").apply {
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":reportsEmpty")?.outcome)
+            assertThat(TaskOutcome.UP_TO_DATE).isEqualTo(task(":reportsEmpty")?.outcome)
         }
         build("reportsNotConfigured").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":reportsNotConfigured")?.outcome)
+            assertThat(task(":reportsNotConfigured")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build("reportsNotConfigured").apply {
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":reportsNotConfigured")?.outcome)
+            assertThat(TaskOutcome.UP_TO_DATE).isEqualTo(task(":reportsNotConfigured")?.outcome)
         }
     }
 
@@ -253,18 +251,18 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
         }
 
         build("ktLintWithReports").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":ktLintWithReports")?.outcome)
-            assertTrue(projectRoot.resolve("build/lint-report.txt").readText().isEmpty())
+            assertThat(task(":ktLintWithReports")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(projectRoot.resolve("build/lint-report.txt")).isEmpty()
         }
         build("ktLintWithReports").apply {
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":ktLintWithReports")?.outcome)
+            assertThat(TaskOutcome.UP_TO_DATE).isEqualTo(task(":ktLintWithReports")?.outcome)
         }
 
         projectRoot.resolve("build/lint-report.txt").appendText("CHANGED REPORT FILE")
 
         build("ktLintWithReports").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":ktLintWithReports")?.outcome)
-            assertTrue(projectRoot.resolve("build/lint-report.txt").readText().isEmpty())
+            assertThat(task(":ktLintWithReports")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(projectRoot.resolve("build/lint-report.txt")).isEmpty()
         }
     }
 }

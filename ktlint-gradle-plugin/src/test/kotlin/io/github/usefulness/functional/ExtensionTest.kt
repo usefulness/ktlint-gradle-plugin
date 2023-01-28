@@ -4,8 +4,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -54,7 +53,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -75,10 +74,10 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         val report = projectRoot.resolve("build/reports/ktlint/main-lint.html")
-        assertTrue(report.readText().isNotEmpty())
+        assertThat(report).isNotEmpty()
     }
 
     @Test
@@ -107,7 +106,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -142,7 +141,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -173,15 +172,13 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin").apply {
-            assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome) { "should fail due to incompatibility" }
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             val expectedMessage = "Caused by: java.lang.NoSuchMethodError: 'com.pinterest.ktlint.core.api.EditorConfigOverride"
-            assertTrue(output.contains(expectedMessage)) { "should explain the incompatibility" }
+            assertThat(output).contains(expectedMessage)
         }
         // remove `--configuration-cache-problems=warn` when upgrading to Gradle 7.6 https://github.com/gradle/gradle/issues/17470
         build("dependencies", "--configuration", "ktlint", "--configuration-cache-problems=warn").apply {
-            assertTrue(output.contains("com.pinterest:ktlint:0.46.0")) {
-                "should include overridden ktlin version in `ktlint` configuration"
-            }
+            assertThat(output).contains("com.pinterest:ktlint:0.46.0")
         }
     }
 }

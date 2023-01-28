@@ -5,13 +5,12 @@ import io.github.usefulness.support.ReporterType
 import io.github.usefulness.tasks.lint.LintWorkerAction
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.InputChanges
+import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
@@ -27,10 +26,10 @@ open class LintTask @Inject constructor(
 ) {
 
     @OutputFiles
-    val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
+    val reports = objectFactory.mapProperty<String, File>(default = emptyMap())
 
     @Input
-    val ignoreFailures: Property<Boolean> = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
+    val ignoreFailures = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
 
     @TaskAction
     fun run(inputChanges: InputChanges) {
@@ -50,13 +49,14 @@ open class LintTask @Inject constructor(
             p.changedEditorConfigFiles.from(getChangedEditorconfigFiles(inputChanges))
         }
 
-        try {
-            workQueue.await()
-        } catch (e: Throwable) {
-            if (!ignoreFailures.get()) {
-                throw e
+        runCatching { workQueue.await() }
+            .onFailure { failure ->
+                when {
+                    ignoreFailures.get() -> Unit
+                    failure is WorkerExecutionException -> throw failure.cause ?: failure
+                    else -> throw failure
+                }
             }
-        }
     }
 
     private fun getReports() = reports.get()

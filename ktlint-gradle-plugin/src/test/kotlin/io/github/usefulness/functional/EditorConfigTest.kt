@@ -5,9 +5,7 @@ import io.github.usefulness.functional.utils.editorConfig
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
@@ -54,7 +52,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -74,7 +72,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -102,10 +100,23 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
 
             writeText(content)
         }
-
         buildAndFail("lintKotlin").apply {
-            assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome)
-            assertTrue(output.contains("[indent] Unexpected indentation (2) (should be 6)"))
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("[indent] Unexpected indentation (2) (should be 6)")
+        }
+
+        projectRoot.resolve(".editorconfig") {
+            appendText(
+                // language=editorconfig
+                """
+                    [*.{kt,kts}]
+                    indent_size = 2
+                """.trimIndent(),
+            )
+        }
+        buildAndFail("lintKotlin").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).doesNotContain("[indent] Unexpected indentation (2) (should be 6)")
         }
     }
 
@@ -125,34 +136,34 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass("DifferentClassName"))
         }
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
-            assertFalse(output.contains("resetting KtLint caches"))
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).doesNotContain("resetting KtLint caches")
         }
 
         projectRoot.resolve(".editorconfig") {
             writeText(editorConfig)
         }
         buildAndFail("lintKotlin", "--info").apply {
-            assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome)
-            assertTrue(output.contains("[filename] File 'FileName.kt' contains a single top level declaration"))
-            assertTrue(output.contains("resetting KtLint caches"))
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("[filename] File 'FileName.kt' contains a single top level declaration")
+            assertThat(output).contains("resetting KtLint caches")
         }
 
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
             writeText(kotlinClass("FileName"))
         }
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlinMain")?.outcome)
-            assertFalse(output.contains("resetting KtLint caches"))
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).doesNotContain("resetting KtLint caches")
         }
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":lintKotlinMain")?.outcome)
-            assertFalse(output.contains("resetting KtLint caches"))
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(output).doesNotContain("resetting KtLint caches")
         }
     }
 
     @Test
-    fun `editorconfig changes do not clear ktlint caches for format task re-runs`() {
+    fun `editorconfig changes clear ktlint caches on format task re-runs`() {
         projectRoot.resolve(".editorconfig") {
             writeText(editorConfig)
         }
@@ -161,8 +172,8 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass("DifferentClassName"))
         }
         build("formatKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":formatKotlinMain")?.outcome)
-            assertTrue(output.contains("Format could not fix > [filename] File 'FileName.kt' contains a single top level declaration"))
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Format could not fix > [filename] File 'FileName.kt' contains a single top level declaration")
         }
 
         projectRoot.resolve(".editorconfig") {
@@ -175,9 +186,24 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             )
         }
         build("formatKotlin", "--info").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":formatKotlinMain")?.outcome)
-            assertFalse(output.contains("Format could not fix"))
-            assertFalse(output.contains("resetting KtLint caches"))
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).doesNotContain("Format could not fix")
+            assertThat(output).contains("resetting KtLint caches")
+        }
+
+        projectRoot.resolve(".editorconfig") {
+            writeText(
+                // language=editorconfig
+                """
+                    [*.{kt,kts}]
+                    indent_size = 2
+                """.trimIndent(),
+            )
+        }
+        build("formatKotlin", "--info").apply {
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Format could not fix")
+            assertThat(output).contains("resetting KtLint caches")
         }
     }
 }

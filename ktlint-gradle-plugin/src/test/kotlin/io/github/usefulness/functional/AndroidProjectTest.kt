@@ -4,7 +4,7 @@ import io.github.usefulness.functional.utils.androidManifest
 import io.github.usefulness.functional.utils.kotlinClass
 import org.gradle.testkit.runner.TaskOutcome
 import io.github.usefulness.functional.utils.resolve
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -84,11 +84,11 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
     @Test
     fun runsOnAndroidProject() {
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinMain")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinDebug")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinTest")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlinFlavorOne")?.outcome)
-            assertEquals(TaskOutcome.SUCCESS, task(":androidproject:lintKotlin")?.outcome)
+            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinMain")?.outcome)
+            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinDebug")?.outcome)
+            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinTest")?.outcome)
+            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinFlavorOne")?.outcome)
+            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlin")?.outcome)
         }
     }
 

@@ -13,7 +13,7 @@ import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.LintTask
 import java.io.File
 
-class KtlinGradlePlugin : Plugin<Project> {
+class KtlintGradlePlugin : Plugin<Project> {
 
     companion object {
         private const val KTLINT_CONFIGURATION_NAME = "ktlint"
@@ -46,7 +46,6 @@ class KtlinGradlePlugin : Plugin<Project> {
                 sourceResolver.applyToAll(this) { id, resolvedSources ->
                     val lintTaskPerSourceSet = tasks.register("lintKotlin${id.capitalize()}", LintTask::class.java) { lintTask ->
                         lintTask.source(resolvedSources)
-                        lintTask.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
                         lintTask.reports.set(
                             provider {
                                 pluginExtension.reporters.associateWith { reporterId ->
@@ -55,6 +54,7 @@ class KtlinGradlePlugin : Plugin<Project> {
                                 }
                             },
                         )
+                        lintTask.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
                         lintTask.experimentalRules.set(provider { pluginExtension.experimentalRules })
                         lintTask.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
                     }

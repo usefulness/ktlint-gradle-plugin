@@ -3,9 +3,8 @@ package io.github.usefulness.functional
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
+import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
@@ -65,15 +64,15 @@ class ReportersTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.SUCCESS, task(":lintKotlin")?.outcome)
-            assertEquals(expectedEmptyPlain(), reportContent("/main-lint.txt"))
-            assertEquals(expectedEmptyCheckstyle(), reportContent("main-lint.xml"))
-            assertEquals(expectedEmptyHtml(), reportContent("/main-lint.html"))
-            assertEquals(expectedEmptyJson(), reportContent("/main-lint.json"))
-            assertTrue(reportContent("/main-lint.sarif.json").isNotBlank())
+            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(reportFile("/main-lint.txt")).content().isEqualTo(expectedEmptyPlain())
+            assertThat(reportFile("main-lint.xml")).content().isEqualTo(expectedEmptyCheckstyle())
+            assertThat(reportFile("/main-lint.html")).content().isEqualTo(expectedEmptyHtml())
+            assertThat(reportFile("/main-lint.json")).content().isEqualTo(expectedEmptyJson())
+            assertThat(reportFile("/main-lint.sarif.json")).content().isNotBlank()
         }
         build("lintKotlin").apply {
-            assertEquals(TaskOutcome.UP_TO_DATE, task(":lintKotlin")?.outcome)
+            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
 
         projectRoot.resolve("src/main/kotlin/FirstClass.kt") {
@@ -88,12 +87,12 @@ class ReportersTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin").apply {
-            assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome)
-            assertEquals(expectedFailedPlain(), reportContent("/main-lint.txt"))
-            assertEquals(expectedFailedCheckstyle(), reportContent("/main-lint.xml"))
-            assertEquals(expectedFailedHtml(), reportContent("/main-lint.html"))
-            assertEquals(expectedFailedJson(), reportContent("/main-lint.json"))
-            assertTrue(reportContent("/main-lint.sarif.json").isNotBlank())
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(reportFile("/main-lint.txt")).content().isEqualTo(expectedFailedPlain())
+            assertThat(reportFile("/main-lint.xml")).content().isEqualTo(expectedFailedCheckstyle())
+            assertThat(reportFile("/main-lint.html")).content().isEqualTo(expectedFailedHtml())
+            assertThat(reportFile("/main-lint.json")).content().isEqualTo(expectedFailedJson())
+            assertThat(reportFile("/main-lint.sarif.json")).content().isNotBlank()
         }
     }
 
@@ -114,16 +113,16 @@ class ReportersTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            val reportContent = projectRoot.resolve("build/reports/ktlint/main-lint.sarif.json").readText()
-            assertTrue(reportContent.contains(""""version": "0.48.1""""))
-            assertTrue(reportContent.contains(""""semanticVersion": "0.48.1""""))
+            val reportContent = projectRoot.resolve("build/reports/ktlint/main-lint.sarif.json")
+            assertThat(reportContent).content().contains(""""version": "0.48.1"""")
+            assertThat(reportContent).content().contains(""""semanticVersion": "0.48.1"""")
         }
     }
 
-    private fun reportContent(reportName: String) = projectRoot.resolve("build/reports/ktlint/$reportName").readText()
+    private fun reportFile(reportName: String) = projectRoot.resolve("build/reports/ktlint/$reportName")
 }
 
-private fun expectedEmptyPlain() = ""
+private fun expectedEmptyPlain() = "".trimIndent()
 
 // language=xml
 private fun expectedEmptyCheckstyle() = """
