@@ -115,11 +115,7 @@ internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Ma
     }
 
 internal fun ConfigurableKtLintTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
-    if (inputChanges.isIncremental) {
-        inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
-    } else {
-        emptyList()
-    }
+    inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
 
 internal fun ConfigurableKtLintTask.getChangedSources(inputChanges: InputChanges) =
     if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {

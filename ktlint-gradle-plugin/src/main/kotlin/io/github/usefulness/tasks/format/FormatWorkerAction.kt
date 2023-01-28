@@ -1,16 +1,15 @@
 package io.github.usefulness.tasks.format
 
 import com.pinterest.ktlint.core.Code
+import io.github.usefulness.support.KtLintParams
+import io.github.usefulness.support.createKtlintEngine
+import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
+import io.github.usefulness.tasks.FormatTask
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
-import io.github.usefulness.support.PluginError
-import io.github.usefulness.support.KtLintParams
-import io.github.usefulness.support.createKtlintEngine
-import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
-import io.github.usefulness.tasks.FormatTask
 import java.io.File
 
 abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
@@ -31,33 +30,29 @@ abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
         logger.info("$name - executing against ${files.count()} file(s)")
 
         val fixes = mutableListOf<String>()
-        try {
-            files.sorted().forEach { file ->
-                val sourceText = file.readText()
-                val relativePath = file.toRelativeString(projectDirectory)
+        files.sorted().forEach { file ->
+            val sourceText = file.readText()
+            val relativePath = file.toRelativeString(projectDirectory)
 
-                logger.debug("$name checking format: $relativePath")
+            logger.debug("$name checking format: $relativePath")
 
-                if (file.extension !in supportedExtensions) {
-                    logger.log(LogLevel.DEBUG, "$name ignoring non Kotlin file: $relativePath")
-                    return@forEach
-                }
-
-                val formattedText = ktLintEngine.format(Code.CodeFile(file)) { error, corrected ->
-                    val msg = when (corrected) {
-                        true -> "${file.path}:${error.line}:${error.col}: Format fixed > [${error.ruleId}] ${error.detail}"
-                        false -> "${file.path}:${error.line}:${error.col}: Format could not fix > [${error.ruleId}] ${error.detail}"
-                    }
-                    logger.log(LogLevel.QUIET, msg)
-                    fixes.add(msg)
-                }
-                if (!formattedText.contentEquals(sourceText)) {
-                    logger.log(LogLevel.QUIET, "${file.path}: Format fixed")
-                    file.writeText(formattedText)
-                }
+            if (file.extension !in supportedExtensions) {
+                logger.log(LogLevel.DEBUG, "$name ignoring non Kotlin file: $relativePath")
+                return@forEach
             }
-        } catch (t: Throwable) {
-            throw PluginError.WorkerError("format worker execution error", t)
+
+            val formattedText = ktLintEngine.format(Code.CodeFile(file)) { error, corrected ->
+                val msg = when (corrected) {
+                    true -> "${file.path}:${error.line}:${error.col}: Format fixed > [${error.ruleId}] ${error.detail}"
+                    false -> "${file.path}:${error.line}:${error.col}: Format could not fix > [${error.ruleId}] ${error.detail}"
+                }
+                logger.log(LogLevel.QUIET, msg)
+                fixes.add(msg)
+            }
+            if (!formattedText.contentEquals(sourceText)) {
+                logger.log(LogLevel.QUIET, "${file.path}: Format fixed")
+                file.writeText(formattedText)
+            }
         }
 
         output?.writeText(

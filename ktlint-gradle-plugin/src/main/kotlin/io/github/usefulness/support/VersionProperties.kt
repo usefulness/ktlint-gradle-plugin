@@ -9,7 +9,7 @@ internal class VersionProperties : Properties() {
         load(this.javaClass.getResourceAsStream("/version.properties"))
     }
 
-    fun pluginVersion(): String = getProperty("version")
+    fun pluginVersion(): String = getProperty("kltint_gradle_plugin_version")
 
     fun ktlintVersion(): String = getProperty("ktlint_version")
 }

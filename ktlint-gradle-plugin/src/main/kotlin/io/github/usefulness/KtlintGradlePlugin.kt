@@ -13,7 +13,7 @@ import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.LintTask
 import java.io.File
 
-class KtlinGradlePlugin : Plugin<Project> {
+class KtlintGradlePlugin : Plugin<Project> {
 
     companion object {
         private const val KTLINT_CONFIGURATION_NAME = "ktlint"

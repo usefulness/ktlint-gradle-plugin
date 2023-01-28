@@ -5,4 +5,9 @@ import java.io.Serializable
 data class KtLintParams(
     val experimentalRules: Boolean,
     val disabledRules: List<String>,
-) : Serializable
+) : Serializable {
+
+    companion object {
+        const val serialVersionUID = 1L
+    }
+}

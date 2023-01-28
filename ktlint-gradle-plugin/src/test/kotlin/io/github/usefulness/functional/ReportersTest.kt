@@ -123,7 +123,7 @@ class ReportersTest : WithGradleTest.Kotlin() {
     private fun reportContent(reportName: String) = projectRoot.resolve("build/reports/ktlint/$reportName").readText()
 }
 
-private fun expectedEmptyPlain() = ""
+private fun expectedEmptyPlain() = "".trimIndent()
 
 // language=xml
 private fun expectedEmptyCheckstyle() = """

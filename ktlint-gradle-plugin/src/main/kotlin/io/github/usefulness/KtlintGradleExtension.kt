@@ -13,7 +13,7 @@ open class KtlintGradleExtension {
 
     var ignoreFailures = DEFAULT_IGNORE_FAILURES
 
-    var reporters = arrayOf(DEFAULT_REPORTER)
+    var reporters = emptyArray<String>()
 
     var experimentalRules = DEFAULT_EXPERIMENTAL_RULES
 

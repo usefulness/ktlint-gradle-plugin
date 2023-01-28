@@ -1,0 +1,91 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapperKt
+
+plugins {
+    id("java-gradle-plugin")
+    id("com.starter.publishing")
+    alias(libs.plugins.starter.library.kotlin)
+}
+
+description = "Lint and formatting for Kotlin using ktlint with configuration-free setup on JVM and Android projects"
+
+configurations {
+    register("testRuntimeDependencies") {
+        extendsFrom(compileOnly)
+        attributes {
+            // KGP publishes multiple variants https://kotlinlang.org/docs/whatsnew17.html#support-for-gradle-plugin-variants
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME))
+            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY))
+        }
+    }
+    configureEach {
+        def kotlinVersion = KotlinPluginWrapperKt.getKotlinPluginVersion(project)
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin")) {
+                useVersion(kotlinVersion)
+            }
+        }
+    }
+}
+
+dependencies {
+    compileOnly(libs.kotlin.gradle)
+    compileOnly(libs.agp.gradle)
+    compileOnly(libs.ktlint.core)
+
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.commons.io)
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+
+tasks.register("generateVersionProperties") {
+    def projectVersion = version
+    def ktlintVersion = libs.versions.maven.ktlint.get()
+    def propertiesFile = new File(sourceSets.main.output.resourcesDir, "version.properties")
+    inputs.property("projectVersion", projectVersion)
+    outputs.file(propertiesFile)
+
+    doLast {
+        propertiesFile.write """
+            kltint_gradle_plugin_version = $projectVersion
+            ktlint_version = $ktlintVersion
+            
+            """.stripIndent()
+    }
+}
+
+tasks.named("processResources") {
+    dependsOn("generateVersionProperties")
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        apiVersion = "1.4"
+        languageVersion = "1.4"
+    }
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+// Required to put the Kotlin plugin on the classpath for the functional test suite
+tasks.withType(PluginUnderTestMetadata).configureEach {
+    pluginClasspath.from(configurations.testRuntimeDependencies)
+}
+
+gradlePlugin {
+    plugins {
+        create("ktlintPlugin") {
+            id = "io.github.usefulness.ktlint-gradle-plugin"
+            displayName = "ktlint Gradle plugin"
+            description = project.description
+            tags.addAll(["kotlin", "ktlint", "lint", "format", "style", "android"])
+            implementationClass = "io.github.usefulness.KtlintGradlePlugin"
+        }
+    }
+}

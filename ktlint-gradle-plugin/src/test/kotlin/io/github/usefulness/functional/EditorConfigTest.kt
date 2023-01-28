@@ -102,10 +102,23 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
 
             writeText(content)
         }
-
         buildAndFail("lintKotlin").apply {
             assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome)
             assertTrue(output.contains("[indent] Unexpected indentation (2) (should be 6)"))
+        }
+
+        projectRoot.resolve(".editorconfig") {
+            appendText(
+                // language=editorconfig
+                """
+                    [*.{kt,kts}]
+                    indent_size = 2
+                """.trimIndent(),
+            )
+        }
+        buildAndFail("lintKotlin").apply {
+            assertEquals(TaskOutcome.FAILED, task(":lintKotlinMain")?.outcome)
+            assertTrue(!output.contains("[indent] Unexpected indentation (2) (should be 6)"))
         }
     }
 
@@ -177,7 +190,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("formatKotlin", "--info").apply {
             assertEquals(TaskOutcome.SUCCESS, task(":formatKotlinMain")?.outcome)
             assertFalse(output.contains("Format could not fix"))
-            assertFalse(output.contains("resetting KtLint caches"))
+            assertTrue(output.contains("resetting KtLint caches"))
         }
     }
 }

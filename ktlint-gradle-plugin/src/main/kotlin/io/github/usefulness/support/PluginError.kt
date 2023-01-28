@@ -10,9 +10,4 @@ internal sealed class PluginError(
     class LintingError(
         message: String,
     ) : PluginError(message)
-
-    class WorkerError(
-        message: String,
-        cause: Throwable,
-    ) : PluginError(message, cause)
 }

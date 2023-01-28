@@ -37,37 +37,33 @@ abstract class LintWorkerAction : WorkAction<LintWorkerParameters> {
 
         var hasError = false
 
-        try {
-            reporters.onEach { (_, reporter) -> reporter.beforeAll() }
-            files.sorted().forEach { file ->
-                val relativePath = file.toRelativeString(projectDirectory)
-                reporters.onEach { (_, reporter) -> reporter.before(relativePath) }
-                logger.debug("$name linting: $relativePath")
+        reporters.onEach { (_, reporter) -> reporter.beforeAll() }
+        files.sorted().forEach { file ->
+            val relativePath = file.toRelativeString(projectDirectory)
+            reporters.onEach { (_, reporter) -> reporter.before(relativePath) }
+            logger.debug("$name linting: $relativePath")
 
-                if (file.extension !in supportedExtensions) {
-                    logger.debug("$name ignoring non Kotlin file: $relativePath")
-                    return@forEach
-                }
-
-                ktLintEngine.lint(Code.CodeFile(file)) { error ->
-                    hasError = true
-                    reporters.onEach { (type, reporter) ->
-                        // some reporters want relative paths, some want absolute
-                        val filePath = reporterPathFor(
-                            reporterType = type,
-                            output = file,
-                            relativeRoot = projectDirectory,
-                        )
-                        reporter.onLintError(filePath, error, false)
-                    }
-                    logger.quiet("${file.path}:${error.line}:${error.col}: Lint error > [${error.ruleId}] ${error.detail}")
-                }
-                reporters.onEach { (_, reporter) -> reporter.after(relativePath) }
+            if (file.extension !in supportedExtensions) {
+                logger.debug("$name ignoring non Kotlin file: $relativePath")
+                return@forEach
             }
-            reporters.onEach { (_, reporter) -> reporter.afterAll() }
-        } catch (t: Throwable) {
-            throw PluginError.WorkerError("lint worker execution error", t)
+
+            ktLintEngine.lint(Code.CodeFile(file)) { error ->
+                hasError = true
+                reporters.onEach { (type, reporter) ->
+                    // some reporters want relative paths, some want absolute
+                    val filePath = reporterPathFor(
+                        reporterType = type,
+                        output = file,
+                        relativeRoot = projectDirectory,
+                    )
+                    reporter.onLintError(filePath, error, false)
+                }
+                logger.quiet("${file.path}:${error.line}:${error.col}: Lint error > [${error.ruleId}] ${error.detail}")
+            }
+            reporters.onEach { (_, reporter) -> reporter.after(relativePath) }
         }
+        reporters.onEach { (_, reporter) -> reporter.afterAll() }
 
         if (hasError) {
             throw PluginError.LintingError("$name source failed lint check")
