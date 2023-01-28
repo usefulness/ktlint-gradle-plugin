@@ -1,14 +1,10 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-
 plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.jmailen.kotlinter)
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.osacky.doctor)
 }
 
-dependencies {
-    implementation(libs.kotlin.gradle)
-}
 
 kotlin {
     jvmToolchain(17)
@@ -18,7 +14,7 @@ def targetJavaVersion = JavaVersion.VERSION_11
 tasks.withType(JavaCompile).configureEach {
     options.release.set(targetJavaVersion.majorVersion.toInteger())
 }
-tasks.withType(KotlinCompile).configureEach {
+tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinCompile).configureEach {
     kotlinOptions.jvmTarget = targetJavaVersion
 }
 

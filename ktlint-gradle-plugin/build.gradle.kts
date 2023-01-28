@@ -44,6 +44,7 @@ kotlin {
 tasks {
     val generateVersionProperties = register("generateVersionProperties") {
         val projectVersion = version
+        val ktlintVersion = libs.versions.maven.ktlint.get()
         val propertiesFile = File(sourceSets.main.get().output.resourcesDir, "version.properties")
         inputs.property("projectVersion", projectVersion)
         outputs.file(propertiesFile)
@@ -52,7 +53,7 @@ tasks {
             propertiesFile.writeText(
                 """
                 version = $projectVersion
-                ktlint_version = ${libs.versions.maven.ktlint.get()}
+                ktlint_version = $ktlintVersion
                 
                 """.trimIndent(),
             )

@@ -27,28 +27,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Write Gradle build properties to `~/.gradle/gradle.properties`
+        run: |
+          mkdir -p ~/.gradle
+          printf "org.gradle.jvmargs=-Xmx3G -XX:+UseParallelGC\n" >> ~/.gradle/gradle.properties
+        shell: bash
+
+      - uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: 17
 
-      - name: Gradle wrapper validation
-        uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/wrapper-validation-action@v1
 
-      - name: ./gradlew assemble
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assemble
+      - uses: gradle/gradle-build-action@v2
 
-      - name: ./gradlew check
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: check -x detekt
+      - run: ./gradlew assemble
 
-      - name: Upload test results
+      - run: ./gradlew check -x detekt
+
+      - uses: actions/upload-artifact@v3
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
         with:
           name: test-results-${{ matrix.os }}
           path: "${{ github.workspace }}/**/build/reports/tests"
@@ -68,8 +67,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Write Gradle build properties to `~/.gradle/gradle.properties`
+        run: |
+          mkdir -p ~/.gradle
+          printf "org.gradle.jvmargs=-Xmx3G -XX:+UseParallelGC\n" >> ~/.gradle/gradle.properties
+        shell: bash
+
+      - uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
@@ -78,7 +82,7 @@ jobs:
         with:
           build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin
+          arguments: formatKotlin lintKotlin --stacktrace
 
       - name: Assert fixes
         run: |
@@ -130,8 +134,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Write Gradle build properties to `~/.gradle/gradle.properties`
+        run: |
+          mkdir -p ~/.gradle
+          printf "org.gradle.jvmargs=-Xmx3G -XX:+UseParallelGC\n" >> ~/.gradle/gradle.properties
+        shell: bash
+
+      - uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
