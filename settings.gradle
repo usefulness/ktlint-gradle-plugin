@@ -29,6 +29,6 @@ dependencyResolutionManagement {
 
 
 rootProject.name = "io.github.usefulness"
-include ":ktlint-gradle-plugin"
+include "ktlint-gradle-plugin"
 
 includeBuild("gradle/plugins")

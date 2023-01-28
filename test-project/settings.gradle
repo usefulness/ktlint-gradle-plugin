@@ -3,9 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         google()
     }
-    plugins {
-        id("org.jetbrains.kotlin.jvm") version "1.8.0"
-    }
 }
 
 plugins {
