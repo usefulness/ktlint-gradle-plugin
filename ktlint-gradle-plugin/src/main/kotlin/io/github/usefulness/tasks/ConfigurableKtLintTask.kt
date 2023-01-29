@@ -27,18 +27,19 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import io.github.usefulness.support.KtLintParams
 import io.github.usefulness.support.findApplicableEditorConfigFiles
+import org.gradle.api.file.ConfigurableFileCollection
 import java.util.concurrent.Callable
 
-abstract class ConfigurableKtLintTask(
+public abstract class ConfigurableKtLintTask(
     projectLayout: ProjectLayout,
     objectFactory: ObjectFactory,
 ) : DefaultTask(), PatternFilterable {
 
     @Input
-    val experimentalRules = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
+    public val experimentalRules: Property<Boolean> = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
 
     @Input
-    val disabledRules = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES.toList())
+    public val disabledRules: ListProperty<String> = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES.toList())
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -48,13 +49,13 @@ abstract class ConfigurableKtLintTask(
     }
 
     @Input
-    val workerMaxHeapSize = objectFactory.property(default = "256m")
+    public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
 
     @Classpath
-    val ktlintClasspath = objectFactory.fileCollection()
+    public val ktlintClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
 
     @Classpath
-    val ruleSetsClasspath = objectFactory.fileCollection()
+    public val ruleSetsClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
 
     private val allSourceFiles = project.objects.fileCollection()
 
@@ -65,17 +66,17 @@ abstract class ConfigurableKtLintTask(
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
     @IgnoreEmptyDirectories
-    val source: FileCollection = objectFactory.fileCollection()
+    public val source: FileCollection = objectFactory.fileCollection()
         .from(Callable { allSourceFiles.asFileTree.matching(patternFilterable) })
 
-    fun source(vararg sources: Any?) = also { allSourceFiles.setFrom(*sources) }
+    public fun source(vararg sources: Any?): ConfigurableKtLintTask = also { allSourceFiles.setFrom(*sources) }
 
-    fun setSource(source: Any) {
+    public fun setSource(source: Any) {
         allSourceFiles.setFrom(source)
     }
 
     @Internal
-    protected fun getKtLintParams(): KtLintParams = KtLintParams(
+    internal fun getKtLintParams(): KtLintParams = KtLintParams(
         experimentalRules = experimentalRules.get(),
         disabledRules = disabledRules.get(),
     )
@@ -86,16 +87,16 @@ abstract class ConfigurableKtLintTask(
     @Internal
     override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
 
-    override fun setIncludes(includes: MutableIterable<String>) = also { patternFilterable.setIncludes(includes) }
-    override fun setExcludes(excludes: MutableIterable<String>) = also { patternFilterable.setExcludes(excludes) }
-    override fun include(vararg includes: String?) = also { patternFilterable.include(*includes) }
-    override fun include(includes: MutableIterable<String>) = also { patternFilterable.include(includes) }
-    override fun include(includeSpec: Spec<FileTreeElement>) = also { patternFilterable.include(includeSpec) }
-    override fun include(includeSpec: Closure<*>) = also { patternFilterable.include(includeSpec) }
-    override fun exclude(vararg excludes: String?) = also { patternFilterable.exclude(*excludes) }
-    override fun exclude(excludes: MutableIterable<String>) = also { patternFilterable.exclude(excludes) }
-    override fun exclude(excludeSpec: Spec<FileTreeElement>) = also { patternFilterable.exclude(excludeSpec) }
-    override fun exclude(excludeSpec: Closure<*>) = also { patternFilterable.exclude(excludeSpec) }
+    override fun setIncludes(includes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.setIncludes(includes) }
+    override fun setExcludes(excludes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.setExcludes(excludes) }
+    override fun include(vararg includes: String?): ConfigurableKtLintTask = also { patternFilterable.include(*includes) }
+    override fun include(includes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.include(includes) }
+    override fun include(includeSpec: Spec<FileTreeElement>): ConfigurableKtLintTask = also { patternFilterable.include(includeSpec) }
+    override fun include(includeSpec: Closure<*>): ConfigurableKtLintTask = also { patternFilterable.include(includeSpec) }
+    override fun exclude(vararg excludes: String?): ConfigurableKtLintTask = also { patternFilterable.exclude(*excludes) }
+    override fun exclude(excludes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.exclude(excludes) }
+    override fun exclude(excludeSpec: Spec<FileTreeElement>): ConfigurableKtLintTask = also { patternFilterable.exclude(excludeSpec) }
+    override fun exclude(excludeSpec: Closure<*>): ConfigurableKtLintTask = also { patternFilterable.exclude(excludeSpec) }
 }
 
 internal inline fun <reified T> ObjectFactory.property(default: T? = null): Property<T> =

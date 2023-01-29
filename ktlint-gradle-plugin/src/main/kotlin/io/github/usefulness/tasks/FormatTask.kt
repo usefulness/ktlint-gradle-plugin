@@ -2,6 +2,7 @@ package io.github.usefulness.tasks
 
 import io.github.usefulness.tasks.format.FormatWorkerAction
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
@@ -11,7 +12,7 @@ import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
-open class FormatTask @Inject constructor(
+public open class FormatTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
@@ -22,14 +23,14 @@ open class FormatTask @Inject constructor(
 
     @OutputFile
     @Optional
-    val report = objectFactory.fileProperty()
+    public val report: RegularFileProperty = objectFactory.fileProperty()
 
     init {
         outputs.upToDateWhen { false }
     }
 
     @TaskAction
-    fun run(inputChanges: InputChanges) {
+    public fun run(inputChanges: InputChanges) {
         val workQueue = workerExecutor.processIsolation { spec ->
             spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->

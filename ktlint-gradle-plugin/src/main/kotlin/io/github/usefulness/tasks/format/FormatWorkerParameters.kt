@@ -6,7 +6,7 @@ import org.gradle.api.provider.Property
 import org.gradle.workers.WorkParameters
 import io.github.usefulness.support.KtLintParams
 
-interface FormatWorkerParameters : WorkParameters {
+internal interface FormatWorkerParameters : WorkParameters {
     val name: Property<String>
     val changedEditorConfigFiles: ConfigurableFileCollection
     val files: ConfigurableFileCollection

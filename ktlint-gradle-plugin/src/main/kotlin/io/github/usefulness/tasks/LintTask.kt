@@ -5,6 +5,8 @@ import io.github.usefulness.support.ReporterType
 import io.github.usefulness.tasks.lint.LintWorkerAction
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFiles
@@ -16,7 +18,7 @@ import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
-open class LintTask @Inject constructor(
+public open class LintTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
@@ -26,13 +28,13 @@ open class LintTask @Inject constructor(
 ) {
 
     @OutputFiles
-    val reports = objectFactory.mapProperty<String, File>(default = emptyMap())
+    public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
 
     @Input
-    val ignoreFailures = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
+    public val ignoreFailures: Property<Boolean> = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
 
     @TaskAction
-    fun run(inputChanges: InputChanges) {
+    public fun run(inputChanges: InputChanges) {
         val workQueue = workerExecutor.processIsolation { spec ->
             spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
