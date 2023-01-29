@@ -158,7 +158,7 @@ tasks.withType(ConfigurableKtLintTask::class).configureEach {
 
 ### Custom Rules
 
-You can add custom `ktlint` RuleSets using the `ktlintRuleSet` dependency:
+You can add custom `ktlint` RuleSets using the `ktlintRuleSet` configuration dependency:
 
 <details open>
 <summary>Kotlin</summary>

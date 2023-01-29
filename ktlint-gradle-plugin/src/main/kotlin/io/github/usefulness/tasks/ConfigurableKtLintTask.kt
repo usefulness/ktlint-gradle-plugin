@@ -1,17 +1,18 @@
 package io.github.usefulness.tasks
 
-import groovy.lang.Closure
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
+import io.github.usefulness.support.KtLintParams
+import io.github.usefulness.support.findApplicableEditorConfigFiles
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTreeElement
+import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
@@ -22,18 +23,17 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
+import org.gradle.work.ChangeType
 import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
-import io.github.usefulness.support.KtLintParams
-import io.github.usefulness.support.findApplicableEditorConfigFiles
-import org.gradle.api.file.ConfigurableFileCollection
 import java.util.concurrent.Callable
 
 public abstract class ConfigurableKtLintTask(
     projectLayout: ProjectLayout,
     objectFactory: ObjectFactory,
-) : DefaultTask(), PatternFilterable {
+    private val patternFilterable: PatternFilterable = PatternSet(),
+) : DefaultTask(), PatternFilterable by patternFilterable {
 
     @Input
     public val experimentalRules: Property<Boolean> = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
@@ -57,10 +57,7 @@ public abstract class ConfigurableKtLintTask(
     @Classpath
     public val ruleSetsClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
 
-    private val allSourceFiles = project.objects.fileCollection()
-
-    @get:Internal
-    internal val patternFilterable: PatternFilterable = PatternSet()
+    private val allSourceFiles = objectFactory.fileCollection()
 
     @SkipWhenEmpty // Marks the input incremental: https://github.com/gradle/gradle/issues/17593
     @InputFiles
@@ -69,7 +66,7 @@ public abstract class ConfigurableKtLintTask(
     public val source: FileCollection = objectFactory.fileCollection()
         .from(Callable { allSourceFiles.asFileTree.matching(patternFilterable) })
 
-    public fun source(vararg sources: Any?): ConfigurableKtLintTask = also { allSourceFiles.setFrom(*sources) }
+    public fun source(vararg sources: Any?): ConfigurableKtLintTask = also { allSourceFiles.from(*sources) }
 
     public fun setSource(source: Any) {
         allSourceFiles.setFrom(source)
@@ -86,17 +83,6 @@ public abstract class ConfigurableKtLintTask(
 
     @Internal
     override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
-
-    override fun setIncludes(includes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.setIncludes(includes) }
-    override fun setExcludes(excludes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.setExcludes(excludes) }
-    override fun include(vararg includes: String?): ConfigurableKtLintTask = also { patternFilterable.include(*includes) }
-    override fun include(includes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.include(includes) }
-    override fun include(includeSpec: Spec<FileTreeElement>): ConfigurableKtLintTask = also { patternFilterable.include(includeSpec) }
-    override fun include(includeSpec: Closure<*>): ConfigurableKtLintTask = also { patternFilterable.include(includeSpec) }
-    override fun exclude(vararg excludes: String?): ConfigurableKtLintTask = also { patternFilterable.exclude(*excludes) }
-    override fun exclude(excludes: MutableIterable<String>): ConfigurableKtLintTask = also { patternFilterable.exclude(excludes) }
-    override fun exclude(excludeSpec: Spec<FileTreeElement>): ConfigurableKtLintTask = also { patternFilterable.exclude(excludeSpec) }
-    override fun exclude(excludeSpec: Closure<*>): ConfigurableKtLintTask = also { patternFilterable.exclude(excludeSpec) }
 }
 
 internal inline fun <reified T> ObjectFactory.property(default: T? = null): Property<T> =
@@ -119,7 +105,11 @@ internal fun ConfigurableKtLintTask.getChangedEditorconfigFiles(inputChanges: In
 
 internal fun ConfigurableKtLintTask.getChangedSources(inputChanges: InputChanges) =
     if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {
-        inputChanges.getFileChanges(source).map(FileChange::getFile)
+        inputChanges.getFileChanges(source)
+            .asSequence()
+            .filter { it.fileType == FileType.FILE && it.changeType != ChangeType.REMOVED }
+            .map(FileChange::getFile)
+            .toList()
     } else {
         source
     }
