@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapperKt
 plugins {
     id("java-gradle-plugin")
     id("com.starter.publishing")
+    alias(libs.plugins.gradle.pluginpublish)
     alias(libs.plugins.starter.library.kotlin)
 }
 
