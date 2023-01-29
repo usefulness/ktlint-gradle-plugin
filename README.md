@@ -2,21 +2,22 @@
 
 [![Build Status](https://github.com/usefulness/ktlint-gradle-plugin/workflows/Build%20Project/badge.svg)](https://github.com/usefulness/ktlint-gradle-plugin/actions)
 [![Latest Version](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/usefulness/ktlin-gradle-plugin/maven-metadata.xml?label=gradle)](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.usefulness/ktlint-gradle-plugin)
 
-Simple and
+Gradle wrapper for [pinterest/ktlint](https://github.com/pinterest/ktlint)
 
 ### Installation
 
-Available on the Gradle Plugin Portal: https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin
+Available on the:
+- [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
+- [Maven Central](https://mvnrepository.com/artifact/io.github.usefulness/kotlin-gradle-plugin)
 
-#### Single module
+#### Apply the plugin
 
-<details open>
-<summary>Kotlin</summary>
 
 ```kotlin
 plugins {
-    id("io.github.usefulness.ktlint-gradle-plugin") version "3.13.0"
+    id("io.github.usefulness.ktlint-gradle-plugin") version "{{version}}"
 }
 ```
 
@@ -25,7 +26,7 @@ plugins {
 
 | plugin version | min gradle version | min ktlint version |
 |----------------|--------------------|--------------------|
-| 3.14.0+        | 7.6                | 0.48.0             |
+| 0.1.0+         | 7.6                | 0.48.0             |
 
 ### Features
 
@@ -53,7 +54,7 @@ Also `check` becomes dependent on `lintKotlin`.
 Granular tasks are added for each source set in the project: `formatKotlin`*`SourceSet`* and `lintKotlin`*`SourceSet`*.
 
 ### Configuration
-Options are configured in the `ktlin` extension. Defaults shown (you may omit the configuration block entirely if you want these defaults).
+Options are configured in the `ktlint` extension:
 
 <details open>
 <summary>Kotlin</summary>
@@ -61,7 +62,7 @@ Options are configured in the `ktlin` extension. Defaults shown (you may omit th
 ```kotlin
 ktlint {
     ignoreFailures = false
-    reporters = arrayOf("checkstyle", "plain")
+    reporters = emptyArray()
     experimentalRules = false
     disabledRules = emptyArray()
     ktlintVersion = "x.y.z"
@@ -76,7 +77,7 @@ ktlint {
 ```groovy
 ktlint {
     ignoreFailures = false
-    reporters = ['checkstyle', 'plain']
+    reporters = []
     experimentalRules = false
     disabledRules = []
     ktlintVersion = 'x.y.z'
@@ -87,11 +88,9 @@ ktlint {
 
 Options for `reporters`: `checkstyle`, `html`, `json`, `plain`, `sarif`
 
-Reporters behave as described at: https://github.com/pinterest/ktlint
-
 The `experimentalRules` property enables rules which are part of ktlint's experimental rule set.
 
-The `disabledRules` property can includes an array of rule ids you wish to disable. For example to allow wildcard imports:
+The `disabledRules` property can include an array of rule ids you wish to disable. For example to allow wildcard imports:
 ```groovy
 disabledRules = ["no-wildcard-imports"]
 ```
@@ -152,65 +151,6 @@ import io.github.usefulness.tasks.ConfigurableKtLintTask
 
 tasks.withType(ConfigurableKtLintTask::class).configureEach {
   workerMaxHeapSize.set("512m")
-}
-```
-
-</details>
-
-### Custom Tasks
-
-If you aren't using autoconfiguration from a supported plugin or otherwise need to handle additional source code, you can create custom tasks:
-
-<details open>
-<summary>Kotlin</summary>
-
-```kotlin
-import io.github.usefulness.tasks.LintTask
-import io.github.usefulness.tasks.FormatTask
-
-tasks.register<LintTask>("ktLint") {
-    group = "verification"
-    source(files("src"))
-    reports.set(
-        mapOf(
-            "plain" to file("build/lint-report.txt"),
-            "json" to file("build/lint-report.json")
-        )
-    )
-}
-
-tasks.register<FormatTask>("ktFormat") {
-    group = "formatting"
-    source(files("src"))
-    report.set(file("build/format-report.txt"))
-}
-```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
-
-```groovy
-import io.github.usefulness.tasks.LintTask
-import io.github.usefulness.tasks.FormatTask
-
-tasks.register('ktLint', LintTask) {
-    group 'verification'
-    source files('src')
-    reports = [
-            'plain': file('build/lint-report.txt'),
-            'json' : file('build/lint-report.json')
-    ]
-    disabledRules = ['import-ordering']
-}
-
-
-tasks.register('ktFormat', FormatTask) {
-  group 'formatting'
-  source files('src/test')
-  report = file('build/format-report.txt')
-  disabledRules = ['import-ordering']
 }
 ```
 
