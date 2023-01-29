@@ -37,7 +37,7 @@ class PublishingPlugin : Plugin<Project> {
             extensions.configure<GradlePluginDevelopmentExtension>("gradlePlugin") { gradlePlugin ->
                 gradlePlugin.apply {
                     website.set("https://github.com/usefulness/ktlint-gradle-plugin")
-                    vcsUrl.set("scm:git:github.com/usefulness/ktlint-gradle-plugin.git")
+                    vcsUrl.set("https://github.com/usefulness/ktlint-gradle-plugin")
                 }
             }
         }
