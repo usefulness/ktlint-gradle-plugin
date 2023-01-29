@@ -11,7 +11,9 @@ class PublishingPlugin : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {
         pluginManager.apply("maven-publish")
-        pluginManager.apply("signing")
+        if (findConfig("SIGNING_PASSWORD").isNotEmpty()) {
+            pluginManager.apply("signing")
+        }
         extensions.configure<PublishingExtension> {
             with(repositories) {
                 maven { maven ->
@@ -50,9 +52,7 @@ class PublishingPlugin : Plugin<Project> {
             }
 
             extensions.configure<SigningExtension>("signing") { signing ->
-                if (findConfig("SIGNING_PASSWORD").isNotEmpty()) {
-                    signing.sign(extensions.getByType(PublishingExtension::class.java).publications)
-                }
+                signing.sign(extensions.getByType(PublishingExtension::class.java).publications)
             }
         }
 
