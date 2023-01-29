@@ -13,9 +13,9 @@ import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.LintTask
 import java.io.File
 
-class KtlintGradlePlugin : Plugin<Project> {
+public class KtlintGradlePlugin : Plugin<Project> {
 
-    companion object {
+    internal companion object {
         private const val KTLINT_CONFIGURATION_NAME = "ktlint"
         private const val RULE_SET_CONFIGURATION_NAME = "ktlintRuleSet"
     }
@@ -27,7 +27,7 @@ class KtlintGradlePlugin : Plugin<Project> {
         "kotlin-android" to AndroidSourceSetApplier,
     )
 
-    override fun apply(project: Project) = with(project) {
+    public override fun apply(project: Project): Unit = with(project) {
         val pluginExtension = extensions.create("ktlint", KtlintGradleExtension::class.java)
 
         extendablePlugins.forEach { (pluginId, sourceResolver) ->

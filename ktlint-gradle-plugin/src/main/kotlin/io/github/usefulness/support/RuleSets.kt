@@ -21,5 +21,5 @@ internal fun resolveRuleProviders(
     .toSet()
 
 // statically resolve providers from plugin classpath. ServiceLoader#load alone resolves classes lazily which fails when run in parallel
-val defaultRuleSetProviders: List<RuleSetProviderV2> =
+internal val defaultRuleSetProviders: List<RuleSetProviderV2> =
     ServiceLoader.load(RuleSetProviderV2::class.java).toList()

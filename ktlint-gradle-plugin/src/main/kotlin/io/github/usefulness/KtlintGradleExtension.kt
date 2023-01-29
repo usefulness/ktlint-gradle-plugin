@@ -2,20 +2,20 @@ package io.github.usefulness
 
 import io.github.usefulness.support.versionProperties
 
-open class KtlintGradleExtension {
+public open class KtlintGradleExtension {
     internal companion object {
         const val DEFAULT_IGNORE_FAILURES = false
         const val DEFAULT_EXPERIMENTAL_RULES = false
         val DEFAULT_DISABLED_RULES = emptyArray<String>()
     }
 
-    var ignoreFailures = DEFAULT_IGNORE_FAILURES
+    public var ignoreFailures: Boolean = DEFAULT_IGNORE_FAILURES
 
-    var reporters = emptyArray<String>()
+    public var reporters: Array<String> = emptyArray()
 
-    var experimentalRules = DEFAULT_EXPERIMENTAL_RULES
+    public var experimentalRules: Boolean = DEFAULT_EXPERIMENTAL_RULES
 
-    var disabledRules = DEFAULT_DISABLED_RULES
+    public var disabledRules: Array<String> = DEFAULT_DISABLED_RULES
 
-    var ktlintVersion = versionProperties.ktlintVersion()
+    public var ktlintVersion: String = versionProperties.ktlintVersion()
 }

@@ -1,24 +1,21 @@
 package io.github.usefulness.tasks.format
 
 import com.pinterest.ktlint.core.Code
-import io.github.usefulness.support.KtLintParams
 import io.github.usefulness.support.createKtlintEngine
 import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
 import io.github.usefulness.tasks.FormatTask
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
-import java.io.File
 
-abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
-    private val logger: Logger = DefaultContextAwareTaskLogger(Logging.getLogger(FormatTask::class.java))
-    private val files: Iterable<File> = parameters.files
-    private val projectDirectory: File = parameters.projectDirectory.asFile.get()
-    private val name: String = parameters.name.get()
-    private val ktLintParams: KtLintParams = parameters.ktLintParams.get()
-    private val output: File? = parameters.output.asFile.orNull
+internal abstract class FormatWorkerAction : WorkAction<FormatWorkerParameters> {
+    private val logger = DefaultContextAwareTaskLogger(Logging.getLogger(FormatTask::class.java))
+    private val files = parameters.files
+    private val projectDirectory = parameters.projectDirectory.asFile.get()
+    private val name = parameters.name.get()
+    private val ktLintParams = parameters.ktLintParams.get()
+    private val output = parameters.output.asFile.orNull
 
     override fun execute() {
         val ktLintEngine = createKtlintEngine(ktLintParams = ktLintParams)
