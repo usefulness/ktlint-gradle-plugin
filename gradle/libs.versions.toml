@@ -2,7 +2,7 @@
 gradle-starter = "0.56.1"
 gradle-pluginpublish = "1.1.0"
 gradle-doctor = "0.8.1"
-google-agp = "7.4.0"
+google-agp = "7.4.1"
 maven-junit = "5.9.2"
 maven-assertj = "3.24.2"
 maven-ktlint = "0.48.2"
