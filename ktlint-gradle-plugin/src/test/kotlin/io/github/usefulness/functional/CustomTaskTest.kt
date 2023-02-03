@@ -7,11 +7,13 @@ import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.OS
 import java.io.File
 
+@Disabled("Not supported")
 class CustomTaskTest : WithGradleTest.Kotlin() {
 
     lateinit var projectRoot: File

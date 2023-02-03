@@ -213,9 +213,11 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
 
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
-            assertThat(output).contains("lintKotlinMain - executing against 2 file(s)")
+            assertThat(task(":lintKotlinTestWorker")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            assertThat(output).contains("lintKotlinMainWorker - executing against 2 file(s)")
         }
 
         kotlinSourceFile(
@@ -227,15 +229,18 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         )
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
-            assertThat(output).contains("lintKotlinMain - executing against 1 file(s)")
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":lintKotlinTestWorker")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
         }
 
         editorconfigFile.appendText("content=updated")
         build("lintKotlin", "--info").apply {
-            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("lintKotlinMain - executing against 2 file(s)")
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(output).contains("lintKotlinMainWorker - executing against 2 file(s)")
         }
 
         kotlinSourceFile(
@@ -246,8 +251,22 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             """.trimIndent(),
         )
         build("lintKotlin", "--info").apply {
-            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("lintKotlinMain - executing against 1 file(s)")
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
+        }
+
+        kotlinSourceFile(
+            "WrongFilename.kt",
+            """
+            data class AnotherCustomClass(val modifiedEditorconfig: Int)
+            
+            """.trimIndent(),
+        )
+        buildAndFail("lintKotlin", "--info").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
         }
     }
 
@@ -302,8 +321,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin", "--info").apply {
-            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            val resolvedRulesCount = output.findResolvedRuleProvidersCount("lintKotlinMain")
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            val resolvedRulesCount = output.findResolvedRuleProvidersCount("lintKotlinMainWorker")
             assertThat(resolvedRulesCount).isGreaterThan(0)
         }
 

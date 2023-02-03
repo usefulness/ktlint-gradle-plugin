@@ -136,6 +136,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass("DifferentClassName"))
         }
         build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).doesNotContain("resetting KtLint caches")
         }
@@ -153,10 +154,12 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass("FileName"))
         }
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
         }
         build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
         }

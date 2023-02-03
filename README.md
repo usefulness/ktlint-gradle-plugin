@@ -36,9 +36,7 @@ plugins {
   - [Android](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.android)
   - [JS](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.js)
 - Supports `.kt` and `.kts` files
-- Standalone `LintTask` and `FormatTask` types for defining custom tasks
 - Incremental build support and fast parallelization with Gradle Worker API
-- Configures from `.editorconfig` when available
 - Configurable reporters
 
 ### Tasks

@@ -1,11 +1,11 @@
 package io.github.usefulness.tasks.lint
 
 import com.pinterest.ktlint.core.Code
-import io.github.usefulness.support.PluginError
+import com.pinterest.ktlint.core.LintError
+import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.createKtlintEngine
-import io.github.usefulness.support.reporterPathFor
 import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
-import io.github.usefulness.support.resolveReporters
+import io.github.usefulness.support.writeTo
 import io.github.usefulness.tasks.LintTask
 import org.gradle.api.logging.Logging
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
@@ -29,15 +29,10 @@ internal abstract class LintWorkerAction : WorkAction<LintWorkerParameters> {
         if (logger.isDebugEnabled) {
             logger.debug("Resolved RuleSetProviders = ${ktLintEngine.ruleProviders.joinToString { it.createNewRuleInstance().id }}")
         }
+        val errors = mutableListOf<KtlintErrorResult>()
 
-        val reporters = resolveReporters(enabled = parameters.reporters.get())
-
-        var hasError = false
-
-        reporters.onEach { (_, reporter) -> reporter.beforeAll() }
-        files.sorted().forEach { file ->
+        files.forEach { file ->
             val relativePath = file.toRelativeString(projectDirectory)
-            reporters.onEach { (_, reporter) -> reporter.before(relativePath) }
             logger.debug("$name linting: $relativePath")
 
             if (file.extension !in supportedExtensions) {
@@ -45,26 +40,20 @@ internal abstract class LintWorkerAction : WorkAction<LintWorkerParameters> {
                 return@forEach
             }
 
-            ktLintEngine.lint(Code.CodeFile(file)) { error ->
-                hasError = true
-                reporters.onEach { (type, reporter) ->
-                    // some reporters want relative paths, some want absolute
-                    val filePath = reporterPathFor(
-                        reporterType = type,
-                        output = file,
-                        relativeRoot = projectDirectory,
-                    )
-                    reporter.onLintError(filePath, error, false)
-                }
-                logger.quiet("${file.path}:${error.line}:${error.col}: Lint error > [${error.ruleId}] ${error.detail}")
+            val fileErrors = mutableListOf<LintError>()
+            ktLintEngine.lint(
+                code = Code.CodeFile(file),
+                callback = fileErrors::add,
+            )
+            if (fileErrors.isNotEmpty()) {
+                errors += KtlintErrorResult(
+                    file = file,
+                    errors = fileErrors,
+                )
             }
-            reporters.onEach { (_, reporter) -> reporter.after(relativePath) }
         }
-        reporters.onEach { (_, reporter) -> reporter.afterAll() }
 
-        if (hasError) {
-            throw PluginError.LintingError("$name source failed lint check")
-        }
+        errors.writeTo(parameters.discoveredErrors.get().asFile)
     }
 }
 

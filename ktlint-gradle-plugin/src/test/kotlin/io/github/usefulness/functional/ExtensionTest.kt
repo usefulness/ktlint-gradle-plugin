@@ -172,12 +172,12 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            val expectedMessage = "Caused by: java.lang.NoSuchMethodError: 'com.pinterest.ktlint.core.api.EditorConfigOverride"
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            val expectedMessage = "EditorConfigOverride com.pinterest.ktlint.core.api.EditorConfigOverride" +
+                "${"$"}Companion.getEMPTY_EDITOR_CONFIG_OVERRIDE()'"
             assertThat(output).contains(expectedMessage)
         }
-        // remove `--configuration-cache-problems=warn` when upgrading to Gradle 7.6 https://github.com/gradle/gradle/issues/17470
-        build("dependencies", "--configuration", "ktlint", "--configuration-cache-problems=warn").apply {
+        build("dependencies", "--configuration", "ktlint").apply {
             assertThat(output).contains("com.pinterest:ktlint:0.46.0")
         }
     }

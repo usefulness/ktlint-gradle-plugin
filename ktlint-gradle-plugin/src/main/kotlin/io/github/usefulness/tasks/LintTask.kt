@@ -1,20 +1,14 @@
 package io.github.usefulness.tasks
 
-import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_IGNORE_FAILURES
-import io.github.usefulness.support.ReporterType
 import io.github.usefulness.tasks.lint.LintWorkerAction
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.InputChanges
-import org.gradle.workers.WorkerExecutionException
 import org.gradle.workers.WorkerExecutor
-import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
@@ -27,11 +21,10 @@ public open class LintTask @Inject constructor(
     objectFactory = objectFactory,
 ) {
 
-    @OutputFiles
-    public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
-
-    @Input
-    public val ignoreFailures: Property<Boolean> = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
+    @OutputFile
+    public val discoveredErrors: RegularFileProperty = objectFactory.fileProperty().apply {
+        value(projectLayout.buildDirectory.file("ktlint_errors_$name.bin"))
+    }
 
     @TaskAction
     public fun run(inputChanges: InputChanges) {
@@ -46,21 +39,11 @@ public open class LintTask @Inject constructor(
             p.name.set(name)
             p.files.from(getChangedSources(inputChanges))
             p.projectDirectory.set(projectLayout.projectDirectory.asFile)
-            p.reporters.putAll(getReports())
             p.ktLintParams.set(getKtLintParams())
             p.changedEditorConfigFiles.from(getChangedEditorconfigFiles(inputChanges))
+            p.discoveredErrors.set(discoveredErrors)
         }
 
-        runCatching { workQueue.await() }
-            .onFailure { failure ->
-                when {
-                    ignoreFailures.get() -> Unit
-                    failure is WorkerExecutionException -> throw failure.cause ?: failure
-                    else -> throw failure
-                }
-            }
+        workQueue.await()
     }
-
-    private fun getReports() = reports.get()
-        .mapKeys { (id, _) -> ReporterType.getById(id = id) }
 }
