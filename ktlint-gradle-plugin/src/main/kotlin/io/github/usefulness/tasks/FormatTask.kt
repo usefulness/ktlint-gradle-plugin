@@ -16,7 +16,7 @@ public open class FormatTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
-) : ConfigurableKtLintTask(
+) : KtlintWorkTask(
     projectLayout = projectLayout,
     objectFactory = objectFactory,
 ) {

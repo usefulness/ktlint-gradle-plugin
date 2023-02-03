@@ -2,7 +2,7 @@ package io.github.usefulness.tasks.workers
 
 import io.github.usefulness.support.readKtlintErrors
 import org.gradle.api.GradleException
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Property
@@ -12,7 +12,7 @@ import org.gradle.workers.WorkParameters
 internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Parameters> {
 
     interface Parameters : WorkParameters {
-        val discoveredErrors: ConfigurableFileCollection
+        val errorsContainer: DirectoryProperty
         val ignoreFailures: Property<Boolean>
         val projectDirectory: RegularFileProperty
     }
@@ -20,7 +20,7 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
     private val logger = Logging.getLogger(ConsoleReportWorker::class.java)
 
     override fun execute() {
-        val discoveredErrors = parameters.discoveredErrors.readKtlintErrors()
+        val discoveredErrors = parameters.errorsContainer.readKtlintErrors()
 
         val errorsFound = discoveredErrors.any()
         if (errorsFound) {

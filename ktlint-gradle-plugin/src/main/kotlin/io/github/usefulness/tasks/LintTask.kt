@@ -1,11 +1,11 @@
 package io.github.usefulness.tasks
 
-import io.github.usefulness.tasks.lint.LintWorkerAction
+import io.github.usefulness.tasks.workers.LintWorker
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
@@ -16,14 +16,14 @@ public open class LintTask @Inject constructor(
     private val workerExecutor: WorkerExecutor,
     objectFactory: ObjectFactory,
     private val projectLayout: ProjectLayout,
-) : ConfigurableKtLintTask(
+) : KtlintWorkTask(
     projectLayout = projectLayout,
     objectFactory = objectFactory,
 ) {
 
-    @OutputFile
-    public val discoveredErrors: RegularFileProperty = objectFactory.fileProperty().apply {
-        value(projectLayout.buildDirectory.file("ktlint_errors_$name.bin"))
+    @OutputDirectory
+    public val discoveredErrors: DirectoryProperty = objectFactory.directoryProperty().apply {
+        value(projectLayout.buildDirectory.dir("ktlint_errors/$name"))
     }
 
     @TaskAction
@@ -35,13 +35,19 @@ public open class LintTask @Inject constructor(
             }
         }
 
-        workQueue.submit(LintWorkerAction::class.java) { p ->
-            p.name.set(name)
-            p.files.from(getChangedSources(inputChanges))
-            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
-            p.ktLintParams.set(getKtLintParams())
-            p.changedEditorConfigFiles.from(getChangedEditorconfigFiles(inputChanges))
-            p.discoveredErrors.set(discoveredErrors)
+        val chunks = getChangedSources(inputChanges)
+            .chunked(chunkSize.get())
+        val changedEditorConfigFiles = getChangedEditorconfigFiles(inputChanges)
+
+        chunks.forEachIndexed { index, sources ->
+            workQueue.submit(LintWorker::class.java) { p ->
+                p.name.set(name)
+                p.files.from(sources)
+                p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+                p.ktLintParams.set(getKtLintParams())
+                p.changedEditorConfigFiles.from(changedEditorConfigFiles)
+                p.discoveredErrors.set(discoveredErrors.get().file("errors_$index.bin"))
+            }
         }
 
         workQueue.await()

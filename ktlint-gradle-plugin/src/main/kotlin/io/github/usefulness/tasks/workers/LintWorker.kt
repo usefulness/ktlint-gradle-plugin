@@ -1,17 +1,22 @@
-package io.github.usefulness.tasks.lint
+package io.github.usefulness.tasks.workers
 
 import com.pinterest.ktlint.core.Code
 import com.pinterest.ktlint.core.LintError
+import io.github.usefulness.support.KtLintParams
 import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.createKtlintEngine
 import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
 import io.github.usefulness.support.writeTo
 import io.github.usefulness.tasks.LintTask
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.Property
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 
-internal abstract class LintWorkerAction : WorkAction<LintWorkerParameters> {
+internal abstract class LintWorker : WorkAction<LintWorker.Parameters> {
     private val logger = DefaultContextAwareTaskLogger(Logging.getLogger(LintTask::class.java))
     private val files = parameters.files
     private val projectDirectory = parameters.projectDirectory.asFile.get()
@@ -54,6 +59,15 @@ internal abstract class LintWorkerAction : WorkAction<LintWorkerParameters> {
         }
 
         errors.writeTo(parameters.discoveredErrors.get().asFile)
+    }
+
+    interface Parameters : WorkParameters {
+        val name: Property<String>
+        val changedEditorConfigFiles: ConfigurableFileCollection
+        val files: ConfigurableFileCollection
+        val projectDirectory: RegularFileProperty
+        val ktLintParams: Property<KtLintParams>
+        val discoveredErrors: RegularFileProperty
     }
 }
 

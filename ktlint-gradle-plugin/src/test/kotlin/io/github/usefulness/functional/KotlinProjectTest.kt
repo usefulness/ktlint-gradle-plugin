@@ -216,7 +216,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinTestWorker")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
             assertThat(output).contains("lintKotlinMainWorker - executing against 2 file(s)")
         }
 
@@ -232,7 +232,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":lintKotlinTestWorker")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SKIPPED)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
             assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
         }
 

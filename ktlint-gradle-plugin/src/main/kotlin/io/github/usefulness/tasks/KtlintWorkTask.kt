@@ -1,5 +1,6 @@
 package io.github.usefulness.tasks
 
+import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_CHUNK_SIZE
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import io.github.usefulness.support.KtLintParams
@@ -29,7 +30,7 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import java.util.concurrent.Callable
 
-public abstract class ConfigurableKtLintTask(
+public abstract class KtlintWorkTask(
     projectLayout: ProjectLayout,
     objectFactory: ObjectFactory,
     private val patternFilterable: PatternFilterable = PatternSet(),
@@ -37,6 +38,9 @@ public abstract class ConfigurableKtLintTask(
 
     @Input
     public val experimentalRules: Property<Boolean> = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
+
+    @Input
+    public val chunkSize: Property<Int> = objectFactory.property(default = DEFAULT_CHUNK_SIZE)
 
     @Input
     public val disabledRules: ListProperty<String> = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES.toList())
@@ -66,7 +70,7 @@ public abstract class ConfigurableKtLintTask(
     public val source: FileCollection = objectFactory.fileCollection()
         .from(Callable { allSourceFiles.asFileTree.matching(patternFilterable) })
 
-    public fun source(vararg sources: Any?): ConfigurableKtLintTask = also { allSourceFiles.from(*sources) }
+    public fun source(vararg sources: Any?): KtlintWorkTask = also { allSourceFiles.from(*sources) }
 
     public fun setSource(source: Any) {
         allSourceFiles.setFrom(source)
@@ -100,10 +104,10 @@ internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Ma
         set(default)
     }
 
-internal fun ConfigurableKtLintTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
+internal fun KtlintWorkTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
     inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
 
-internal fun ConfigurableKtLintTask.getChangedSources(inputChanges: InputChanges) =
+internal fun KtlintWorkTask.getChangedSources(inputChanges: InputChanges) =
     if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {
         inputChanges.getFileChanges(source)
             .asSequence()

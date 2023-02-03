@@ -5,6 +5,7 @@ import io.github.usefulness.tasks.workers.ConsoleReportWorker
 import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -12,7 +13,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -41,17 +42,13 @@ public open class GenerateReportsTask @Inject constructor(
     public val ignoreFailures: Property<Boolean> = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
 
     @SkipWhenEmpty
-    @InputFiles
+    @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
     @IgnoreEmptyDirectories
-    public val discoveredErrors: ConfigurableFileCollection = objectFactory.fileCollection()
+    public val errorsContainer: DirectoryProperty = objectFactory.directoryProperty()
 
     @OutputFiles
     public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
-
-    init {
-        onlyIf { (it as GenerateReportsTask).discoveredErrors.any(File::exists) } // https://github.com/gradle/gradle/issues/2919
-    }
 
     @TaskAction
     public fun run() {
@@ -63,13 +60,13 @@ public open class GenerateReportsTask @Inject constructor(
         }
 
         workQueue.submit(GenerateReportsWorker::class.java) { p ->
-            p.discoveredErrors.setFrom(discoveredErrors)
+            p.errorsContainer.set(errorsContainer)
             p.projectDirectory.set(projectLayout.projectDirectory.asFile)
             p.reporters.putAll(reports.get())
         }
 
         workQueue.submit(ConsoleReportWorker::class.java) { param ->
-            param.discoveredErrors.setFrom(discoveredErrors)
+            param.errorsContainer.set(errorsContainer)
             param.ignoreFailures.set(ignoreFailures)
             param.projectDirectory.set(projectLayout.projectDirectory.asFile)
         }

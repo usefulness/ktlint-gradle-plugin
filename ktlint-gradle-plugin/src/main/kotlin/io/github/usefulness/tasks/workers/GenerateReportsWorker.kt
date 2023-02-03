@@ -5,7 +5,7 @@ import io.github.usefulness.support.readKtlintErrors
 import io.github.usefulness.support.reporterPathFor
 import io.github.usefulness.support.resolveReporters
 import io.github.usefulness.tasks.LintTask
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.MapProperty
@@ -18,7 +18,7 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
     private val logger = Logging.getLogger(LintTask::class.java)
 
     internal interface Parameters : WorkParameters {
-        val discoveredErrors: ConfigurableFileCollection
+        val errorsContainer: DirectoryProperty
         val projectDirectory: RegularFileProperty
         val reporters: MapProperty<String, File>
     }
@@ -26,7 +26,7 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
     override fun execute() {
         val projectDir = parameters.projectDirectory.get().asFile
         val reporters = resolveReporters(enabled = getReports())
-        val discoveredErrors = parameters.discoveredErrors.readKtlintErrors()
+        val discoveredErrors = parameters.errorsContainer.readKtlintErrors()
         logger.info("resolved ${reporters.size} Reporters")
 
         reporters.onEach { (_, reporter) -> reporter.beforeAll() }

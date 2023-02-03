@@ -6,7 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
 import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
-import io.github.usefulness.tasks.ConfigurableKtLintTask
+import io.github.usefulness.tasks.KtlintWorkTask
 import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.GenerateReportsTask
 import io.github.usefulness.tasks.LintTask
@@ -39,9 +39,10 @@ public class KtlintGradlePlugin : Plugin<Project> {
                 val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
                 val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
 
-                tasks.withType(ConfigurableKtLintTask::class.java).configureEach { task ->
+                tasks.withType(KtlintWorkTask::class.java).configureEach { task ->
                     task.ktlintClasspath.setFrom(ktlintConfiguration)
                     task.ruleSetsClasspath.setFrom(ruleSetConfiguration)
+                    task.chunkSize.set(provider { pluginExtension.chunkSize })
                 }
                 tasks.withType(GenerateReportsTask::class.java).configureEach { task ->
                     task.ktlintClasspath.setFrom(ktlintConfiguration)
@@ -69,7 +70,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                         "lintKotlin${id.capitalize()}",
                         GenerateReportsTask::class.java,
                     ) { generateReport ->
-                        generateReport.discoveredErrors.setFrom(lintTaskPerSourceSet.get().discoveredErrors)
+                        generateReport.errorsContainer.set(lintTaskPerSourceSet.get().discoveredErrors)
                         generateReport.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
                         generateReport.reports.set(
                             provider {

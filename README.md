@@ -132,9 +132,9 @@ By default, Gradle workers will use 256MB of heap size. To adjust this setting u
 <summary>Kotlin</summary>
 
 ```kotlin
-import io.github.usefulness.tasks.ConfigurableKtLintTask
+import io.github.usefulness.tasks.KtlintWorkTask
 
-tasks.withType<ConfigurableKtLintTask> {
+tasks.withType<KtlintWorkTask> {
   workerMaxHeapSize.set("512m")
 }
 ```
@@ -145,9 +145,9 @@ tasks.withType<ConfigurableKtLintTask> {
 <summary>Groovy</summary>
 
 ```groovy
-import io.github.usefulness.tasks.ConfigurableKtLintTask
+import io.github.usefulness.tasks.KtlintWorkTask
 
-tasks.withType(ConfigurableKtLintTask::class).configureEach {
+tasks.withType(KtlintWorkTask::class).configureEach {
   workerMaxHeapSize.set("512m")
 }
 ```
