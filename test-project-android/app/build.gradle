@@ -4,16 +4,12 @@ plugins {
     id("io.github.usefulness.ktlint-gradle-plugin")
 }
 
+ktlint {
+    reporters = ["plain"]
+}
 android {
     compileSdkVersion(33)
     namespace = "com.ktint_gradle_plugin.example"
-
-    if (properties["agpVersion"].toString().startsWith("4")) {
-        sourceSets {
-            named("main") { java.srcDirs("src/main/kotlin") }
-            named("test") { java.srcDirs("src/test/kotlin") }
-        }
-    }
 }
 
 dependencies {

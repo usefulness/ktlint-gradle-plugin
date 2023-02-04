@@ -75,6 +75,9 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 resolve("src/main/kotlin/MainSourceSet.kt") {
                     writeText(kotlinClass("MainSourceSet"))
                 }
+                resolve("src/testFixtures/kotlin/TestFixturesSourceSet.kt") {
+                    writeText(kotlinClass("TestFixturesSourceSet"))
+                }
                 resolve("src/debug/kotlin/DebugSourceSet.kt") {
                     writeText(kotlinClass("DebugSourceSet"))
                 }
@@ -127,16 +130,43 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
     @Test
     fun `plugin detects sources in all sourcesets`() {
         build("lintKotlin").apply {
-            assertThat(task(":androidproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":androidproject:lintKotlinDebug")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":androidproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":androidproject:lintKotlinFlavorOne")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":androidproject:lintKotlinAndroidTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            listOf(
+                ":androidproject:lintKotlinMain",
+                ":androidproject:lintKotlinDebug",
+                ":androidproject:lintKotlinTest",
+                ":androidproject:lintKotlinFlavorOne",
+                ":androidproject:lintKotlinAndroidTest",
+                ":androidproject:lintKotlinTestFixtures",
+                ":kotlinproject:lintKotlinMain",
+                ":kotlinproject:lintKotlinTestFixtures",
+                ":kotlinproject:lintKotlinTest",
+                ":kotlinproject:lintKotlinIndividuallyCustomized",
+            )
+                .forEach { task ->
+                    assertThat(task(task)?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                }
             assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":kotlinproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":kotlinproject:lintKotlinTestFixtures")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":kotlinproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":kotlinproject:lintKotlinIndividuallyCustomized")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":kotlinproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+
+        build("formatKotlin").apply {
+            listOf(
+                ":androidproject:formatKotlinMain",
+                ":androidproject:formatKotlinDebug",
+                ":androidproject:formatKotlinTest",
+                ":androidproject:formatKotlinFlavorOne",
+                ":androidproject:formatKotlinAndroidTest",
+                ":androidproject:formatKotlinTestFixtures",
+                ":kotlinproject:formatKotlinMain",
+                ":kotlinproject:formatKotlinTestFixtures",
+                ":kotlinproject:formatKotlinTest",
+                ":kotlinproject:formatKotlinIndividuallyCustomized",
+            )
+                .forEach { task ->
+                    assertThat(task(task)?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                }
+            assertThat(task(":androidproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":kotlinproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -145,16 +175,43 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
         build("lintKotlin")
 
         build("lintKotlin").apply {
-            assertThat(task(":androidproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":androidproject:lintKotlinDebug")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":androidproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":androidproject:lintKotlinFlavorOne")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":androidproject:lintKotlinAndroidTest")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            listOf(
+                ":androidproject:lintKotlinMain",
+                ":androidproject:lintKotlinDebug",
+                ":androidproject:lintKotlinTest",
+                ":androidproject:lintKotlinFlavorOne",
+                ":androidproject:lintKotlinAndroidTest",
+                ":kotlinproject:lintKotlinMain",
+                ":kotlinproject:lintKotlinTestFixtures",
+                ":kotlinproject:lintKotlinTest",
+                ":kotlinproject:lintKotlinIndividuallyCustomized",
+            )
+                .forEach { taskName ->
+                    assertThat(task(taskName)?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                }
             assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":kotlinproject:lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":kotlinproject:lintKotlinTestFixtures")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":kotlinproject:lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-            assertThat(task(":kotlinproject:lintKotlinIndividuallyCustomized")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":kotlinproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        }
+
+        build("formatKotlin")
+
+        build("formatKotlin").apply {
+            listOf(
+                ":androidproject:formatKotlinMain",
+                ":androidproject:formatKotlinDebug",
+                ":androidproject:formatKotlinTest",
+                ":androidproject:formatKotlinFlavorOne",
+                ":androidproject:formatKotlinAndroidTest",
+                ":kotlinproject:formatKotlinMain",
+                ":kotlinproject:formatKotlinTestFixtures",
+                ":kotlinproject:formatKotlinTest",
+                ":kotlinproject:formatKotlinIndividuallyCustomized",
+            )
+                .forEach { taskName ->
+                    assertThat(task(taskName)?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                }
+            assertThat(task(":androidproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":kotlinproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 

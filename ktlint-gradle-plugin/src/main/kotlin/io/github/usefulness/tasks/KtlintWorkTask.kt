@@ -1,9 +1,15 @@
 package io.github.usefulness.tasks
 
+import io.github.usefulness.KtlintGradleExtension
+import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_CHUNK_SIZE
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import io.github.usefulness.support.KtLintParams
+import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.findApplicableEditorConfigFiles
+import io.github.usefulness.tasks.workers.ConsoleReportWorker
+import io.github.usefulness.tasks.workers.GenerateReportsWorker
+import io.github.usefulness.tasks.workers.KtlintWorker
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
@@ -18,6 +24,7 @@ import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
@@ -27,16 +34,22 @@ import org.gradle.work.ChangeType
 import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
+import org.gradle.workers.WorkerExecutor
+import java.io.File
 import java.util.concurrent.Callable
 
-public abstract class ConfigurableKtLintTask(
-    projectLayout: ProjectLayout,
+public abstract class KtlintWorkTask(
+    private val workerExecutor: WorkerExecutor,
+    private val projectLayout: ProjectLayout,
     objectFactory: ObjectFactory,
     private val patternFilterable: PatternFilterable = PatternSet(),
 ) : DefaultTask(), PatternFilterable by patternFilterable {
 
     @Input
     public val experimentalRules: Property<Boolean> = objectFactory.property(default = DEFAULT_EXPERIMENTAL_RULES)
+
+    @Input
+    public val chunkSize: Property<Int> = objectFactory.property(default = DEFAULT_CHUNK_SIZE)
 
     @Input
     public val disabledRules: ListProperty<String> = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES.toList())
@@ -57,7 +70,16 @@ public abstract class ConfigurableKtLintTask(
     @Classpath
     public val ruleSetsClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
 
+    @Classpath
+    public val reportersConfiguration: ConfigurableFileCollection = objectFactory.fileCollection()
+
     private val allSourceFiles = objectFactory.fileCollection()
+
+    @Input
+    public val ignoreFailures: Property<Boolean> = objectFactory.property(default = KtlintGradleExtension.DEFAULT_IGNORE_FAILURES)
+
+    @OutputFiles
+    public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
 
     @SkipWhenEmpty // Marks the input incremental: https://github.com/gradle/gradle/issues/17593
     @InputFiles
@@ -66,7 +88,7 @@ public abstract class ConfigurableKtLintTask(
     public val source: FileCollection = objectFactory.fileCollection()
         .from(Callable { allSourceFiles.asFileTree.matching(patternFilterable) })
 
-    public fun source(vararg sources: Any?): ConfigurableKtLintTask = also { allSourceFiles.from(*sources) }
+    public fun source(vararg sources: Any?): KtlintWorkTask = also { allSourceFiles.from(*sources) }
 
     public fun setSource(source: Any) {
         allSourceFiles.setFrom(source)
@@ -83,6 +105,57 @@ public abstract class ConfigurableKtLintTask(
 
     @Internal
     override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
+
+    internal fun runKtlint(inputChanges: InputChanges, mode: KtlintRunMode) {
+        val tempErrorsDir = projectLayout.buildDirectory.dir("ktlint_errors/$name").get()
+
+        val workerQueue = workerExecutor.processIsolation { spec ->
+            spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
+            spec.forkOptions { options ->
+                options.maxHeapSize = workerMaxHeapSize.get()
+                options.jvmArgs = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED") // https://youtrack.jetbrains.com/issue/KT-51619
+            }
+        }
+
+        val chunks = getChangedSources(inputChanges)
+            .chunked(chunkSize.get())
+        val changedEditorConfigFiles = getChangedEditorconfigFiles(inputChanges)
+
+        chunks.forEachIndexed { index, sources ->
+            workerQueue.submit(KtlintWorker::class.java) { p ->
+                p.name.set(name)
+                p.files.from(sources)
+                p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+                p.ktLintParams.set(getKtLintParams())
+                p.changedEditorConfigFiles.from(changedEditorConfigFiles)
+                p.discoveredErrors.set(tempErrorsDir.file("errors_$index.bin"))
+                p.mode.set(mode)
+            }
+        }
+        workerQueue.await()
+
+        val reporterQueue = workerExecutor.processIsolation { spec ->
+            spec.classpath.setFrom(ktlintClasspath, reportersConfiguration)
+            spec.forkOptions { options ->
+                options.maxHeapSize = workerMaxHeapSize.get()
+            }
+        }
+
+        reporterQueue.submit(GenerateReportsWorker::class.java) { p ->
+            p.errorsContainer.set(tempErrorsDir)
+            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+            p.reporters.putAll(reports.get())
+        }
+
+        reporterQueue.submit(ConsoleReportWorker::class.java) { p ->
+            p.errorsContainer.set(tempErrorsDir)
+            p.ignoreFailures.set(ignoreFailures)
+            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+            p.mode.set(mode)
+        }
+        reporterQueue.await()
+        tempErrorsDir.asFile.delete()
+    }
 }
 
 internal inline fun <reified T> ObjectFactory.property(default: T? = null): Property<T> =
@@ -100,10 +173,10 @@ internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Ma
         set(default)
     }
 
-internal fun ConfigurableKtLintTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
+internal fun KtlintWorkTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
     inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
 
-internal fun ConfigurableKtLintTask.getChangedSources(inputChanges: InputChanges) =
+internal fun KtlintWorkTask.getChangedSources(inputChanges: InputChanges) =
     if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {
         inputChanges.getFileChanges(source)
             .asSequence()

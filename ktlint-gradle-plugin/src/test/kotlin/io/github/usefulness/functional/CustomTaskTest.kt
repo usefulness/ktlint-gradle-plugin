@@ -1,11 +1,11 @@
 package io.github.usefulness.functional
 
-import org.gradle.testkit.runner.TaskOutcome
 import io.github.usefulness.functional.utils.editorConfig
 import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
 import org.assertj.core.api.Assertions.assertThat
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs

@@ -45,7 +45,6 @@ kotlin {
     jvmToolchain(17)
 }
 
-
 tasks.register("generateVersionProperties") {
     def projectVersion = version
     def ktlintVersion = libs.versions.maven.ktlint.get()

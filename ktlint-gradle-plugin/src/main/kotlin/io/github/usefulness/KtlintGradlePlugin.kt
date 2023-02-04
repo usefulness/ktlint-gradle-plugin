@@ -3,12 +3,10 @@ package io.github.usefulness
 import io.github.usefulness.support.ReporterType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.tasks.TaskProvider
 import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
 import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
-import io.github.usefulness.tasks.ConfigurableKtLintTask
+import io.github.usefulness.tasks.KtlintWorkTask
 import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.LintTask
 import java.io.File
@@ -18,6 +16,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
     internal companion object {
         private const val KTLINT_CONFIGURATION_NAME = "ktlint"
         private const val RULE_SET_CONFIGURATION_NAME = "ktlintRuleSet"
+        private const val REPORTERS_CONFIGURATION_NAME = "ktlintReporters"
     }
 
     private val extendablePlugins = mapOf(
@@ -37,16 +36,27 @@ public class KtlintGradlePlugin : Plugin<Project> {
 
                 val ktlintConfiguration = createKtlintConfiguration(pluginExtension)
                 val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
+                val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
 
-                tasks.withType(ConfigurableKtLintTask::class.java).configureEach { task ->
+                tasks.withType(KtlintWorkTask::class.java).configureEach { task ->
                     task.ktlintClasspath.setFrom(ktlintConfiguration)
                     task.ruleSetsClasspath.setFrom(ruleSetConfiguration)
+                    task.reportersConfiguration.setFrom(reportersConfiguration)
+                    task.chunkSize.set(provider { pluginExtension.chunkSize })
                 }
 
                 sourceResolver.applyToAll(this) { id, resolvedSources ->
-                    val lintTaskPerSourceSet = tasks.register("lintKotlin${id.capitalize()}", LintTask::class.java) { lintTask ->
-                        lintTask.source(resolvedSources)
-                        lintTask.reports.set(
+                    val checkWorker = tasks.register(
+                        "lintKotlin${id.capitalize()}",
+                        LintTask::class.java,
+                    ) { task ->
+                        task.source(resolvedSources)
+
+                        task.experimentalRules.set(provider { pluginExtension.experimentalRules })
+                        task.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
+
+                        task.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
+                        task.reports.set(
                             provider {
                                 pluginExtension.reporters.associateWith { reporterId ->
                                     val type = ReporterType.getById(reporterId)
@@ -54,29 +64,34 @@ public class KtlintGradlePlugin : Plugin<Project> {
                                 }
                             },
                         )
-                        lintTask.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
-                        lintTask.experimentalRules.set(provider { pluginExtension.experimentalRules })
-                        lintTask.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
                     }
-                    lintKotlin.configure { lintTask ->
-                        lintTask.dependsOn(lintTaskPerSourceSet)
+                    lintKotlin.configure { it.dependsOn(checkWorker) }
+
+                    val formatWorker = tasks.register(
+                        "formatKotlin${id.capitalize()}",
+                        FormatTask::class.java,
+                    ) { task ->
+                        task.source(resolvedSources)
+                        task.experimentalRules.set(provider { pluginExtension.experimentalRules })
+                        task.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
+                        task.ignoreFailures.set(provider { true })
+                        task.reports.set(
+                            provider {
+                                pluginExtension.reporters.associateWith { reporterId ->
+                                    val type = ReporterType.getById(reporterId)
+                                    reportFile("$id-format.${type.fileExtension}")
+                                }
+                            },
+                        )
                     }
 
-                    val formatKotlinPerSourceSet = tasks.register("formatKotlin${id.capitalize()}", FormatTask::class.java) { formatTask ->
-                        formatTask.source(resolvedSources)
-                        formatTask.report.set(reportFile("$id-format.txt"))
-                        formatTask.experimentalRules.set(provider { pluginExtension.experimentalRules })
-                        formatTask.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
-                    }
-                    formatKotlin.configure { formatTask ->
-                        formatTask.dependsOn(formatKotlinPerSourceSet)
-                    }
+                    formatKotlin.configure { it.dependsOn(formatWorker) }
                 }
             }
         }
     }
 
-    private fun Project.registerParentLintTask(): TaskProvider<Task> =
+    private fun Project.registerParentLintTask() =
         tasks.register("lintKotlin") {
             it.group = "formatting"
             it.description = "Runs lint on the Kotlin source files."
@@ -84,7 +99,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
             tasks.named("check").configure { check -> check.dependsOn(lintKotlin) }
         }
 
-    private fun Project.registerParentFormatTask(): TaskProvider<Task> =
+    private fun Project.registerParentFormatTask() =
         tasks.register("formatKotlin") {
             it.group = "formatting"
             it.description = "Formats the Kotlin source files."
@@ -108,6 +123,17 @@ public class KtlintGradlePlugin : Plugin<Project> {
     private fun Project.createRuleSetConfiguration(
         ktlintConfiguration: Configuration,
     ): Configuration = configurations.maybeCreate(RULE_SET_CONFIGURATION_NAME).apply {
+        isCanBeResolved = true
+        isCanBeConsumed = false
+        isVisible = false
+
+        shouldResolveConsistentlyWith(ktlintConfiguration)
+    }
+
+    @Suppress("UnstableApiUsage")
+    private fun Project.createReportersConfiguration(
+        ktlintConfiguration: Configuration,
+    ): Configuration = configurations.maybeCreate(REPORTERS_CONFIGURATION_NAME).apply {
         isCanBeResolved = true
         isCanBeConsumed = false
         isVisible = false

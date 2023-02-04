@@ -29,7 +29,7 @@ abstract class WithGradleTest {
 
     protected fun build(vararg args: String): BuildResult = gradleRunnerFor(*args).build()
 
-    protected fun buildAndFail(vararg args: String): BuildResult = gradleRunnerFor(*args).buildAndFail()
+    protected fun buildAndFail(vararg args: String): BuildResult = gradleRunnerFor(*args, "--continue").buildAndFail()
 
     protected abstract fun gradleRunnerFor(vararg args: String): GradleRunner
 
@@ -61,5 +61,5 @@ abstract class WithGradleTest {
 private fun WithGradleTest.defaultRunner(vararg args: String) =
     GradleRunner.create()
         .withProjectDir(testProjectDir)
-        .withArguments(args.toList() + listOf("--stacktrace", "--configuration-cache"))
+        .withArguments(args.toList() + listOf("--configuration-cache", "--stacktrace"))
         .forwardOutput()
