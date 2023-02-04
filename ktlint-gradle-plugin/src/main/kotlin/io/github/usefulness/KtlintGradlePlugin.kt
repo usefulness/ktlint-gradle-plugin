@@ -100,7 +100,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                             provider {
                                 pluginExtension.reporters.associateWith { reporterId ->
                                     val type = ReporterType.getById(reporterId)
-                                    reportFile("$id-lint.${type.fileExtension}")
+                                    reportFile("$id-format.${type.fileExtension}")
                                 }
                             },
                         )
