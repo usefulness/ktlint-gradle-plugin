@@ -5,10 +5,13 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.logging.Logger
 import java.io.File
 
-internal fun createKtlintEngine(ktLintParams: KtLintParams) = KtLintRuleEngine(
+internal fun createKtlintEngine(
+    disabledRules: List<String>,
+    experimentalRules: Boolean,
+) = KtLintRuleEngine(
     ruleProviders = resolveRuleProviders(defaultRuleSetProviders),
-    editorConfigOverride = editorConfigOverride(ktLintParams),
-    editorConfigDefaults = editorConfigDefaults(ktLintParams),
+    editorConfigOverride = editorConfigOverride(disabledRules),
+    editorConfigDefaults = editorConfigDefaults(experimentalRules),
 )
 
 internal fun KtLintRuleEngine.resetEditorconfigCacheIfNeeded(

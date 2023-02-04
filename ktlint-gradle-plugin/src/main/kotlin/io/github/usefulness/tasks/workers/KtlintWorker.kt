@@ -2,7 +2,6 @@ package io.github.usefulness.tasks.workers
 
 import com.pinterest.ktlint.core.Code
 import com.pinterest.ktlint.core.LintError
-import io.github.usefulness.support.KtLintParams
 import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.createKtlintEngine
@@ -11,6 +10,7 @@ import io.github.usefulness.support.writeTo
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
@@ -25,7 +25,10 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
         val projectDir = parameters.projectDirectory.asFile.get()
         val files = parameters.files
 
-        val ktLintEngine = createKtlintEngine(ktLintParams = parameters.ktLintParams.get())
+        val ktLintEngine = createKtlintEngine(
+            disabledRules = parameters.disabledRules.get(),
+            experimentalRules = parameters.experimentalRules.get(),
+        )
         ktLintEngine.resetEditorconfigCacheIfNeeded(
             changedEditorconfigFiles = parameters.changedEditorConfigFiles,
             logger = logger,
@@ -89,7 +92,8 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
         val changedEditorConfigFiles: ConfigurableFileCollection
         val files: ConfigurableFileCollection
         val projectDirectory: RegularFileProperty
-        val ktLintParams: Property<KtLintParams>
+        val experimentalRules: Property<Boolean>
+        val disabledRules: ListProperty<String>
         val discoveredErrors: RegularFileProperty
         val mode: Property<KtlintRunMode>
     }

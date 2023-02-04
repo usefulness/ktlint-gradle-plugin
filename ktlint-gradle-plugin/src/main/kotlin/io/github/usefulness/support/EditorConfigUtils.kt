@@ -12,40 +12,37 @@ import org.ec4j.core.model.Section
 import org.gradle.api.file.ProjectLayout
 import java.io.File
 
-internal fun editorConfigOverride(ktLintParams: KtLintParams) =
-    getPropertiesForDisabledRules(ktLintParams)
+internal fun editorConfigOverride(disabledRules: List<String>) =
+    getPropertiesForDisabledRules(disabledRules)
         .let(::buildEditorConfigOverride)
 
-internal fun editorConfigDefaults(ktLintParams: KtLintParams): EditorConfigDefaults =
-    getPropertiesForExperimentalRules(ktLintParams)
+internal fun editorConfigDefaults(includeExperimentalRules: Boolean) =
+    getPropertiesForExperimentalRules(includeExperimentalRules)
         .let(::buildEditorConfigDefaults)
 
 private fun getPropertiesForDisabledRules(
-    ktLintParams: KtLintParams,
-): List<Pair<EditorConfigProperty<String>, String>> {
-    val rules = ktLintParams.disabledRules
-    return if (rules.isEmpty()) {
-        emptyList()
-    } else {
-        rules
-            .asSequence()
-            .map(::getKtlintRulePropertyName)
-            .map { propertyName ->
-                EditorConfigProperty(
-                    type = PropertyType(propertyName, "Rule to be disabled", IDENTITY_VALUE_PARSER),
-                    defaultValue = "disabled",
-                )
-            }
-            .map { it to "disabled" }
-            .toList()
-    }
+    disabledRules: List<String>,
+) = if (disabledRules.isEmpty()) {
+    emptyList()
+} else {
+    disabledRules
+        .asSequence()
+        .map(::getKtlintRulePropertyName)
+        .map { propertyName ->
+            EditorConfigProperty(
+                type = PropertyType(propertyName, "Rule to be disabled", IDENTITY_VALUE_PARSER),
+                defaultValue = "disabled",
+            )
+        }
+        .map { it to "disabled" }
+        .toList()
 }
 
-private fun getPropertiesForExperimentalRules(ktLintParams: KtLintParams) =
+private fun getPropertiesForExperimentalRules(includeExperimentalRules: Boolean) =
     Property
         .builder()
         .name("ktlint_experimental")
-        .value(if (ktLintParams.experimentalRules) "enabled" else "disabled")
+        .value(if (includeExperimentalRules) "enabled" else "disabled")
         .let(::listOf)
 
 private fun buildEditorConfigOverride(editorConfigProperties: List<Pair<EditorConfigProperty<String>, String>>) =
