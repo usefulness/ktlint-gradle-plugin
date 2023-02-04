@@ -94,8 +94,7 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
                 "lintKotlinFlavorOne",
                 "lintKotlinAndroidTest",
             ).forEach { taskName ->
-                assertThat(task(":androidproject:${taskName}Worker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(task(":androidproject:${taskName}Reporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":androidproject:$taskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
             assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
@@ -108,8 +107,7 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
                 "formatKotlinFlavorOne",
                 "formatKotlinAndroidTest",
             ).forEach { taskName ->
-                assertThat(task(":androidproject:${taskName}Worker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                assertThat(task(":androidproject:${taskName}Reporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":androidproject:$taskName")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             }
             assertThat(task(":androidproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }

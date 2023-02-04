@@ -1,15 +1,17 @@
 package io.github.usefulness.tasks
 
+import io.github.usefulness.KtlintGradleExtension
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_CHUNK_SIZE
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import io.github.usefulness.support.KtLintParams
 import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.findApplicableEditorConfigFiles
+import io.github.usefulness.tasks.workers.ConsoleReportWorker
+import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import io.github.usefulness.tasks.workers.KtlintWorker
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
@@ -22,7 +24,7 @@ import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
@@ -33,6 +35,7 @@ import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
+import java.io.File
 import java.util.concurrent.Callable
 
 public abstract class KtlintWorkTask(
@@ -67,7 +70,16 @@ public abstract class KtlintWorkTask(
     @Classpath
     public val ruleSetsClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
 
+    @Classpath
+    public val reportersConfiguration: ConfigurableFileCollection = objectFactory.fileCollection()
+
     private val allSourceFiles = objectFactory.fileCollection()
+
+    @Input
+    public val ignoreFailures: Property<Boolean> = objectFactory.property(default = KtlintGradleExtension.DEFAULT_IGNORE_FAILURES)
+
+    @OutputFiles
+    public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
 
     @SkipWhenEmpty // Marks the input incremental: https://github.com/gradle/gradle/issues/17593
     @InputFiles
@@ -75,11 +87,6 @@ public abstract class KtlintWorkTask(
     @IgnoreEmptyDirectories
     public val source: FileCollection = objectFactory.fileCollection()
         .from(Callable { allSourceFiles.asFileTree.matching(patternFilterable) })
-
-    @OutputDirectory
-    public val discoveredErrors: DirectoryProperty = objectFactory.directoryProperty().apply {
-        value(projectLayout.buildDirectory.dir("ktlint_errors/$name"))
-    }
 
     public fun source(vararg sources: Any?): KtlintWorkTask = also { allSourceFiles.from(*sources) }
 
@@ -100,7 +107,9 @@ public abstract class KtlintWorkTask(
     override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
 
     internal fun runKtlint(inputChanges: InputChanges, mode: KtlintRunMode) {
-        val workQueue = workerExecutor.processIsolation { spec ->
+        val tempErrorsDir = projectLayout.buildDirectory.dir("ktlint_errors/$name").get()
+
+        val workerQueue = workerExecutor.processIsolation { spec ->
             spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
                 options.maxHeapSize = workerMaxHeapSize.get()
@@ -113,18 +122,39 @@ public abstract class KtlintWorkTask(
         val changedEditorConfigFiles = getChangedEditorconfigFiles(inputChanges)
 
         chunks.forEachIndexed { index, sources ->
-            workQueue.submit(KtlintWorker::class.java) { p ->
+            workerQueue.submit(KtlintWorker::class.java) { p ->
                 p.name.set(name)
                 p.files.from(sources)
                 p.projectDirectory.set(projectLayout.projectDirectory.asFile)
                 p.ktLintParams.set(getKtLintParams())
                 p.changedEditorConfigFiles.from(changedEditorConfigFiles)
-                p.discoveredErrors.set(discoveredErrors.get().file("errors_$index.bin"))
+                p.discoveredErrors.set(tempErrorsDir.file("errors_$index.bin"))
                 p.mode.set(mode)
             }
         }
+        workerQueue.await()
 
-        workQueue.await()
+        val reporterQueue = workerExecutor.processIsolation { spec ->
+            spec.classpath.setFrom(ktlintClasspath, reportersConfiguration)
+            spec.forkOptions { options ->
+                options.maxHeapSize = workerMaxHeapSize.get()
+            }
+        }
+
+        reporterQueue.submit(GenerateReportsWorker::class.java) { p ->
+            p.errorsContainer.set(tempErrorsDir)
+            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+            p.reporters.putAll(reports.get())
+        }
+
+        reporterQueue.submit(ConsoleReportWorker::class.java) { p ->
+            p.errorsContainer.set(tempErrorsDir)
+            p.ignoreFailures.set(ignoreFailures)
+            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+            p.mode.set(mode)
+        }
+        reporterQueue.await()
+        tempErrorsDir.asFile.delete()
     }
 }
 

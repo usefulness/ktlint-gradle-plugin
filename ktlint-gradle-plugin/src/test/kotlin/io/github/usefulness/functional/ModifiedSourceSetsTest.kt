@@ -143,8 +143,7 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 ":kotlinproject:lintKotlinIndividuallyCustomized",
             )
                 .forEach { task ->
-                    assertThat(task("${task}Worker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(task("${task}Reporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                    assertThat(task(task)?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 }
             assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":kotlinproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -164,8 +163,7 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 ":kotlinproject:formatKotlinIndividuallyCustomized",
             )
                 .forEach { task ->
-                    assertThat(task("${task}Worker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-                    assertThat(task("${task}Reporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                    assertThat(task(task)?.outcome).isEqualTo(TaskOutcome.SUCCESS)
                 }
             assertThat(task(":androidproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":kotlinproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
@@ -189,8 +187,7 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 ":kotlinproject:lintKotlinIndividuallyCustomized",
             )
                 .forEach { taskName ->
-                    assertThat(task("${taskName}Worker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-                    assertThat(task("${taskName}Reporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                    assertThat(task(taskName)?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 }
             assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":kotlinproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
@@ -211,8 +208,7 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                 ":kotlinproject:formatKotlinIndividuallyCustomized",
             )
                 .forEach { taskName ->
-                    assertThat(task("${taskName}Worker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
-                    assertThat(task("${taskName}Reporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+                    assertThat(task(taskName)?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
                 }
             assertThat(task(":androidproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":kotlinproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)

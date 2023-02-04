@@ -87,7 +87,7 @@ class ReportersTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(reportFile("/main-lint.txt")).content().isEqualTo(expectedFailedPlain())
             assertThat(reportFile("/main-lint.xml")).content().isEqualTo(expectedFailedCheckstyle())
             assertThat(reportFile("/main-lint.html")).content().isEqualTo(expectedFailedHtml())

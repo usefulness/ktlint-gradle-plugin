@@ -53,7 +53,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -74,7 +74,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         val report = projectRoot.resolve("build/reports/ktlint/main-lint.html")
         assertThat(report).isNotEmpty()
@@ -106,7 +106,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -141,7 +141,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -172,7 +172,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             val expectedMessage = "EditorConfigOverride com.pinterest.ktlint.core.api.EditorConfigOverride" +
                 "${"$"}Companion.getEMPTY_EDITOR_CONFIG_OVERRIDE()'"
             assertThat(output).contains(expectedMessage)

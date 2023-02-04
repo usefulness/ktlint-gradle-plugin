@@ -50,8 +50,8 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinTestReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -65,9 +65,9 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
         }
 
         buildAndFail("lintKotlin", "--continue").apply {
-            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Lint error > [filename] File 'FixtureFileName.kt' contains a single top level declaration")
-            assertThat(task(":lintKotlinTestReporter")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("Lint error > [filename] File 'FixtureTestFileName.kt' contains a single top level declaration")
         }
     }
@@ -103,10 +103,10 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass)
         }
         build("formatKotlin").apply {
-            assertThat(task(":formatKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("FixtureClass.kt:3:19: Format fixed > [curly-spacing] Missing spacing before \"{\"")
             assertThat(output).contains("FixtureClass.kt:1:1: Format could not fix > [no-wildcard-imports] Wildcard import")
-            assertThat(task(":formatKotlinTestReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("FixtureTestClass.kt:3:23: Format fixed > [curly-spacing] Missing spacing before \"{\"")
             assertThat(output).contains("FixtureTestClass.kt:1:1: Format could not fix > [no-wildcard-imports] Wildcard import")
         }
