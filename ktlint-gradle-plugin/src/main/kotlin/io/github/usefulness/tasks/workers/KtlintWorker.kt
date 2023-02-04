@@ -4,10 +4,10 @@ import com.pinterest.ktlint.core.Code
 import com.pinterest.ktlint.core.LintError
 import io.github.usefulness.support.KtLintParams
 import io.github.usefulness.support.KtlintErrorResult
+import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.createKtlintEngine
 import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
 import io.github.usefulness.support.writeTo
-import io.github.usefulness.tasks.LintTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -16,15 +16,16 @@ import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 
-internal abstract class LintWorker : WorkAction<LintWorker.Parameters> {
-    private val logger = DefaultContextAwareTaskLogger(Logging.getLogger(LintTask::class.java))
-    private val files = parameters.files
-    private val projectDirectory = parameters.projectDirectory.asFile.get()
+internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
+    private val logger = DefaultContextAwareTaskLogger(Logging.getLogger(KtlintWorker::class.java))
+
     private val name = parameters.name.get()
-    private val ktLintParams = parameters.ktLintParams.get()
 
     override fun execute() {
-        val ktLintEngine = createKtlintEngine(ktLintParams = ktLintParams)
+        val projectDir = parameters.projectDirectory.asFile.get()
+        val files = parameters.files
+
+        val ktLintEngine = createKtlintEngine(ktLintParams = parameters.ktLintParams.get())
         ktLintEngine.resetEditorconfigCacheIfNeeded(
             changedEditorconfigFiles = parameters.changedEditorConfigFiles,
             logger = logger,
@@ -34,10 +35,11 @@ internal abstract class LintWorker : WorkAction<LintWorker.Parameters> {
         if (logger.isDebugEnabled) {
             logger.debug("Resolved RuleSetProviders = ${ktLintEngine.ruleProviders.joinToString { it.createNewRuleInstance().id }}")
         }
+
         val errors = mutableListOf<KtlintErrorResult>()
 
         files.forEach { file ->
-            val relativePath = file.toRelativeString(projectDirectory)
+            val relativePath = file.toRelativeString(projectDir)
             logger.debug("$name linting: $relativePath")
 
             if (file.extension !in supportedExtensions) {
@@ -45,11 +47,32 @@ internal abstract class LintWorker : WorkAction<LintWorker.Parameters> {
                 return@forEach
             }
 
-            val fileErrors = mutableListOf<LintError>()
-            ktLintEngine.lint(
-                code = Code.CodeFile(file),
-                callback = fileErrors::add,
-            )
+            val fileErrors = mutableListOf<Pair<LintError, Boolean>>()
+            when (parameters.mode.get()) {
+                KtlintRunMode.Check,
+                null,
+                -> ktLintEngine.lint(
+                    code = Code.CodeFile(file),
+                    callback = { fileErrors.add(it to false) },
+                )
+
+                KtlintRunMode.Format -> {
+                    var fileFixed = false
+                    val fixedContent = ktLintEngine.format(
+                        code = Code.CodeFile(file),
+                        callback = { error, corrected ->
+                            if (corrected) {
+                                fileFixed = true
+                            }
+                            fileErrors.add(error to corrected)
+                        },
+                    )
+
+                    if (fileFixed) {
+                        file.writeText(fixedContent)
+                    }
+                }
+            }
             if (fileErrors.isNotEmpty()) {
                 errors += KtlintErrorResult(
                     file = file,
@@ -68,6 +91,7 @@ internal abstract class LintWorker : WorkAction<LintWorker.Parameters> {
         val projectDirectory: RegularFileProperty
         val ktLintParams: Property<KtLintParams>
         val discoveredErrors: RegularFileProperty
+        val mode: Property<KtlintRunMode>
     }
 }
 

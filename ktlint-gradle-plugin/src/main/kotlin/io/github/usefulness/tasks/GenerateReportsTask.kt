@@ -1,6 +1,7 @@
 package io.github.usefulness.tasks
 
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_IGNORE_FAILURES
+import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.tasks.workers.ConsoleReportWorker
 import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import org.gradle.api.DefaultTask
@@ -47,6 +48,9 @@ public open class GenerateReportsTask @Inject constructor(
     @IgnoreEmptyDirectories
     public val errorsContainer: DirectoryProperty = objectFactory.directoryProperty()
 
+    @get:Input
+    internal val mode: Property<KtlintRunMode> = objectFactory.property()
+
     @OutputFiles
     public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
 
@@ -65,10 +69,11 @@ public open class GenerateReportsTask @Inject constructor(
             p.reporters.putAll(reports.get())
         }
 
-        workQueue.submit(ConsoleReportWorker::class.java) { param ->
-            param.errorsContainer.set(errorsContainer)
-            param.ignoreFailures.set(ignoreFailures)
-            param.projectDirectory.set(projectLayout.projectDirectory.asFile)
+        workQueue.submit(ConsoleReportWorker::class.java) { p ->
+            p.errorsContainer.set(errorsContainer)
+            p.ignoreFailures.set(ignoreFailures)
+            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+            p.mode.set(mode)
         }
 
         workQueue.await()

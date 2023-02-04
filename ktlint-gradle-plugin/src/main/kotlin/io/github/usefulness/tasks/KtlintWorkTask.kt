@@ -4,9 +4,12 @@ import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_CHUNK_SIZE
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import io.github.usefulness.support.KtLintParams
+import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.findApplicableEditorConfigFiles
+import io.github.usefulness.tasks.workers.KtlintWorker
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
@@ -19,6 +22,7 @@ import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
@@ -28,10 +32,12 @@ import org.gradle.work.ChangeType
 import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
+import org.gradle.workers.WorkerExecutor
 import java.util.concurrent.Callable
 
 public abstract class KtlintWorkTask(
-    projectLayout: ProjectLayout,
+    private val workerExecutor: WorkerExecutor,
+    private val projectLayout: ProjectLayout,
     objectFactory: ObjectFactory,
     private val patternFilterable: PatternFilterable = PatternSet(),
 ) : DefaultTask(), PatternFilterable by patternFilterable {
@@ -70,6 +76,11 @@ public abstract class KtlintWorkTask(
     public val source: FileCollection = objectFactory.fileCollection()
         .from(Callable { allSourceFiles.asFileTree.matching(patternFilterable) })
 
+    @OutputDirectory
+    public val discoveredErrors: DirectoryProperty = objectFactory.directoryProperty().apply {
+        value(projectLayout.buildDirectory.dir("ktlint_errors/$name"))
+    }
+
     public fun source(vararg sources: Any?): KtlintWorkTask = also { allSourceFiles.from(*sources) }
 
     public fun setSource(source: Any) {
@@ -87,6 +98,33 @@ public abstract class KtlintWorkTask(
 
     @Internal
     override fun getExcludes(): MutableSet<String> = patternFilterable.excludes
+
+    internal fun runKtlint(inputChanges: InputChanges, mode: KtlintRunMode) {
+        val workQueue = workerExecutor.processIsolation { spec ->
+            spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
+            spec.forkOptions { options ->
+                options.maxHeapSize = workerMaxHeapSize.get()
+            }
+        }
+
+        val chunks = getChangedSources(inputChanges)
+            .chunked(chunkSize.get())
+        val changedEditorConfigFiles = getChangedEditorconfigFiles(inputChanges)
+
+        chunks.forEachIndexed { index, sources ->
+            workQueue.submit(KtlintWorker::class.java) { p ->
+                p.name.set(name)
+                p.files.from(sources)
+                p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+                p.ktLintParams.set(getKtLintParams())
+                p.changedEditorConfigFiles.from(changedEditorConfigFiles)
+                p.discoveredErrors.set(discoveredErrors.get().file("errors_$index.bin"))
+                p.mode.set(mode)
+            }
+        }
+
+        workQueue.await()
+    }
 }
 
 internal inline fun <reified T> ObjectFactory.property(default: T? = null): Property<T> =

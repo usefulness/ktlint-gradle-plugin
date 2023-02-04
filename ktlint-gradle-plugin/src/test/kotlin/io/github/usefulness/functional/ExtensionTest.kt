@@ -53,7 +53,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -74,7 +74,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         val report = projectRoot.resolve("build/reports/ktlint/main-lint.html")
         assertThat(report).isNotEmpty()
@@ -106,7 +106,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -141,7 +141,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 

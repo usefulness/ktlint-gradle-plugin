@@ -6,7 +6,7 @@ import java.io.Serializable
 
 internal data class KtlintErrorResult(
     val file: File,
-    val errors: List<LintError>,
+    val errors: List<Pair<LintError, Boolean>>,
 ) : Serializable {
 
     companion object {

@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
 import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
+import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.tasks.KtlintWorkTask
 import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.GenerateReportsTask
@@ -50,29 +51,23 @@ public class KtlintGradlePlugin : Plugin<Project> {
                 }
 
                 sourceResolver.applyToAll(this) { id, resolvedSources ->
-                    val lintTaskPerSourceSet = tasks.register("lintKotlin${id.capitalize()}Worker", LintTask::class.java) { lintTask ->
-                        lintTask.source(resolvedSources)
+                    val checkWorker = tasks.register(
+                        "lintKotlin${id.capitalize()}Worker",
+                        LintTask::class.java,
+                    ) { task ->
+                        task.source(resolvedSources)
 
-                        lintTask.experimentalRules.set(provider { pluginExtension.experimentalRules })
-                        lintTask.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
+                        task.experimentalRules.set(provider { pluginExtension.experimentalRules })
+                        task.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
                     }
-                    lintKotlin.configure { it.dependsOn(lintTaskPerSourceSet) }
-
-                    val formatKotlinPerSourceSet = tasks.register("formatKotlin${id.capitalize()}", FormatTask::class.java) { formatTask ->
-                        formatTask.source(resolvedSources)
-                        formatTask.report.set(reportFile("$id-format.txt"))
-                        formatTask.experimentalRules.set(provider { pluginExtension.experimentalRules })
-                        formatTask.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
-                    }
-                    formatKotlin.configure { it.dependsOn(formatKotlinPerSourceSet) }
-
-                    val generatePerSourceSet = tasks.register(
-                        "lintKotlin${id.capitalize()}",
+                    val checkReporter = tasks.register(
+                        "lintKotlin${id.capitalize()}Reporter",
                         GenerateReportsTask::class.java,
-                    ) { generateReport ->
-                        generateReport.errorsContainer.set(lintTaskPerSourceSet.get().discoveredErrors)
-                        generateReport.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
-                        generateReport.reports.set(
+                    ) { task ->
+                        task.errorsContainer.set(checkWorker.get().discoveredErrors)
+                        task.mode.set(KtlintRunMode.Check)
+                        task.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
+                        task.reports.set(
                             provider {
                                 pluginExtension.reporters.associateWith { reporterId ->
                                     val type = ReporterType.getById(reporterId)
@@ -81,7 +76,35 @@ public class KtlintGradlePlugin : Plugin<Project> {
                             },
                         )
                     }
-                    lintKotlin.configure { it.dependsOn(generatePerSourceSet) }
+                    lintKotlin.configure { it.dependsOn(checkWorker) }
+                    lintKotlin.configure { it.dependsOn(checkReporter) }
+
+                    val formatWorker = tasks.register(
+                        "formatKotlin${id.capitalize()}Worker",
+                        FormatTask::class.java,
+                    ) { task ->
+                        task.source(resolvedSources)
+                        task.experimentalRules.set(provider { pluginExtension.experimentalRules })
+                        task.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
+                    }
+                    val formatReporter = tasks.register(
+                        "formatKotlin${id.capitalize()}Reporter",
+                        GenerateReportsTask::class.java,
+                    ) { task ->
+                        task.errorsContainer.set(formatWorker.get().discoveredErrors)
+                        task.mode.set(KtlintRunMode.Format)
+                        task.ignoreFailures.set(provider { true })
+                        task.reports.set(
+                            provider {
+                                pluginExtension.reporters.associateWith { reporterId ->
+                                    val type = ReporterType.getById(reporterId)
+                                    reportFile("$id-lint.${type.fileExtension}")
+                                }
+                            },
+                        )
+                    }
+                    formatKotlin.configure { it.dependsOn(formatWorker) }
+                    formatKotlin.configure { it.dependsOn(formatReporter) }
                 }
             }
         }

@@ -35,14 +35,14 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
             reporters.onEach { (_, reporter) -> reporter.before(relativePath) }
 
             reporters.onEach { (type, reporter) ->
-                result.errors.forEach { lintError ->
+                result.errors.forEach { (lintError, corrected) ->
                     // some reporters want relative paths, some want absolute
                     val filePath = reporterPathFor(
                         reporterType = type,
                         output = result.file,
                         relativeRoot = projectDir,
                     )
-                    reporter.onLintError(filePath, lintError, false)
+                    reporter.onLintError(filePath, lintError, corrected)
                 }
             }
 

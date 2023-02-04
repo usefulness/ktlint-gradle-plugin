@@ -41,14 +41,14 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             """.trimIndent(),
         )
 
-        buildAndFail("lintKotlinMain").apply {
+        buildAndFail("lintKotlin").apply {
             assertThat(output).containsPattern(".*$className.kt.* Lint error > \\[.*] Missing spacing before \"\\{\"".toPattern())
             assertThat(output).containsPattern(".*$className.kt.* Lint error > \\[.*] Unexpected spacing before \"\\(\"".toPattern())
             output.lines().filter { it.contains("Lint error") }.forEach { line ->
                 val filePath = pathPattern.find(line)?.groups?.get(1)?.value.orEmpty()
                 assertThat(File(filePath)).exists()
             }
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
@@ -68,13 +68,13 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
 
         fileWithFailingExperimentalRule()
 
-        buildAndFail("lintKotlinMain").apply {
+        buildAndFail("lintKotlin").apply {
             assertThat(output).containsPattern(".*Lint error > \\[experimental:unnecessary-parentheses".toPattern())
             output.lines().filter { it.contains("Lint error") }.forEach { line ->
                 val filePath = pathPattern.find(line)?.groups?.get(1)?.value.orEmpty()
                 assertThat(File(filePath)).exists()
             }
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.FAILED)
         }
     }
 
@@ -94,20 +94,20 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             """.trimIndent(),
         )
 
-        build("lintKotlinMain").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
-    fun `lintKotlinMain succeeds when experimental rules are not enabled and code contains experimental rules violations`() {
+    fun `lintKotlin succeeds when experimental rules are not enabled and code contains experimental rules violations`() {
         settingsFile()
         buildFile()
 
         fileWithFailingExperimentalRule()
 
-        build("lintKotlinMain").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -129,12 +129,12 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile("KotlinClass.kt", kotlinClass)
 
         build("formatKotlin").apply {
-            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             output.lines().filter { it.contains("Format could not fix") }.forEach { line ->
                 val filePath = pathPattern.find(line)?.groups?.get(1)?.value.orEmpty()
                 assertThat(File(filePath)).exists()
             }
-            assertThat(output).contains("Format failed to autocorrect")
         }
     }
 
@@ -169,25 +169,47 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         )
 
         build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
 
         build("formatKotlin").apply {
+            assertThat(task(":formatKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build("formatKotlin").apply {
-            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":formatKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
 
         editorconfigFile.appendText("content=updated")
         build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
         build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+        }
+        build("formatKotlin").apply {
+            assertThat(task(":formatKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+        build("formatKotlin").apply {
+            assertThat(task(":formatKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":formatKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
         }
     }
 
@@ -214,9 +236,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinTestWorker")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":lintKotlinTestReporter")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
             assertThat(output).contains("lintKotlinMainWorker - executing against 2 file(s)")
         }
 
@@ -230,16 +252,16 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(task(":lintKotlinTestWorker")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
+            assertThat(task(":lintKotlinTestReporter")?.outcome).isEqualTo(TaskOutcome.NO_SOURCE)
             assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
         }
 
         editorconfigFile.appendText("content=updated")
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).contains("lintKotlinMainWorker - executing against 2 file(s)")
         }
 
@@ -252,7 +274,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         )
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
         }
 
@@ -265,7 +287,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         )
         buildAndFail("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("lintKotlinMainWorker - executing against 1 file(s)")
         }
     }
@@ -296,7 +318,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             assertThat(output).contains("Configuration cache entry stored")
         }
         build("formatKotlin", "--configuration-cache").apply {
-            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).contains("Configuration cache entry reused.")
         }
     }
@@ -321,7 +343,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         }
 
         build("lintKotlin", "--info").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinMainReporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(task(":lintKotlinMainWorker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             val resolvedRulesCount = output.findResolvedRuleProvidersCount("lintKotlinMainWorker")
             assertThat(resolvedRulesCount).isGreaterThan(0)
@@ -329,7 +351,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
 
         build("formatKotlin", "--info").apply {
             assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            val resolvedRulesCount = output.findResolvedRuleProvidersCount("formatKotlinMain")
+            val resolvedRulesCount = output.findResolvedRuleProvidersCount("formatKotlinMainWorker")
             assertThat(resolvedRulesCount).isGreaterThan(0)
         }
     }

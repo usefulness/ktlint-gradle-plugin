@@ -68,6 +68,9 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
                 resolve("src/main/kotlin/MainSourceSet.kt") {
                     writeText(kotlinClass("MainSourceSet"))
                 }
+                resolve("src/androidTest/kotlin/AndroidTestSourceSet.kt") {
+                    writeText(kotlinClass("AndroidTestSourceSet"))
+                }
                 resolve("src/debug/kotlin/DebugSourceSet.kt") {
                     writeText(kotlinClass("DebugSourceSet"))
                 }
@@ -84,11 +87,31 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
     @Test
     fun runsOnAndroidProject() {
         build("lintKotlin").apply {
-            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinMain")?.outcome)
-            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinDebug")?.outcome)
-            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinTest")?.outcome)
-            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlinFlavorOne")?.outcome)
-            assertThat(TaskOutcome.SUCCESS).isEqualTo(task(":androidproject:lintKotlin")?.outcome)
+            listOf(
+                "lintKotlinMain",
+                "lintKotlinDebug",
+                "lintKotlinTest",
+                "lintKotlinFlavorOne",
+                "lintKotlinAndroidTest",
+            ).forEach { taskName ->
+                assertThat(task(":androidproject:${taskName}Worker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":androidproject:${taskName}Reporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+            assertThat(task(":androidproject:lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+
+        build("formatKotlin").apply {
+            listOf(
+                "formatKotlinMain",
+                "formatKotlinDebug",
+                "formatKotlinTest",
+                "formatKotlinFlavorOne",
+                "formatKotlinAndroidTest",
+            ).forEach { taskName ->
+                assertThat(task(":androidproject:${taskName}Worker")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+                assertThat(task(":androidproject:${taskName}Reporter")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            }
+            assertThat(task(":androidproject:formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
