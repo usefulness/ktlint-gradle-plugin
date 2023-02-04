@@ -104,6 +104,7 @@ public abstract class KtlintWorkTask(
             spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
                 options.maxHeapSize = workerMaxHeapSize.get()
+                options.jvmArgs = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED") // https://youtrack.jetbrains.com/issue/KT-51619
             }
         }
 
