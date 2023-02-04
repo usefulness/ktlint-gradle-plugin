@@ -26,37 +26,34 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
         val discoveredErrors = parameters.errorsContainer.readKtlintErrors()
         val baselineContent = parameters.baselineFile.orNull?.asFile?.readKtlintBaseline().orEmpty()
 
-        val errorsFound = discoveredErrors.any()
-        if (errorsFound) {
-            discoveredErrors.forEach { (file, errors) ->
-                val baselineErrors = baselineContent[file.getBaselineKey(projectDir)].orEmpty()
-                errors.forEach { (lintError, corrected) ->
-                    if (baselineErrors.doesNotContain(lintError)) {
-                        printError(
-                            file = file,
-                            lintError = lintError,
-                            corrected = corrected,
-                        )
+        var hasUncoveredErrors = false
+        discoveredErrors.forEach { (file, errors) ->
+            val baselineErrors = baselineContent[file.getBaselineKey(projectDir)].orEmpty()
+            errors.forEach { (lintError, corrected) ->
+                when (mode) {
+                    KtlintRunMode.Check ->
+                        if (baselineErrors.doesNotContain(lintError)) {
+                            logger.warn(lintError.generateMessage(file = file, message = "Lint error"))
+                            hasUncoveredErrors = true
+                        }
+
+                    KtlintRunMode.Format -> {
+                        when (corrected) {
+                            true -> logger.quiet(lintError.generateMessage(file = file, message = "Format fixed"))
+                            false -> logger.warn(lintError.generateMessage(file = file, message = "Format could not fix"))
+                        }
+                        hasUncoveredErrors = true
                     }
                 }
             }
         }
 
-        if (!parameters.ignoreFailures.get() && errorsFound) {
+        if (!parameters.ignoreFailures.get() && hasUncoveredErrors) {
             val message = when (mode) {
                 KtlintRunMode.Check -> "ktlint check failed"
                 KtlintRunMode.Format -> "Format failed to autocorrect"
             }
             throw GradleException(message)
-        }
-    }
-
-    private fun printError(file: File, lintError: LintError, corrected: Boolean) = when (mode) {
-        KtlintRunMode.Check -> logger.warn(lintError.generateMessage(file, message = "Lint error"))
-
-        KtlintRunMode.Format -> when (corrected) {
-            true -> logger.quiet(lintError.generateMessage(file, message = "Format fixed"))
-            false -> logger.warn(lintError.generateMessage(file, message = "Format could not fix"))
         }
     }
 
