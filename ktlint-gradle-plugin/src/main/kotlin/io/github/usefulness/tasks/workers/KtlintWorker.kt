@@ -43,7 +43,7 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
             logger.debug("$name linting: $relativePath")
 
             if (file.extension !in supportedExtensions) {
-                logger.debug("$name ignoring non Kotlin file: $relativePath")
+                logger.warn("$name ignoring non Kotlin file: $relativePath")
                 return@forEach
             }
 

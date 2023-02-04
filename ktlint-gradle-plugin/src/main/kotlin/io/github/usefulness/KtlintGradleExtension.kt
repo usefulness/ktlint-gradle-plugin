@@ -6,7 +6,7 @@ public open class KtlintGradleExtension {
     internal companion object {
         const val DEFAULT_IGNORE_FAILURES = false
         const val DEFAULT_EXPERIMENTAL_RULES = false
-        const val DEFAULT_CHUNK_SIZE = 100
+        const val DEFAULT_CHUNK_SIZE = 50
         val DEFAULT_DISABLED_RULES = emptyArray<String>()
     }
 
