@@ -66,7 +66,7 @@ class ReportersTest : WithGradleTest.Kotlin() {
         build("lintKotlin").apply {
             assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(reportFile("/main-lint.txt")).content().isEqualTo(expectedEmptyPlain())
-            assertThat(reportFile("main-lint.xml")).content().isEqualTo(expectedEmptyCheckstyle())
+            assertThat(reportFile("/main-lint.xml")).content().isEqualTo(expectedEmptyCheckstyle())
             assertThat(reportFile("/main-lint.html")).content().isEqualTo(expectedEmptyHtml())
             assertThat(reportFile("/main-lint.json")).content().isEqualTo(expectedEmptyJson())
             assertThat(reportFile("/main-lint.sarif.json")).content().isNotBlank()

@@ -3,6 +3,9 @@ plugins {
     id("io.github.usefulness.ktlint-gradle-plugin")
 }
 
+ktlint {
+    reporters = ["plain"]
+}
 kotlin {
     jvmToolchain(JavaVersion.current().majorVersion.toInteger())
 }

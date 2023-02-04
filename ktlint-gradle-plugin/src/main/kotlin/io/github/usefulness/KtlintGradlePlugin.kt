@@ -76,8 +76,10 @@ public class KtlintGradlePlugin : Plugin<Project> {
                             },
                         )
                     }
-                    lintKotlin.configure { it.dependsOn(checkWorker) }
-                    lintKotlin.configure { it.dependsOn(checkReporter) }
+                    lintKotlin.configure {
+                        it.dependsOn(checkWorker)
+                        it.dependsOn(checkReporter)
+                    }
 
                     val formatWorker = tasks.register(
                         "formatKotlin${id.capitalize()}Worker",
@@ -103,8 +105,10 @@ public class KtlintGradlePlugin : Plugin<Project> {
                             },
                         )
                     }
-                    formatKotlin.configure { it.dependsOn(formatWorker) }
-                    formatKotlin.configure { it.dependsOn(formatReporter) }
+                    formatKotlin.configure {
+                        it.dependsOn(formatWorker)
+                        it.dependsOn(formatReporter)
+                    }
                 }
             }
         }

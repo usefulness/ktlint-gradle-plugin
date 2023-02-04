@@ -4,6 +4,9 @@ plugins {
     id("io.github.usefulness.ktlint-gradle-plugin")
 }
 
+ktlint {
+    reporters = ["plain"]
+}
 android {
     compileSdkVersion(33)
     namespace = "com.ktint_gradle_plugin.example"
