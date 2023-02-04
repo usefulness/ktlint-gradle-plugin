@@ -9,18 +9,17 @@ Gradle wrapper for [pinterest/ktlint](https://github.com/pinterest/ktlint)
 ### Installation
 
 Available on the:
+
 - [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
 - [Maven Central](https://mvnrepository.com/artifact/io.github.usefulness/kotlin-gradle-plugin)
 
 #### Apply the plugin
 
-
-```kotlin
+```groovy
 plugins {
     id("io.github.usefulness.ktlint-gradle-plugin") version "{{version}}"
 }
 ```
-
 
 ### Compatibility
 
@@ -31,158 +30,91 @@ plugins {
 ### Features
 
 - Supports Kotlin Gradle plugins:
-  - [JVM](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm)
-  - [Multiplatform](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.multiplatform)
-  - [Android](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.android)
-  - [JS](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.js)
+    - [JVM](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm)
+    - [Multiplatform](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.multiplatform)
+    - [Android](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.android)
+    - [JS](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.js)
 - Supports `.kt` and `.kts` files
-- Incremental build support and fast parallelization with Gradle Worker API
+- Leverages latest Gradle APIs (cacheable, incremental tasks using Gradle Worker API)   
 - Configurable reporters
 
 ### Tasks
 
 When your project uses one of the supported Kotlin Gradle plugins, the plugin adds these tasks:
 
-`formatKotlin`: format Kotlin source code according to `ktlint` rules or warn when auto-format not possible.
+- `./gradlew formatKotlin`: format Kotlin source code according to `ktlint` rules or warn when auto-format not possible.
 
-`lintKotlin`: report Kotlin lint errors and by default fail the build.
+- `./gradlew lintKotlin`: report Kotlin lint errors and by default fail the build.
 
 Also `check` becomes dependent on `lintKotlin`.
 
 Granular tasks are added for each source set in the project: `formatKotlin`*`SourceSet`* and `lintKotlin`*`SourceSet`*.
 
 ### Configuration
-Options are configured in the `ktlint` extension:
 
-<details open>
-<summary>Kotlin</summary>
-
-```kotlin
-ktlint {
-    ignoreFailures = false
-    reporters = emptyArray()
-    experimentalRules = false
-    disabledRules = emptyArray()
-    ktlintVersion = "x.y.z"
-    chunkSize = 50
-}
-```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
+Options can be configured in the `ktlint` extension:
 
 ```groovy
 ktlint {
     ignoreFailures = false
-    reporters = []
-    experimentalRules = false
-    disabledRules = []
-    ktlintVersion = 'x.y.z'
+    reporters = ["checkstyle", "html", "json", "plain", "sarif"]
+    experimentalRules = true
+    disabledRules = ["no-wildcard-imports", "experimental:annotation", "your-custom-rule:no-bugs"]
+    ktlintVersion = "1.0.0-SNAPSHOT"
     chunkSize = 50
+    baselineFile.set(file("config/ktlint_baseline.xml"))
 }
 ```
 
-</details>
+- `ignoreFailures` - makes the `LintTask` tasks always pass
+- `reporters` - defines enable [reporters](https://pinterest.github.io/ktlint/install/cli/#violation-reporting) for all
+  tasks.
+- `experimentalRules` - enables rules from ktlint [Experimental](https://pinterest.github.io/ktlint/rules/experimental/)
+  ruleset.
+- `disabledRules` - can include an array of rule ids you wish to disable
+- `ktlintVersion` There is a basic support for overriding ktlint version, but the plugin doesn't guarantee backwards
+  compatibility with all `ktlint` versions.
+  Errors like `java.lang.NoSuchMethodError:` or `com/pinterest/ktlint/core/KtLint$Params` can be thrown if
+  provided `ktlint` version isn't compatible with the latest ktlint apis.
 
-`ignoreFailures` - makes the `LintTask` tasks alway spass
-`reporters` - defines enable [reporters](https://pinterest.github.io/ktlint/install/cli/#violation-reporting) for all tasks. Supported values: `checkstyle`, `html`, `json`, `plain`, `sarif`
-`experimentalRules` - enables rules from ktlint [Experimental](https://pinterest.github.io/ktlint/rules/experimental/) ruleset.
-`disabledRules` - can include an array of rule ids you wish to disable. For example to allow wildcard imports:
-```groovy
-disabledRules = ["no-wildcard-imports"]
-```
-You must prefix rule ids not part of the standard rule set with `<rule-set-id>:<rule-id>`. For example `experimental:annotation`.
-
-`ktlintVersion` There is a basic support for overriding ktlint version, but the plugin doesn't guarantee backwards compatibility with all `ktlint` versions.
-Errors like `java.lang.NoSuchMethodError:` or `com/pinterest/ktlint/core/KtLint$Params` can be thrown if provided `ktlint` version isn't compatible with the latest ktlint apis.
-
-`chunkSize` - defines how many files will be processed by a single gradle worker in parallel
+- `chunkSize` - defines how many files will be processed by a single gradle worker in parallel
+- `baselineFile` - points at location of baseline file containing _known_ offenses that will be ignored during `lintKotlin` task execution  
 
 ### Customizing Tasks
 
-The `formatKotlin`*`SourceSet`* and `lintKotlin`*`SourceSet`* tasks inherit from [SourceTask](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceTask.html)
+The `formatKotlin`*`SourceSet`* and `lintKotlin`*`SourceSet`* tasks inherit
+from [SourceTask](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceTask.html)
 so you can customize includes, excludes, and source.
 
-<details open>
-<summary>Kotlin</summary>
-
-```kotlin
-tasks.lintKotlinMain {
-  exclude("com/example/**/generated/*.kt")
-}
-```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
-
 ```groovy
-tasks.named('lintKotlinMain') {
-    exclude 'com/example/**/generated/*.kt'
+tasks.named("lintKotlinMain") {
+    exclude("com/example/**/generated/*.kt")
 }
 ```
-
-</details>
 
 Note that exclude paths are relative to the package root.
 
 #### Advanced
+
 By default, Gradle workers will use 256MB of heap size. To adjust this setting use:
-<details>
-<summary>Kotlin</summary>
-
-```kotlin
-import io.github.usefulness.tasks.KtlintWorkTask
-
-tasks.withType<KtlintWorkTask> {
-  workerMaxHeapSize.set("512m")
-}
-```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
 
 ```groovy
 import io.github.usefulness.tasks.KtlintWorkTask
 
-tasks.withType(KtlintWorkTask::class).configureEach {
-  workerMaxHeapSize.set("512m")
+tasks.withType(KtlintWorkTask).configureEach {
+    workerMaxHeapSize.set("512m")
 }
 ```
-
-</details>
 
 ### Custom Rules
 
 You can add custom `ktlint` RuleSets using the `ktlintRuleSet` configuration dependency:
 
-<details open>
-<summary>Kotlin</summary>
-
-```kotlin
+```groovy
 dependencies {
     ktlintRuleSet(files("libs/my-custom-ktlint-rules.jar"))
     ktlintRuleSet(project(":ktlint-custom-rules"))
     ktlintRuleSet("org.other.ktlint:custom-rules:1.0")
+    ktlintRuleSet("com.twitter.compose.rules:ktlint:0.0.26")
 }
 ```
-
-</details>
-
-<details>
-<summary>Groovy</summary>
-
-```groovy
-dependencies {
-    ktlintRuleSet files('libs/my-custom-ktlint-rules.jar')
-    ktlintRuleSet project(':ktlint-custom-rules')
-    ktlintRuleSet 'org.other.ktlint:custom-rules:1.0'
-}
-```
-
-</details>

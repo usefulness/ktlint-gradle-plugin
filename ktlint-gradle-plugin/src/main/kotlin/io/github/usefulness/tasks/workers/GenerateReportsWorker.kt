@@ -1,6 +1,9 @@
 package io.github.usefulness.tasks.workers
 
 import io.github.usefulness.support.ReporterType
+import io.github.usefulness.support.doesNotContain
+import io.github.usefulness.support.getBaselineKey
+import io.github.usefulness.support.readKtlintBaseline
 import io.github.usefulness.support.readKtlintErrors
 import io.github.usefulness.support.reporterPathFor
 import io.github.usefulness.support.resolveReporters
@@ -17,32 +20,33 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
 
     private val logger = Logging.getLogger(LintTask::class.java)
 
-    internal interface Parameters : WorkParameters {
-        val errorsContainer: DirectoryProperty
-        val projectDirectory: RegularFileProperty
-        val reporters: MapProperty<String, File>
-    }
-
     override fun execute() {
         val projectDir = parameters.projectDirectory.get().asFile
-        val reporters = resolveReporters(enabled = getReports())
+
         val discoveredErrors = parameters.errorsContainer.readKtlintErrors()
+        val baselineContent = parameters.baselineFile.orNull?.asFile?.readKtlintBaseline().orEmpty()
+
+        val reporters = resolveReporters(enabled = getReports())
         logger.info("resolved ${reporters.size} Reporters")
 
         reporters.onEach { (_, reporter) -> reporter.beforeAll() }
         discoveredErrors.forEach { result ->
             val relativePath = result.file.toRelativeString(projectDir)
+            val baselineErrors = baselineContent[result.file.getBaselineKey(projectDir)].orEmpty()
+
             reporters.onEach { (_, reporter) -> reporter.before(relativePath) }
 
             reporters.onEach { (type, reporter) ->
                 result.errors.forEach { (lintError, corrected) ->
-                    // some reporters want relative paths, some want absolute
-                    val filePath = reporterPathFor(
-                        reporterType = type,
-                        output = result.file,
-                        relativeRoot = projectDir,
-                    )
-                    reporter.onLintError(filePath, lintError, corrected)
+                    if (baselineErrors.doesNotContain(lintError)) {
+                        // some reporters want relative paths, some want absolute
+                        val filePath = reporterPathFor(
+                            reporterType = type,
+                            output = result.file,
+                            relativeRoot = projectDir,
+                        )
+                        reporter.onLintError(filePath, lintError, corrected)
+                    }
                 }
             }
 
@@ -53,4 +57,11 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
 
     private fun getReports() = parameters.reporters.get()
         .mapKeys { (id, _) -> ReporterType.getById(id = id) }
+
+    internal interface Parameters : WorkParameters {
+        val errorsContainer: DirectoryProperty
+        val projectDirectory: RegularFileProperty
+        val reporters: MapProperty<String, File>
+        val baselineFile: RegularFileProperty
+    }
 }

@@ -181,4 +181,41 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
             assertThat(output).contains("com.pinterest:ktlint:0.46.0")
         }
     }
+
+    @Test
+    fun `readme doc contains valid groovy code`() {
+        projectRoot.resolve("build.gradle") {
+            // language=groovy
+            val buildScript =
+                """
+                plugins {
+                    id 'kotlin'
+                    id 'io.github.usefulness.ktlint-gradle-plugin'
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                ktlint {
+                    ignoreFailures = false
+                    reporters = ["checkstyle", "html", "json", "plain", "sarif"]
+                    experimentalRules = true
+                    disabledRules = ["no-wildcard-imports", "experimental:annotation", "your-custom-rule:no-bugs"]
+                    ktlintVersion = "0.48.2"
+                    chunkSize = 50
+                    baselineFile.set(file("config/ktlint_baseline.xml"))
+                }
+                
+                """.trimIndent()
+            writeText(buildScript)
+        }
+        projectRoot.resolve("src/main/kotlin/FileName.kt") {
+            writeText(kotlinClass("FileName"))
+        }
+
+        build("lintKotlin", "--dry-run").apply {
+            assertThat(output).contains(":lintKotlin SKIPPED")
+        }
+    }
 }
