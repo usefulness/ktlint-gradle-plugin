@@ -90,6 +90,11 @@ jobs:
           cd test-project/build/reports/ktlint
           grep 'no-empty-class-body' main-lint.txt | grep -q 'EmptyClassBodyClass.kt:3:27'
           grep 'op-spacing' test-lint.txt | grep -q 'OpSpacing.kt:5:16'
+          if [ ${{ matrix.os }} == "windows-latest" ]; then
+            echo "Windows can't delete files: https://github.com/gradle/gradle/issues/21964"
+            gradle --stop     
+          fi
+        shell: bash
 
       - uses: gradle/gradle-build-action@v2
         with:
