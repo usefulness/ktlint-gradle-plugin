@@ -141,10 +141,13 @@ public abstract class KtlintWorkTask(
             }
         }
 
-        reporterQueue.submit(GenerateReportsWorker::class.java) { p ->
-            p.errorsContainer.set(tempErrorsDir)
-            p.projectDirectory.set(projectLayout.projectDirectory.asFile)
-            p.reporters.putAll(reports.get())
+        val reports = reports.get()
+        if (reports.any()) {
+            reporterQueue.submit(GenerateReportsWorker::class.java) { p ->
+                p.errorsContainer.set(tempErrorsDir)
+                p.projectDirectory.set(projectLayout.projectDirectory.asFile)
+                p.reporters.putAll(reports)
+            }
         }
 
         reporterQueue.submit(ConsoleReportWorker::class.java) { p ->
