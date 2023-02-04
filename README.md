@@ -64,6 +64,7 @@ ktlint {
     experimentalRules = false
     disabledRules = emptyArray()
     ktlintVersion = "x.y.z"
+    chunkSize = 50
 }
 ```
 
@@ -79,23 +80,25 @@ ktlint {
     experimentalRules = false
     disabledRules = []
     ktlintVersion = 'x.y.z'
+    chunkSize = 50
 }
 ```
 
 </details>
 
-Options for `reporters`: `checkstyle`, `html`, `json`, `plain`, `sarif`
-
-The `experimentalRules` property enables rules which are part of ktlint's experimental rule set.
-
-The `disabledRules` property can include an array of rule ids you wish to disable. For example to allow wildcard imports:
+`ignoreFailures` - makes the `LintTask` tasks alway spass
+`reporters` - defines enable [reporters](https://pinterest.github.io/ktlint/install/cli/#violation-reporting) for all tasks. Supported values: `checkstyle`, `html`, `json`, `plain`, `sarif`
+`experimentalRules` - enables rules from ktlint [Experimental](https://pinterest.github.io/ktlint/rules/experimental/) ruleset.
+`disabledRules` - can include an array of rule ids you wish to disable. For example to allow wildcard imports:
 ```groovy
 disabledRules = ["no-wildcard-imports"]
 ```
 You must prefix rule ids not part of the standard rule set with `<rule-set-id>:<rule-id>`. For example `experimental:annotation`.
 
-There is a basic support for overriding `ktlintVersion`, but the plugin doesn't guarantee backwards compatibility with all `ktlint` versions.
+`ktlintVersion` There is a basic support for overriding ktlint version, but the plugin doesn't guarantee backwards compatibility with all `ktlint` versions.
 Errors like `java.lang.NoSuchMethodError:` or `com/pinterest/ktlint/core/KtLint$Params` can be thrown if provided `ktlint` version isn't compatible with the latest ktlint apis.
+
+`chunkSize` - defines how many files will be processed by a single gradle worker in parallel
 
 ### Customizing Tasks
 
