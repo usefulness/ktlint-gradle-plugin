@@ -1,14 +1,14 @@
 package io.github.usefulness
 
+import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
+import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
 import io.github.usefulness.support.ReporterType
+import io.github.usefulness.tasks.FormatTask
+import io.github.usefulness.tasks.KtlintWorkTask
+import io.github.usefulness.tasks.LintTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
-import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
-import io.github.usefulness.tasks.KtlintWorkTask
-import io.github.usefulness.tasks.FormatTask
-import io.github.usefulness.tasks.LintTask
 import java.io.File
 
 public class KtlintGradlePlugin : Plugin<Project> {
@@ -42,7 +42,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     task.ktlintClasspath.setFrom(ktlintConfiguration)
                     task.ruleSetsClasspath.setFrom(ruleSetConfiguration)
                     task.reportersConfiguration.setFrom(reportersConfiguration)
-                    task.chunkSize.set(provider { pluginExtension.chunkSize })
+                    task.chunkSize.set(pluginExtension.chunkSize)
                 }
 
                 sourceResolver.applyToAll(this) { id, resolvedSources ->
@@ -51,14 +51,13 @@ public class KtlintGradlePlugin : Plugin<Project> {
                         LintTask::class.java,
                     ) { task ->
                         task.source(resolvedSources)
-
-                        task.experimentalRules.set(provider { pluginExtension.experimentalRules })
-                        task.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
-
-                        task.ignoreFailures.set(provider { pluginExtension.ignoreFailures })
+                        task.experimentalRules.set(pluginExtension.experimentalRules)
+                        task.disabledRules.set(pluginExtension.disabledRules)
+                        task.ignoreFailures.set(pluginExtension.ignoreFailures)
+                        task.baselineFile.set(pluginExtension.baselineFile)
                         task.reports.set(
-                            provider {
-                                pluginExtension.reporters.associateWith { reporterId ->
+                            pluginExtension.reporters.map {
+                                it.associateWith { reporterId ->
                                     val type = ReporterType.getById(reporterId)
                                     reportFile("$id-lint.${type.fileExtension}")
                                 }
@@ -72,12 +71,13 @@ public class KtlintGradlePlugin : Plugin<Project> {
                         FormatTask::class.java,
                     ) { task ->
                         task.source(resolvedSources)
-                        task.experimentalRules.set(provider { pluginExtension.experimentalRules })
-                        task.disabledRules.set(provider { pluginExtension.disabledRules.toList() })
-                        task.ignoreFailures.set(provider { true })
+                        task.experimentalRules.set(pluginExtension.experimentalRules)
+                        task.disabledRules.set(pluginExtension.disabledRules)
+                        task.ignoreFailures.set(true)
+                        task.baselineFile.set(pluginExtension.baselineFile)
                         task.reports.set(
-                            provider {
-                                pluginExtension.reporters.associateWith { reporterId ->
+                            pluginExtension.reporters.map {
+                                it.associateWith { reporterId ->
                                     val type = ReporterType.getById(reporterId)
                                     reportFile("$id-format.${type.fileExtension}")
                                 }
@@ -112,7 +112,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
             isVisible = false
 
             val dependencyProvider = provider {
-                val ktlintVersion = pluginExtension.ktlintVersion
+                val ktlintVersion = pluginExtension.ktlintVersion.get()
                 this@createKtlintConfiguration.dependencies.create("com.pinterest:ktlint:$ktlintVersion")
             }
 

@@ -14,6 +14,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -21,8 +22,10 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -74,6 +77,11 @@ public abstract class KtlintWorkTask(
 
     @Input
     public val ignoreFailures: Property<Boolean> = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
+
+    @PathSensitive(PathSensitivity.RELATIVE)
+    @InputFile
+    @Optional
+    public val baselineFile: RegularFileProperty = objectFactory.fileProperty()
 
     @OutputFiles
     public val reports: MapProperty<String, File> = objectFactory.mapProperty(default = emptyMap())
@@ -141,6 +149,7 @@ public abstract class KtlintWorkTask(
                 p.errorsContainer.set(tempErrorsDir)
                 p.projectDirectory.set(projectLayout.projectDirectory.asFile)
                 p.reporters.putAll(reports)
+                p.baselineFile.set(baselineFile)
             }
         }
 
@@ -149,6 +158,7 @@ public abstract class KtlintWorkTask(
             p.ignoreFailures.set(ignoreFailures)
             p.projectDirectory.set(projectLayout.projectDirectory.asFile)
             p.mode.set(mode)
+            p.baselineFile.set(baselineFile)
         }
         reporterQueue.await()
         tempErrorsDir.asFile.delete()
