@@ -161,7 +161,7 @@ public abstract class KtlintWorkTask(
             p.baselineFile.set(baselineFile)
         }
         reporterQueue.await()
-        tempErrorsDir.asFile.delete()
+        tempErrorsDir.asFile.deleteRecursively()
     }
 }
 
