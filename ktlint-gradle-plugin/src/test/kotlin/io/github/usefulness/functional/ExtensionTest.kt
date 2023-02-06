@@ -37,7 +37,19 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
     }
 
     @Test
-    fun `extension configures ignoreFailures`() {
+    fun `extension configures ignoreFailures for 'lintKotlin'`() {
+        projectRoot.resolve("src/main/kotlin/SomeClass.kt") {
+            writeText(
+                """
+                data class SomeClass(val value : String)
+                
+                """.trimIndent(),
+            )
+        }
+        projectRoot.resolve("src/main/kotlin/FileName.kt") {
+            writeText(kotlinClass("DifferentClassName"))
+        }
+
         projectRoot.resolve("build.gradle") {
             // language=groovy
             val script =
@@ -45,15 +57,47 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                 ktlint {
                     ignoreFailures = true
                 }
+                
                 """.trimIndent()
             appendText(script)
-        }
-        projectRoot.resolve("src/main/kotlin/FileName.kt") {
-            writeText(kotlinClass("DifferentClassName"))
         }
 
         build("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        }
+
+        projectRoot.resolve("build.gradle") {
+            // language=groovy
+            val script =
+                """
+                import io.github.usefulness.tasks.FormatTask 
+                
+                tasks.withType(FormatTask).configureEach {
+                    ignoreFailures = false
+                }
+                
+                """.trimIndent()
+            appendText(script)
+        }
+
+        buildAndFail("formatKotlin").apply {
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("FileName.kt:1:1: Format could not fix > [filename]")
+            assertThat(output).contains("SomeClass.kt:1:32: Format fixed > [colon-spacing]")
+        }
+
+        projectRoot.resolve("src/main/kotlin/FileName.kt") {
+            writeText(
+                """
+                data class FileName(val value : String)
+                
+                """.trimIndent(),
+            )
+        }
+
+        build("formatKotlin").apply {
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("FileName.kt:1:31: Format fixed > [colon-spacing]")
         }
     }
 

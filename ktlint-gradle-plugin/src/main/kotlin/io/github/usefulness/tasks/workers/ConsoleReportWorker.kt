@@ -40,9 +40,11 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
                     KtlintRunMode.Format -> {
                         when (corrected) {
                             true -> logger.quiet(lintError.generateMessage(file = file, message = "Format fixed"))
-                            false -> logger.warn(lintError.generateMessage(file = file, message = "Format could not fix"))
+                            false -> {
+                                hasUncoveredErrors = true
+                                logger.warn(lintError.generateMessage(file = file, message = "Format could not fix"))
+                            }
                         }
-                        hasUncoveredErrors = true
                     }
                 }
             }
