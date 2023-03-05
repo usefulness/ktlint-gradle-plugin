@@ -100,7 +100,7 @@ jobs:
         with:
           build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin --scan --stacktrace
+          arguments: formatKotlin lintKotlin --scan --stacktrace --rerun
 
       - name: Upload reports
         if: ${{ failure() }}
