@@ -76,6 +76,11 @@ public abstract class KtlintWorkTask(
     public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
 
     @Input
+    public val jvmArgs: ListProperty<String> = objectFactory.listProperty(
+        default = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED"), // https://youtrack.jetbrains.com/issue/KT-51619
+    )
+
+    @Input
     public val ignoreFailures: Property<Boolean> = objectFactory.property(default = DEFAULT_IGNORE_FAILURES)
 
     @PathSensitive(PathSensitivity.RELATIVE)
@@ -114,7 +119,7 @@ public abstract class KtlintWorkTask(
             spec.classpath.setFrom(ktlintClasspath, ruleSetsClasspath)
             spec.forkOptions { options ->
                 options.maxHeapSize = workerMaxHeapSize.get()
-                options.jvmArgs = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED") // https://youtrack.jetbrains.com/issue/KT-51619
+                options.jvmArgs = jvmArgs.get()
             }
         }
 
