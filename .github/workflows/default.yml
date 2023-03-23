@@ -100,7 +100,7 @@ jobs:
         with:
           build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin --scan --stacktrace --rerun
+          arguments: formatKotlin lintKotlin --scan --stacktrace --no-build-cache
 
       - name: Upload reports
         if: ${{ failure() }}
@@ -176,7 +176,7 @@ jobs:
         with:
           build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin -PagpVersion=${{ matrix.agp }}
+          arguments: formatKotlin lintKotlin -PagpVersion=${{ matrix.agp }} --no-build-cache
 
       - name: Upload reports
         if: ${{ failure() }}
