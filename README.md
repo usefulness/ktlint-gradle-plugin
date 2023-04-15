@@ -119,6 +119,7 @@ dependencies {
 }
 ```
 
+Credits
 ---
 
 <img src="https://www.yourkit.com/images/yklogo.png" alt="YourKit logo" />
