@@ -44,7 +44,7 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
                         
                         android {
                             namespace 'io.github.usefulness'
-                            compileSdkVersion 33
+                            compileSdk 33
                             defaultConfig {
                                 minSdkVersion 23
                             }
