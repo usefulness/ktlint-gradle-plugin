@@ -1,7 +1,9 @@
 package io.github.usefulness.tasks.workers
 
-import com.pinterest.ktlint.core.Code
-import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
+import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError.Status
+import com.pinterest.ktlint.rule.engine.api.Code
+import com.pinterest.ktlint.rule.engine.api.LintError
 import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.createKtlintEngine
@@ -15,6 +17,7 @@ import org.gradle.api.provider.Property
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
+import org.jetbrains.kotlin.utils.addToStdlib.applyIf
 
 internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
     private val logger = DefaultContextAwareTaskLogger(Logging.getLogger(KtlintWorker::class.java))
@@ -36,7 +39,9 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
         logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
         logger.info("$name - executing against ${files.count()} file(s)")
         if (logger.isDebugEnabled) {
-            logger.debug("Resolved RuleSetProviders = ${ktLintEngine.ruleProviders.joinToString { it.createNewRuleInstance().id }}")
+            logger.debug(
+                "Resolved RuleSetProviders = ${ktLintEngine.ruleProviders.joinToString { it.createNewRuleInstance().ruleId.value }}",
+            )
         }
 
         val errors = mutableListOf<KtlintErrorResult>()
@@ -50,24 +55,24 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
                 return@forEach
             }
 
-            val fileErrors = mutableListOf<Pair<LintError, Boolean>>()
+            val fileErrors = mutableListOf<KtlintCliError>()
             when (parameters.mode.get()) {
                 KtlintRunMode.Check,
                 null,
                 -> ktLintEngine.lint(
-                    code = Code.CodeFile(file),
-                    callback = { fileErrors.add(it to false) },
+                    code = Code.fromFile(file),
+                    callback = { fileErrors.add(it.toKtlintCliErrorForLint()) },
                 )
 
                 KtlintRunMode.Format -> {
                     var fileFixed = false
                     val fixedContent = ktLintEngine.format(
-                        code = Code.CodeFile(file),
+                        code = Code.fromFile(file),
                         callback = { error, corrected ->
                             if (corrected) {
                                 fileFixed = true
                             }
-                            fileErrors.add(error to corrected)
+                            fileErrors.add(error.toKtlintCliErrorForFormat(corrected))
                         },
                     )
 
@@ -98,5 +103,29 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
         val mode: Property<KtlintRunMode>
     }
 }
+
+private fun LintError.toKtlintCliErrorForLint() = KtlintCliError(
+    line = line,
+    col = col,
+    ruleId = ruleId.value,
+    detail = detail,
+    status = if (canBeAutoCorrected) {
+        Status.LINT_CAN_BE_AUTOCORRECTED
+    } else {
+        Status.LINT_CAN_NOT_BE_AUTOCORRECTED
+    },
+)
+
+private fun LintError.toKtlintCliErrorForFormat(corrected: Boolean): KtlintCliError = KtlintCliError(
+    line = line,
+    col = col,
+    ruleId = ruleId.value,
+    detail = detail.applyIf(corrected) { "$this (cannot be auto-corrected)" },
+    status = if (corrected) {
+        Status.FORMAT_IS_AUTOCORRECTED
+    } else {
+        Status.LINT_CAN_NOT_BE_AUTOCORRECTED
+    },
+)
 
 private val supportedExtensions = setOf("kt", "kts")

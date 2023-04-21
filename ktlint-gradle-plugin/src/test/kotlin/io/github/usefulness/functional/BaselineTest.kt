@@ -33,6 +33,15 @@ class BaselineTest : WithGradleTest.Kotlin() {
                     """.trimIndent(),
                 )
             }
+            resolve(".editorconfig") {
+                writeText(
+                    """
+                    [*.kt]
+                    ktlint_standard_function-start-of-body-spacing = disabled
+                    
+                    """.trimIndent(),
+                )
+            }
             resolve("src/main/kotlin/ClassOne.kt") {
                 writeText(kotlinClass("ClassOne"))
             }
@@ -64,10 +73,10 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 <?xml version="1.0" encoding="utf-8"?>
                 <baseline version="1.0">
                 	<file name="src/main/kotlin/WithOffence.kt">
-                		<error line="1" column="1" source="filename" />
+                		<error line="1" column="1" source="standard:filename" />
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
-                		<error line="2" column="21" source="curly-spacing" />
+                		<error line="2" column="21" source="standard:curly-spacing" />
                 	</file>
                 </baseline>
 
@@ -93,7 +102,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
             writeText(validClass)
         }
         buildAndFail("lintKotlin").apply {
-            assertThat(output).contains("CustomClass.kt:2:22: Lint error > [no-multi-spaces]")
+            assertThat(output).contains("CustomClass.kt:2:22: Lint error > [standard:no-multi-spaces]")
         }
 
         projectRoot.resolve("config/baseline.xml") {
@@ -103,10 +112,10 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 <?xml version="1.0" encoding="utf-8"?>
                 <baseline version="1.0">
                 	<file name="src/main/kotlin/WithOffence.kt">
-                		<error line="1" column="1" source="filename" />
+                		<error line="1" column="1" source="standard:filename" />
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
-                		<error line="2" column="22" source="no-multi-spaces" />
+                		<error line="2" column="22" source="standard:no-multi-spaces" />
                 	</file>
                 </baseline>
 
@@ -143,10 +152,10 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 <?xml version="1.0" encoding="utf-8"?>
                 <baseline version="1.0">
                 	<file name="src/main/kotlin/WithOffence.kt">
-                		<error line="1" column="1" source="filename" />
+                		<error line="1" column="1" source="standard:filename" />
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
-                		<error line="2" column="21" source="curly-spacing" />
+                		<error line="2" column="21" source="standard:curly-spacing" />
                 	</file>
                 </baseline>
 
@@ -154,7 +163,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
             )
         }
         build("formatKotlin").apply {
-            assertThat(output).contains("CustomClass.kt:2:21: Format fixed > [curly-spacing]")
+            assertThat(output).contains("CustomClass.kt:2:21: Format fixed > [standard:curly-spacing]")
         }
 
         projectRoot.resolve("src/main/kotlin/CustomClass.kt") {
@@ -178,10 +187,10 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 <?xml version="1.0" encoding="utf-8"?>
                 <baseline version="1.0">
                 	<file name="src/main/kotlin/WithOffence.kt">
-                		<error line="1" column="1" source="filename" />
+                		<error line="1" column="1" source="standard:filename" />
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
-                		<error line="2" column="22" source="no-multi-spaces" />
+                		<error line="2" column="22" source="standard:no-multi-spaces" />
                 	</file>
                 </baseline>
 
@@ -189,7 +198,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
             )
         }
         build("formatKotlin").apply {
-            assertThat(output).contains("CustomClass.kt:2:22: Format fixed > [no-multi-spaces]")
+            assertThat(output).contains("CustomClass.kt:2:22: Format fixed > [standard:no-multi-spaces]")
         }
     }
 }

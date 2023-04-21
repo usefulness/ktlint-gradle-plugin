@@ -32,7 +32,10 @@ configurations {
 dependencies {
     compileOnly(libs.kotlin.gradle)
     compileOnly(libs.agp.gradle)
-    compileOnly(libs.ktlint.core)
+    compileOnly(libs.ktlint)
+    compileOnly(libs.ktlint.rule.engine)
+    compileOnly(libs.ktlint.cli.ruleset.core)
+    compileOnly(libs.ktlint.cli.reporter)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.jupiter.api)

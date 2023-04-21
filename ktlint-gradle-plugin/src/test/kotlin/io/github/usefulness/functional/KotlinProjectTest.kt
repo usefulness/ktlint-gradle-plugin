@@ -70,7 +70,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         fileWithFailingExperimentalRule()
 
         buildAndFail("lintKotlin").apply {
-            assertThat(output).containsPattern(".*Lint error > \\[experimental:unnecessary-parentheses".toPattern())
+            assertThat(output).containsPattern(".*Lint error > \\[standard:unnecessary-parentheses".toPattern())
             output.lines().filter { it.contains("Lint error") }.forEach { line ->
                 val filePath = pathPattern.find(line)?.groups?.get(1)?.value.orEmpty()
                 assertThat(File(filePath)).exists()
@@ -135,9 +135,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
                 val filePath = pathPattern.find(line)?.groups?.get(1)?.value.orEmpty()
                 assertThat(File(filePath)).exists()
             }
-            assertThat(output).contains("Format could not fix > [no-wildcard-imports] Wildcard import")
-            assertThat(output).contains("KotlinClass.kt:1:1: Format fixed > [final-newline] File must end with a newline")
-            assertThat(output).contains("KotlinClass.kt:3:18: Format fixed > [curly-spacing] Missing spacing before \"{\"")
+            assertThat(output).contains("Format could not fix > [standard:no-wildcard-imports] Wildcard import")
+            assertThat(output).contains("KotlinClass.kt:1:1: Format fixed > [standard:final-newline] File must end with a newline")
+            assertThat(output).contains("KotlinClass.kt:3:18: Format fixed > [standard:curly-spacing] Missing spacing before \"{\"")
 
             // language=kotlin
             val expected =
@@ -156,7 +156,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
 
         build("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("Format could not fix > [no-wildcard-imports] Wildcard import")
+            assertThat(output).contains("Format could not fix > [standard:no-wildcard-imports] Wildcard import")
             assertThat(output).doesNotContain("Format fixed")
         }
     }

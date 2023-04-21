@@ -1,7 +1,7 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.core.Reporter
-import com.pinterest.ktlint.core.ReporterProvider
+import com.pinterest.ktlint.cli.reporter.core.api.ReporterV2
+import com.pinterest.ktlint.cli.reporter.core.api.ReporterProviderV2
 import java.io.File
 import java.io.PrintStream
 import java.util.ServiceLoader
@@ -33,7 +33,7 @@ internal fun reporterPathFor(reporterType: ReporterType, output: File, relativeR
 
 internal fun resolveReporters(
     enabled: Map<ReporterType, File>,
-): Map<ReporterType, Reporter> {
+): Map<ReporterType, ReporterV2> {
     val allReporterProviders = defaultReporters().associateBy { it.id }
 
     return enabled
@@ -56,5 +56,5 @@ private fun ReporterType.generateOpt() = when (this) {
     ReporterType.Plain -> mapOf("color_name" to "DARK_GRAY")
 }
 
-private fun defaultReporters(): List<ReporterProvider<*>> =
-    ServiceLoader.load(ReporterProvider::class.java).toList()
+private fun defaultReporters(): List<ReporterProviderV2<*>> =
+    ServiceLoader.load(ReporterProviderV2::class.java).toList()
