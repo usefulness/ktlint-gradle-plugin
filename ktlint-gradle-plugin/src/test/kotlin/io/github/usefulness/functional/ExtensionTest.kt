@@ -205,7 +205,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                 }
                 
                 ktlint {
-                    ktlintVersion = "0.46.0"
+                    ktlintVersion = "0.32.0"
                 }
                 
                 """.trimIndent()
@@ -217,12 +217,11 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            val expectedMessage = "com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3: " +
-                "com.pinterest.ktlint.ruleset.standard.StandardRuleSetProvider not a subtype"
+            val expectedMessage = "ClassNotFoundException: com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine"
             assertThat(output).contains(expectedMessage)
         }
         build("dependencies", "--configuration", "ktlint").apply {
-            assertThat(output).contains("com.pinterest:ktlint:0.46.0")
+            assertThat(output).contains("com.pinterest:ktlint:0.32.0")
         }
     }
 

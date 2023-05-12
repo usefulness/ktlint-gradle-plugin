@@ -1,6 +1,6 @@
 package io.github.usefulness.tasks.workers
 
-import com.pinterest.ktlint.cli.api.doesNotContain
+import com.pinterest.ktlint.cli.reporter.baseline.doesNotContain
 import io.github.usefulness.support.ReporterType
 import io.github.usefulness.support.getBaselineKey
 import io.github.usefulness.support.readKtlintBaseline

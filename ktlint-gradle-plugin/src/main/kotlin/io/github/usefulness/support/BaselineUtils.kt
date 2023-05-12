@@ -1,7 +1,7 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.cli.api.Baseline
-import com.pinterest.ktlint.cli.api.loadBaseline
+import com.pinterest.ktlint.cli.reporter.baseline.Baseline
+import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
 import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
 import java.io.File
 

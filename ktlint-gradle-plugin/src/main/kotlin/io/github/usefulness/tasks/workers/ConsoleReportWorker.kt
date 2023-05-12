@@ -1,6 +1,6 @@
 package io.github.usefulness.tasks.workers
 
-import com.pinterest.ktlint.cli.api.doesNotContain
+import com.pinterest.ktlint.cli.reporter.baseline.doesNotContain
 import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
 import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError.Status
 import io.github.usefulness.support.KtlintRunMode
