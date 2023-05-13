@@ -1,17 +1,20 @@
 package io.github.usefulness.customrules
 
-import com.pinterest.ktlint.core.Rule
-import com.pinterest.ktlint.core.api.EditorConfigProperties
-import com.pinterest.ktlint.core.ast.isPartOfComment
-import com.pinterest.ktlint.core.ast.isPartOfString
-import com.pinterest.ktlint.core.ast.nextLeaf
+import com.pinterest.ktlint.rule.engine.core.api.Rule
+import com.pinterest.ktlint.rule.engine.core.api.RuleId
+import com.pinterest.ktlint.rule.engine.core.api.isPartOfComment
+import com.pinterest.ktlint.rule.engine.core.api.isPartOfString
+import com.pinterest.ktlint.rule.engine.core.api.nextLeaf
 import org.jetbrains.kotlin.com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 
-class NoNewLineBeforeReturnTypeRule : Rule("no-newline-before-return-type") {
+class NoNewLineBeforeReturnTypeRule : Rule(
+    ruleId = RuleId("custom-ktlint-rules:no-newline-before-return-type"),
+    about = About()
+) {
 
     override fun beforeVisitChildNodes(
         node: ASTNode,

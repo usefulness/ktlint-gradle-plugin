@@ -1,7 +1,7 @@
 package io.github.usefulness.tasks.workers
 
+import com.pinterest.ktlint.cli.reporter.baseline.doesNotContain
 import io.github.usefulness.support.ReporterType
-import io.github.usefulness.support.doesNotContain
 import io.github.usefulness.support.getBaselineKey
 import io.github.usefulness.support.readKtlintBaseline
 import io.github.usefulness.support.readKtlintErrors
@@ -37,7 +37,7 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
             reporters.onEach { (_, reporter) -> reporter.before(relativePath) }
 
             reporters.onEach { (type, reporter) ->
-                result.errors.forEach { (lintError, corrected) ->
+                result.errors.forEach { lintError ->
                     if (baselineErrors.doesNotContain(lintError)) {
                         // some reporters want relative paths, some want absolute
                         val filePath = reporterPathFor(
@@ -45,7 +45,7 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
                             output = result.file,
                             relativeRoot = projectDir,
                         )
-                        reporter.onLintError(filePath, lintError, corrected)
+                        reporter.onLintError(filePath, lintError)
                     }
                 }
             }

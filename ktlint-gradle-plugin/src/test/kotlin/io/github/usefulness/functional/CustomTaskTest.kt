@@ -187,12 +187,12 @@ class CustomTaskTest : WithGradleTest.Kotlin() {
 
         buildAndFail("reportsEmpty").apply {
             assertThat(task(":reportsEmpty")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("[final-newline] File must end with a newline (\\n)")
+            assertThat(output).contains("[standard:final-newline] File must end with a newline (\\n)")
             assertThat(projectRoot.resolve("build/reports/ktlint")).doesNotExist()
         }
         buildAndFail("reportsNotConfigured").apply {
             assertThat(task(":reportsNotConfigured")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("[final-newline] File must end with a newline (\\n)")
+            assertThat(output).contains("[standard:final-newline] File must end with a newline (\\n)")
             assertThat(projectRoot.resolve("build/reports/ktlint")).doesNotExist()
         }
     }

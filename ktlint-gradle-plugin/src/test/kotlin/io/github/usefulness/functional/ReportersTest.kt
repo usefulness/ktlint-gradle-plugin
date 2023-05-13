@@ -105,7 +105,7 @@ class ReportersTest : WithGradleTest.Kotlin() {
 
                 ktlint {
                     reporters = ['sarif']
-                    ktlintVersion = "0.48.1"
+                    ktlintVersion = "0.49.0"
                 }
 
                 """
@@ -114,8 +114,8 @@ class ReportersTest : WithGradleTest.Kotlin() {
 
         build("lintKotlin").apply {
             val reportContent = projectRoot.resolve("build/reports/ktlint/main-lint.sarif.json")
-            assertThat(reportContent).content().contains(""""version": "0.48.1"""")
-            assertThat(reportContent).content().contains(""""semanticVersion": "0.48.1"""")
+            assertThat(reportContent).content().contains(""""version": "0.49.0"""")
+            assertThat(reportContent).content().contains(""""semanticVersion": "0.49.0"""")
         }
     }
 
@@ -161,11 +161,11 @@ private fun expectedEmptyJson() = """
 """.trimIndent()
 
 private fun expectedFailedPlain() = """
-src/main/kotlin/FirstClass.kt:1:1: File 'FirstClass.kt' contains a single top level declaration and should be named 'WrongClassName.kt' (filename)
-src/main/kotlin/SecondClass.kt:1:1: File 'SecondClass.kt' contains a single top level declaration and should be named 'MultipleOffencesInSingleSourceSet.kt' (filename)
+src/main/kotlin/FirstClass.kt:1:1: File 'FirstClass.kt' contains a single top level declaration and should be named 'WrongClassName.kt' (standard:filename)
+src/main/kotlin/SecondClass.kt:1:1: File 'SecondClass.kt' contains a single top level declaration and should be named 'MultipleOffencesInSingleSourceSet.kt' (standard:filename)
 
 Summary error count (descending) by rule:
-  filename: 2
+  standard:filename: 2
 
 """.trimIndent()
 
@@ -174,10 +174,10 @@ private fun expectedFailedCheckstyle() = """
 <?xml version="1.0" encoding="utf-8"?>
 <checkstyle version="8.0">
     <file name="src/main/kotlin/FirstClass.kt">
-        <error line="1" column="1" severity="error" message="File &apos;FirstClass.kt&apos; contains a single top level declaration and should be named &apos;WrongClassName.kt&apos;" source="filename" />
+        <error line="1" column="1" severity="error" message="File &apos;FirstClass.kt&apos; contains a single top level declaration and should be named &apos;WrongClassName.kt&apos;" source="standard:filename" />
     </file>
     <file name="src/main/kotlin/SecondClass.kt">
-        <error line="1" column="1" severity="error" message="File &apos;SecondClass.kt&apos; contains a single top level declaration and should be named &apos;MultipleOffencesInSingleSourceSet.kt&apos;" source="filename" />
+        <error line="1" column="1" severity="error" message="File &apos;SecondClass.kt&apos; contains a single top level declaration and should be named &apos;MultipleOffencesInSingleSourceSet.kt&apos;" source="standard:filename" />
     </file>
 </checkstyle>
 
@@ -203,11 +203,11 @@ h3 {
 <p>Issues corrected: 0</p>
 <h3>src/main/kotlin/FirstClass.kt</h3>
 <ul>
-<li>(1, 1): File &apos;FirstClass.kt&apos; contains a single top level declaration and should be named &apos;WrongClassName.kt&apos;  (filename)</li>
+<li>(1, 1): File &apos;FirstClass.kt&apos; contains a single top level declaration and should be named &apos;WrongClassName.kt&apos;  (standard:filename)</li>
 </ul>
 <h3>src/main/kotlin/SecondClass.kt</h3>
 <ul>
-<li>(1, 1): File &apos;SecondClass.kt&apos; contains a single top level declaration and should be named &apos;MultipleOffencesInSingleSourceSet.kt&apos;  (filename)</li>
+<li>(1, 1): File &apos;SecondClass.kt&apos; contains a single top level declaration and should be named &apos;MultipleOffencesInSingleSourceSet.kt&apos;  (standard:filename)</li>
 </ul>
 </body>
 </html>
@@ -224,7 +224,7 @@ fun expectedFailedJson() = """
                 "line": 1,
                 "column": 1,
                 "message": "File 'FirstClass.kt' contains a single top level declaration and should be named 'WrongClassName.kt'",
-                "rule": "filename"
+                "rule": "standard:filename"
             }
         ]
     },
@@ -235,7 +235,7 @@ fun expectedFailedJson() = """
                 "line": 1,
                 "column": 1,
                 "message": "File 'SecondClass.kt' contains a single top level declaration and should be named 'MultipleOffencesInSingleSourceSet.kt'",
-                "rule": "filename"
+                "rule": "standard:filename"
             }
         ]
     }

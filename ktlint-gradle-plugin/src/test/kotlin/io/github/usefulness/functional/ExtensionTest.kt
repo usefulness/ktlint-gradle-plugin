@@ -82,8 +82,8 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         buildAndFail("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("FileName.kt:1:1: Format could not fix > [filename]")
-            assertThat(output).contains("SomeClass.kt:1:32: Format fixed > [colon-spacing]")
+            assertThat(output).contains("FileName.kt:1:1: Format could not fix > [standard:filename]")
+            assertThat(output).contains("SomeClass.kt:1:32: Format fixed > [standard:colon-spacing]")
         }
 
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
@@ -97,7 +97,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         build("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("FileName.kt:1:31: Format fixed > [colon-spacing]")
+            assertThat(output).contains("FileName.kt:1:31: Format fixed > [standard:colon-spacing]")
         }
     }
 
@@ -132,7 +132,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                 """
                 ktlint {
                     experimentalRules = true
-                    disabledRules = ["filename", "experimental:unnecessary-parentheses-before-trailing-lambda"]
+                    disabledRules = ["filename", "standard:unnecessary-parentheses-before-trailing-lambda"]
                 }
                 """.trimIndent()
             appendText(script)
@@ -205,7 +205,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                 }
                 
                 ktlint {
-                    ktlintVersion = "0.46.0"
+                    ktlintVersion = "0.32.0"
                 }
                 
                 """.trimIndent()
@@ -217,12 +217,11 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            val expectedMessage = "EditorConfigOverride com.pinterest.ktlint.core.api.EditorConfigOverride" +
-                "${"$"}Companion.getEMPTY_EDITOR_CONFIG_OVERRIDE()'"
+            val expectedMessage = "ClassNotFoundException: com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine"
             assertThat(output).contains(expectedMessage)
         }
         build("dependencies", "--configuration", "ktlint").apply {
-            assertThat(output).contains("com.pinterest:ktlint:0.46.0")
+            assertThat(output).contains("com.pinterest:ktlint:0.32.0")
         }
     }
 
@@ -246,7 +245,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                     reporters = ["checkstyle", "html", "json", "plain", "sarif"]
                     experimentalRules = true
                     disabledRules = ["no-wildcard-imports", "experimental:annotation", "your-custom-rule:no-bugs"]
-                    ktlintVersion = "0.48.2"
+                    ktlintVersion = "0.49.0"
                     chunkSize = 50
                     baselineFile.set(file("config/ktlint_baseline.xml"))
                 }

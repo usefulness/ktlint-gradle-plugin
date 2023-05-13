@@ -1,8 +1,9 @@
 package io.github.usefulness.tasks.workers
 
-import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.cli.reporter.baseline.doesNotContain
+import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
+import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError.Status
 import io.github.usefulness.support.KtlintRunMode
-import io.github.usefulness.support.doesNotContain
 import io.github.usefulness.support.getBaselineKey
 import io.github.usefulness.support.readKtlintBaseline
 import io.github.usefulness.support.readKtlintErrors
@@ -29,7 +30,7 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
         var hasUncoveredErrors = false
         discoveredErrors.forEach { (file, errors) ->
             val baselineErrors = baselineContent[file.getBaselineKey(projectDir)].orEmpty()
-            errors.forEach { (lintError, corrected) ->
+            errors.forEach { lintError ->
                 when (mode) {
                     KtlintRunMode.Check ->
                         if (baselineErrors.doesNotContain(lintError)) {
@@ -38,13 +39,21 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
                         }
 
                     KtlintRunMode.Format -> {
-                        when (corrected) {
-                            true -> logger.quiet(lintError.generateMessage(file = file, message = "Format fixed"))
-                            false -> {
+                        when (lintError.status) {
+                            Status.BASELINE_IGNORED -> Unit
+                            Status.LINT_CAN_NOT_BE_AUTOCORRECTED -> {
                                 hasUncoveredErrors = true
                                 logger.warn(lintError.generateMessage(file = file, message = "Format could not fix"))
                             }
-                        }
+
+                            Status.FORMAT_IS_AUTOCORRECTED -> logger.quiet(lintError.generateMessage(file = file, message = "Format fixed"))
+                            Status.LINT_CAN_BE_AUTOCORRECTED,
+                            Status.KOTLIN_PARSE_EXCEPTION,
+                            Status.KTLINT_RULE_ENGINE_EXCEPTION,
+                            -> logger.warn(
+                                lintError.generateMessage(file = file, message = "Internal exception status=${lintError.status}"),
+                            )
+                        }.let { }
                     }
                 }
             }
@@ -59,7 +68,7 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
         }
     }
 
-    private fun LintError.generateMessage(file: File, message: String) = "${file.path}:$line:$col: $message > [$ruleId] $detail"
+    private fun KtlintCliError.generateMessage(file: File, message: String) = "${file.path}:$line:$col: $message > [$ruleId] $detail"
 
     interface Parameters : WorkParameters {
         val errorsContainer: DirectoryProperty

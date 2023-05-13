@@ -102,7 +102,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("[indent] Unexpected indentation (2) (should be 6)")
+            assertThat(output).contains("[standard:indent] Unexpected indentation (2) (should be 6)")
         }
 
         projectRoot.resolve(".editorconfig") {
@@ -116,7 +116,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).doesNotContain("[indent] Unexpected indentation (2) (should be 6)")
+            assertThat(output).doesNotContain("[standard:indent] Unexpected indentation (2) (should be 6)")
         }
     }
 
@@ -145,7 +145,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
         buildAndFail("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            assertThat(output).contains("[filename] File 'FileName.kt' contains a single top level declaration")
+            assertThat(output).contains("[standard:filename] File 'FileName.kt' contains a single top level declaration")
             assertThat(output).contains("resetting KtLint caches")
         }
 
@@ -173,7 +173,9 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
         build("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("Format could not fix > [filename] File 'FileName.kt' contains a single top level declaration")
+            assertThat(output).contains(
+                "Format could not fix > [standard:filename] File 'FileName.kt' contains a single top level declaration",
+            )
         }
 
         projectRoot.resolve(".editorconfig") {
