@@ -25,6 +25,7 @@ plugins {
 
 | plugin version | min gradle version | min ktlint version |
 |----------------|--------------------|--------------------|
+| 0.3.0+         | 7.6                | 0.49.0             |
 | 0.1.0+         | 7.6                | 0.48.0             |
 
 ### Features
