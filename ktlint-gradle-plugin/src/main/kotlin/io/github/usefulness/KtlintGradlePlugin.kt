@@ -91,19 +91,17 @@ public class KtlintGradlePlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.registerParentLintTask() =
-        tasks.register("lintKotlin") {
-            it.group = "formatting"
-            it.description = "Runs lint on the Kotlin source files."
-        }.also { lintKotlin ->
-            tasks.named("check").configure { check -> check.dependsOn(lintKotlin) }
-        }
+    private fun Project.registerParentLintTask() = tasks.register("lintKotlin") {
+        it.group = "formatting"
+        it.description = "Runs lint on the Kotlin source files."
+    }.also { lintKotlin ->
+        tasks.named("check").configure { check -> check.dependsOn(lintKotlin) }
+    }
 
-    private fun Project.registerParentFormatTask() =
-        tasks.register("formatKotlin") {
-            it.group = "formatting"
-            it.description = "Formats the Kotlin source files."
-        }
+    private fun Project.registerParentFormatTask() = tasks.register("formatKotlin") {
+        it.group = "formatting"
+        it.description = "Formats the Kotlin source files."
+    }
 
     private fun Project.createKtlintConfiguration(pluginExtension: KtlintGradleExtension): Configuration =
         configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
@@ -120,26 +118,24 @@ public class KtlintGradlePlugin : Plugin<Project> {
         }
 
     @Suppress("UnstableApiUsage")
-    private fun Project.createRuleSetConfiguration(
-        ktlintConfiguration: Configuration,
-    ): Configuration = configurations.maybeCreate(RULE_SET_CONFIGURATION_NAME).apply {
-        isCanBeResolved = true
-        isCanBeConsumed = false
-        isVisible = false
+    private fun Project.createRuleSetConfiguration(ktlintConfiguration: Configuration): Configuration =
+        configurations.maybeCreate(RULE_SET_CONFIGURATION_NAME).apply {
+            isCanBeResolved = true
+            isCanBeConsumed = false
+            isVisible = false
 
-        shouldResolveConsistentlyWith(ktlintConfiguration)
-    }
+            shouldResolveConsistentlyWith(ktlintConfiguration)
+        }
 
     @Suppress("UnstableApiUsage")
-    private fun Project.createReportersConfiguration(
-        ktlintConfiguration: Configuration,
-    ): Configuration = configurations.maybeCreate(REPORTERS_CONFIGURATION_NAME).apply {
-        isCanBeResolved = true
-        isCanBeConsumed = false
-        isVisible = false
+    private fun Project.createReportersConfiguration(ktlintConfiguration: Configuration): Configuration =
+        configurations.maybeCreate(REPORTERS_CONFIGURATION_NAME).apply {
+            isCanBeResolved = true
+            isCanBeConsumed = false
+            isVisible = false
 
-        shouldResolveConsistentlyWith(ktlintConfiguration)
-    }
+            shouldResolveConsistentlyWith(ktlintConfiguration)
+        }
 }
 
 internal val String.id: String

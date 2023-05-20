@@ -58,8 +58,7 @@ abstract class WithGradleTest {
     }
 }
 
-private fun WithGradleTest.defaultRunner(vararg args: String) =
-    GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments(args.toList() + listOf("--configuration-cache", "--stacktrace"))
-        .forwardOutput()
+private fun WithGradleTest.defaultRunner(vararg args: String) = GradleRunner.create()
+    .withProjectDir(testProjectDir)
+    .withArguments(args.toList() + listOf("--configuration-cache", "--stacktrace"))
+    .forwardOutput()
