@@ -16,8 +16,7 @@ internal enum class ReporterType(val id: String, val fileExtension: String) {
 
     companion object {
 
-        fun getById(id: String) =
-            values().firstOrNull { it.id == id } ?: error("Unknown reporter type=$id")
+        fun getById(id: String) = values().firstOrNull { it.id == id } ?: error("Unknown reporter type=$id")
     }
 }
 
@@ -31,9 +30,7 @@ internal fun reporterPathFor(reporterType: ReporterType, output: File, relativeR
     ReporterType.Sarif -> output.absolutePath
 }
 
-internal fun resolveReporters(
-    enabled: Map<ReporterType, File>,
-): Map<ReporterType, ReporterV2> {
+internal fun resolveReporters(enabled: Map<ReporterType, File>): Map<ReporterType, ReporterV2> {
     val allReporterProviders = defaultReporters().associateBy { it.id }
 
     return enabled
@@ -56,5 +53,4 @@ private fun ReporterType.generateOpt() = when (this) {
     ReporterType.Plain -> mapOf("color_name" to "DARK_GRAY")
 }
 
-private fun defaultReporters(): List<ReporterProviderV2<*>> =
-    ServiceLoader.load(ReporterProviderV2::class.java).toList()
+private fun defaultReporters(): List<ReporterProviderV2<*>> = ServiceLoader.load(ReporterProviderV2::class.java).toList()

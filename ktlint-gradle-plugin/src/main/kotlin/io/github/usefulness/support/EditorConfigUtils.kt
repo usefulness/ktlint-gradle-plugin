@@ -12,17 +12,13 @@ import org.ec4j.core.model.Section
 import org.gradle.api.file.ProjectLayout
 import java.io.File
 
-internal fun editorConfigOverride(disabledRules: List<String>) =
-    getPropertiesForDisabledRules(disabledRules)
-        .let(::buildEditorConfigOverride)
+internal fun editorConfigOverride(disabledRules: List<String>) = getPropertiesForDisabledRules(disabledRules)
+    .let(::buildEditorConfigOverride)
 
-internal fun editorConfigDefaults(includeExperimentalRules: Boolean) =
-    getPropertiesForExperimentalRules(includeExperimentalRules)
-        .let(::buildEditorConfigDefaults)
+internal fun editorConfigDefaults(includeExperimentalRules: Boolean) = getPropertiesForExperimentalRules(includeExperimentalRules)
+    .let(::buildEditorConfigDefaults)
 
-private fun getPropertiesForDisabledRules(
-    disabledRules: List<String>,
-) = if (disabledRules.isEmpty()) {
+private fun getPropertiesForDisabledRules(disabledRules: List<String>) = if (disabledRules.isEmpty()) {
     emptyList()
 } else {
     disabledRules
@@ -38,12 +34,11 @@ private fun getPropertiesForDisabledRules(
         .toList()
 }
 
-private fun getPropertiesForExperimentalRules(includeExperimentalRules: Boolean) =
-    Property
-        .builder()
-        .name("ktlint_experimental")
-        .value(if (includeExperimentalRules) "enabled" else "disabled")
-        .let(::listOf)
+private fun getPropertiesForExperimentalRules(includeExperimentalRules: Boolean) = Property
+    .builder()
+    .name("ktlint_experimental")
+    .value(if (includeExperimentalRules) "enabled" else "disabled")
+    .let(::listOf)
 
 private fun buildEditorConfigOverride(editorConfigProperties: List<Pair<EditorConfigProperty<String>, String>>) =
     if (editorConfigProperties.isEmpty()) {
@@ -52,29 +47,27 @@ private fun buildEditorConfigOverride(editorConfigProperties: List<Pair<EditorCo
         EditorConfigOverride.from(*editorConfigProperties.toTypedArray())
     }
 
-private fun buildEditorConfigDefaults(kotlinSectionProperties: List<Property.Builder>) =
-    if (kotlinSectionProperties.isEmpty()) {
-        EditorConfigDefaults.EMPTY_EDITOR_CONFIG_DEFAULTS
-    } else {
-        EditorConfigDefaults(
-            EditorConfig
-                .builder()
-                .section(
-                    Section
-                        .builder()
-                        .glob(Glob("*.{kt,kts}"))
-                        .properties(kotlinSectionProperties),
-                )
-                .build(),
-        )
-    }
+private fun buildEditorConfigDefaults(kotlinSectionProperties: List<Property.Builder>) = if (kotlinSectionProperties.isEmpty()) {
+    EditorConfigDefaults.EMPTY_EDITOR_CONFIG_DEFAULTS
+} else {
+    EditorConfigDefaults(
+        EditorConfig
+            .builder()
+            .section(
+                Section
+                    .builder()
+                    .glob(Glob("*.{kt,kts}"))
+                    .properties(kotlinSectionProperties),
+            )
+            .build(),
+    )
+}
 
-private fun getKtlintRulePropertyName(ruleName: String) =
-    if (ruleName.contains(':')) { // Rule from a non-standard rule set
-        "ktlint_${ruleName.replace(':', '_')}"
-    } else {
-        "ktlint_standard_$ruleName"
-    }
+private fun getKtlintRulePropertyName(ruleName: String) = if (ruleName.contains(':')) { // Rule from a non-standard rule set
+    "ktlint_${ruleName.replace(':', '_')}"
+} else {
+    "ktlint_standard_$ruleName"
+}
 
 internal fun ProjectLayout.findApplicableEditorConfigFiles(): Sequence<File> {
     val projectEditorConfig = projectDirectory.file(".editorconfig").asFile

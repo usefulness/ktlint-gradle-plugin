@@ -18,5 +18,4 @@ internal fun File.readKtlintBaseline(): Map<String, List<KtlintCliError>>? {
     return baseline.lintErrorsPerFile
 }
 
-internal fun File.getBaselineKey(projectDir: File) =
-    toRelativeString(projectDir).replace(File.separatorChar, '/')
+internal fun File.getBaselineKey(projectDir: File) = toRelativeString(projectDir).replace(File.separatorChar, '/')

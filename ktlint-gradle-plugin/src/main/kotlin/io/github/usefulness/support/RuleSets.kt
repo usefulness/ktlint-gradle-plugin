@@ -5,9 +5,7 @@ import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
 import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
 import java.util.ServiceLoader
 
-internal fun resolveRuleProviders(
-    providers: Iterable<RuleSetProviderV3>,
-): Set<RuleProvider> = providers
+internal fun resolveRuleProviders(providers: Iterable<RuleSetProviderV3>): Set<RuleProvider> = providers
     .asSequence()
     .sortedWith(
         compareBy {
