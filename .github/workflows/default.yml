@@ -35,8 +35,8 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: 17
+          distribution: 'temurin'
+          java-version: 19
 
       - uses: gradle/wrapper-validation-action@v1
 
@@ -45,6 +45,10 @@ jobs:
       - run: ./gradlew assemble
 
       - run: ./gradlew check
+
+      - run: ./gradlew publishToMavenLocal
+
+      - run: git diff --exit-code
 
       - uses: actions/upload-artifact@v3
         if: ${{ always() }}
@@ -75,7 +79,7 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
       - uses: gradle/gradle-build-action@v2
@@ -128,17 +132,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gradle: [ current ]
-        java: [ 17 ]
+        gradle: [ current, release-candidate ]
+        java: [ 19 ]
         agp: ${{ fromJSON(needs.provide-agp-version-matrix.outputs.agp-versions) }}
-        exclude:
-          - gradle: current
-            java: 17
-            agp: 8.1.0-alpha02
-        include:
-          - gradle: 8.0-rc-2
-            java: 17
-            agp: 8.1.0-alpha02
 
     name: '[android] Gradle: ${{ matrix.gradle }}, Java: ${{ matrix.java }}, AGP: ${{ matrix.agp }}'
     steps:
@@ -154,7 +150,7 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
       - uses: gradle/gradle-build-action@v2

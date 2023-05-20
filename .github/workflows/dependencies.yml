@@ -29,8 +29,8 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: 17
+          distribution: 'temurin'
+          java-version: 19
 
       - name: Assemble
         uses: gradle/gradle-build-action@v2
