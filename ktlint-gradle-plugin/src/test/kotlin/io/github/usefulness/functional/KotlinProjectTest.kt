@@ -485,6 +485,8 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         // language=groovy
         val buildscript =
             """
+            import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+            
             plugins {
                 id 'org.jetbrains.kotlin.jvm'
                 id 'io.github.usefulness.ktlint-gradle-plugin'
@@ -492,6 +494,14 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
 
             repositories {
                 mavenCentral()
+            }
+            
+            def targetJavaVersion = JavaVersion.VERSION_11
+            tasks.withType(JavaCompile).configureEach {
+                options.release.set(targetJavaVersion.majorVersion.toInteger())
+            }
+            tasks.withType(KotlinCompile).configureEach {
+                kotlinOptions.jvmTarget = targetJavaVersion
             }
             """.trimIndent()
         writeText(buildscript)
