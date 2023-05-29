@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
     id("org.jetbrains.kotlin.android") version "1.8.21" apply(false)
     id("org.jetbrains.kotlin.jvm") version "1.8.21" apply(false)
@@ -8,6 +10,14 @@ allprojects {
     pluginManager.withPlugin("kotlin") {
         kotlin {
             jvmToolchain(JavaVersion.current().majorVersion.toInteger())
+        }
+
+        def targetJavaVersion = JavaVersion.VERSION_11
+        tasks.withType(JavaCompile).configureEach {
+            options.release.set(targetJavaVersion.majorVersion.toInteger())
+        }
+        tasks.withType(KotlinCompile).configureEach {
+            kotlinOptions.jvmTarget = targetJavaVersion
         }
     }
 }

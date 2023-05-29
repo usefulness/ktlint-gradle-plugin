@@ -120,7 +120,7 @@ private fun LintError.toKtlintCliErrorForFormat(corrected: Boolean): KtlintCliEr
     line = line,
     col = col,
     ruleId = ruleId.value,
-    detail = detail.applyIf(corrected) { "$this (cannot be auto-corrected)" },
+    detail = detail.applyIf(!corrected) { "$this (cannot be auto-corrected)" },
     status = if (corrected) {
         Status.FORMAT_IS_AUTOCORRECTED
     } else {
