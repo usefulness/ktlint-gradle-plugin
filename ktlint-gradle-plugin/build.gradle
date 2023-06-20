@@ -57,7 +57,7 @@ kotlin {
 tasks.register("generateVersionProperties") {
     def projectVersion = version
     def ktlintVersion = libs.versions.maven.ktlint.get()
-    def propertiesFile = new File(sourceSets.main.output.resourcesDir, "version.properties")
+    def propertiesFile = new File(sourceSets.main.output.resourcesDir, "ktlint-gradle-plugin.properties")
     inputs.property("projectVersion", projectVersion)
     outputs.file(propertiesFile)
 

@@ -6,7 +6,7 @@ internal val versionProperties by lazy(::VersionProperties)
 
 internal class VersionProperties : Properties() {
     init {
-        load(this.javaClass.getResourceAsStream("/version.properties"))
+        load(this.javaClass.getResourceAsStream("/ktlint-gradle-plugin.properties"))
     }
 
     fun pluginVersion(): String = getProperty("kltint_gradle_plugin_version")
