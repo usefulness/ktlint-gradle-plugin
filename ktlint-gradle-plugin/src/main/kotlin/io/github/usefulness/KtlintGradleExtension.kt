@@ -7,9 +7,11 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 
 public open class KtlintGradleExtension internal constructor(
     objectFactory: ObjectFactory,
+    providerFactory: ProviderFactory,
 ) {
 
     internal companion object {
@@ -27,7 +29,7 @@ public open class KtlintGradleExtension internal constructor(
 
     public var disabledRules: ListProperty<String> = objectFactory.listProperty(default = DEFAULT_DISABLED_RULES)
 
-    public var ktlintVersion: Property<String> = objectFactory.property(default = versionProperties.ktlintVersion())
+    public var ktlintVersion: Property<String> = objectFactory.property(providerFactory.provider { versionProperties.ktlintVersion() })
 
     public var chunkSize: Property<Int> = objectFactory.property(default = DEFAULT_CHUNK_SIZE)
 

@@ -19,6 +19,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
@@ -171,17 +172,21 @@ public abstract class KtlintWorkTask(
 }
 
 internal inline fun <reified T> ObjectFactory.property(default: T? = null): Property<T> = property(T::class.java).apply {
-    set(default)
+    convention(default)
+}
+
+internal inline fun <reified T> ObjectFactory.property(default: Provider<T>): Property<T> = property(T::class.java).apply {
+    convention(default)
 }
 
 internal inline fun <reified T> ObjectFactory.listProperty(default: Iterable<T> = emptyList()): ListProperty<T> =
     listProperty(T::class.java).apply {
-        set(default)
+        convention(default)
     }
 
 internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Map<K, V> = emptyMap()): MapProperty<K, V> =
     mapProperty(K::class.java, V::class.java).apply {
-        set(default)
+        convention(default)
     }
 
 internal fun KtlintWorkTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
