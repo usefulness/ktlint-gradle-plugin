@@ -11,6 +11,6 @@ internal data class KtlintErrorResult(
 
     companion object {
 
-        const val serialVersionUID = 2L
+        private const val serialVersionUID = 2L
     }
 }

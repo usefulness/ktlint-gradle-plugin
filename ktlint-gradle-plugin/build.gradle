@@ -18,14 +18,6 @@ configurations {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY))
         }
     }
-    configureEach {
-        def kotlinVersion = KotlinPluginWrapperKt.getKotlinPluginVersion(project)
-        resolutionStrategy.eachDependency {
-            if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin")) {
-                useVersion(kotlinVersion)
-            }
-        }
-    }
 }
 
 jacoco {
