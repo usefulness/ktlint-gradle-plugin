@@ -1,3 +1,4 @@
+import kotlin.Suppress
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapperKt
 
@@ -46,20 +47,16 @@ kotlin {
     explicitApi()
 }
 
-tasks.register("generateVersionProperties") {
-    def projectVersion = version
-    def ktlintVersion = libs.versions.maven.ktlint.get()
+tasks.register("generateVersionProperties", WriteProperties) { writeProps ->
     def propertiesFile = new File(sourceSets.main.output.resourcesDir, "ktlint-gradle-plugin.properties")
-    inputs.property("projectVersion", projectVersion)
-    outputs.file(propertiesFile)
-
-    doLast {
-        propertiesFile.write """
-            kltint_gradle_plugin_version = $projectVersion
-            ktlint_version = $ktlintVersion
-            
-            """.stripIndent()
+    if (GradleVersion.current() >= GradleVersion.version("8.1")) {
+        writeProps.destinationFile = propertiesFile
+    } else {
+        //noinspection GrDeprecatedAPIUsage
+        writeProps.outputFile = propertiesFile
     }
+    writeProps.property("kltint_gradle_plugin_version", provider { version })
+    writeProps.property("ktlint_version", libs.versions.maven.ktlint)
 }
 
 tasks.named("processResources") {
