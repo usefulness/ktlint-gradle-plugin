@@ -11,7 +11,7 @@ Gradle wrapper for [pinterest/ktlint](https://github.com/pinterest/ktlint)
 Available on the:
 
 - [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
-- [Maven Central](https://mvnrepository.com/artifact/io.github.usefulness/kotlin-gradle-plugin)
+- [Maven Central](https://mvnrepository.com/artifact/io.github.usefulness/ktlint-gradle-plugin)
 
 #### Apply the plugin
 
