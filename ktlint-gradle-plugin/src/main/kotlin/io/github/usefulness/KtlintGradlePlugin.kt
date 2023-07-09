@@ -29,14 +29,14 @@ public class KtlintGradlePlugin : Plugin<Project> {
     public override fun apply(project: Project): Unit = with(project) {
         val pluginExtension = extensions.create("ktlint", KtlintGradleExtension::class.java)
 
+        val ktlintConfiguration = createKtlintConfiguration(pluginExtension)
+        val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
+        val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
+
         extendablePlugins.forEach { (pluginId, sourceResolver) ->
             pluginManager.withPlugin(pluginId) {
                 val lintKotlin = registerParentLintTask()
                 val formatKotlin = registerParentFormatTask()
-
-                val ktlintConfiguration = createKtlintConfiguration(pluginExtension)
-                val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
-                val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
 
                 tasks.withType(KtlintWorkTask::class.java).configureEach { task ->
                     task.ktlintClasspath.setFrom(ktlintConfiguration)
