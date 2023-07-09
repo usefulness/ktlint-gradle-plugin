@@ -117,7 +117,7 @@ dependencies {
     ktlintRuleSet(files("libs/my-custom-ktlint-rules.jar"))
     ktlintRuleSet(project(":ktlint-custom-rules"))
     ktlintRuleSet("org.other.ktlint:custom-rules:1.0")
-    ktlintRuleSet("com.twitter.compose.rules:ktlint:0.0.26")
+    ktlintRuleSet("io.nlopez.compose.rules:ktlint:0.1.12")
 }
 ```
 
