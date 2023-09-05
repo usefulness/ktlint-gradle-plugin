@@ -30,8 +30,8 @@ dependencies {
     compileOnly(libs.agp.gradle)
     compileOnly(libs.ktlint.rule.engine)
     compileOnly(libs.ktlint.cli.ruleset.core)
-    compileOnly(libs.ktlint.cli.reporter)
-    compileOnly(libs.ktlint.reporter.baseline)
+    compileOnly(libs.ktlint.cli.reporter.core)
+    compileOnly(libs.ktlint.cli.reporter.baseline)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
 

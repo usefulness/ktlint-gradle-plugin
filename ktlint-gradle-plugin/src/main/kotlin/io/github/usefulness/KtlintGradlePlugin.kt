@@ -111,7 +111,12 @@ public class KtlintGradlePlugin : Plugin<Project> {
 
             val dependencyProvider = provider {
                 val ktlintVersion = pluginExtension.ktlintVersion.get()
-                this@createKtlintConfiguration.dependencies.create("com.pinterest:ktlint:$ktlintVersion")
+                val ktlintDependency = if (ktlintVersion.startsWith("0.")) {
+                    "com.pinterest:ktlint:$ktlintVersion"
+                } else {
+                    "com.pinterest.ktlint:ktlint-cli:$ktlintVersion"
+                }
+                this@createKtlintConfiguration.dependencies.create(ktlintDependency)
             }
 
             dependencies.addLater(dependencyProvider)

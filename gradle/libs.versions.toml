@@ -5,7 +5,7 @@ gradle-doctor = "0.8.1"
 google-agp = "8.1.1"
 maven-junit = "5.10.0"
 maven-assertj = "3.24.2"
-maven-ktlint = "0.50.0"
+maven-ktlint = "1.0.0"
 maven-commons = "2.13.0"
 
 [libraries]
@@ -13,8 +13,8 @@ agp-gradle = { module = "com.android.tools.build:gradle", version.ref = "google-
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "maven-ktlint" }
 ktlint-cli-ruleset-core = { module = "com.pinterest.ktlint:ktlint-cli-ruleset-core", version.ref = "maven-ktlint" }
-ktlint-cli-reporter = { module = "com.pinterest.ktlint:ktlint-cli-reporter", version.ref = "maven-ktlint" }
-ktlint-reporter-baseline = { module = "com.pinterest.ktlint:ktlint-reporter-baseline", version.ref = "maven-ktlint" }
+ktlint-cli-reporter-core = { module = "com.pinterest.ktlint:ktlint-cli-reporter-core", version.ref = "maven-ktlint" }
+ktlint-cli-reporter-baseline = { module = "com.pinterest.ktlint:ktlint-cli-reporter-baseline", version.ref = "maven-ktlint" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "maven-junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "maven-junit" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "maven-assertj" }
