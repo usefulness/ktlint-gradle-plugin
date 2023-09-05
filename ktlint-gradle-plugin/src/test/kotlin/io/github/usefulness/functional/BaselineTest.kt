@@ -77,6 +77,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
                 		<error line="2" column="21" source="standard:curly-spacing" />
+                		<error line="2" column="21" source="standard:function-signature" />
                 	</file>
                 </baseline>
 
@@ -103,6 +104,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
         }
         buildAndFail("lintKotlin").apply {
             assertThat(output).contains("CustomClass.kt:2:22: Lint error > [standard:no-multi-spaces]")
+            assertThat(output).contains("CustomClass.kt:2:23: Lint error > [standard:function-signature]")
         }
 
         projectRoot.resolve("config/baseline.xml") {
@@ -116,6 +118,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
                 		<error line="2" column="22" source="standard:no-multi-spaces" />
+                		<error line="2" column="23" source="standard:function-signature" />
                 	</file>
                 </baseline>
 

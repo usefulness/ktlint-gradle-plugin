@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.gradle.internal.impldep.org.bouncycastle.asn1.x500.style.RFC4519Style.name
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 
@@ -101,6 +102,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
     }
 
     @Test
+    @Disabled("I'm not aware of any experimental rule")
     fun `lintKotlin succeeds when experimental rules are not enabled and code contains experimental rules violations`() {
         settingsFile()
         buildFile()
