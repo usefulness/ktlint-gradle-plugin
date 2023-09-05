@@ -5,7 +5,7 @@ gradle-doctor = "0.8.1"
 google-agp = "8.1.1"
 maven-junit = "5.10.0"
 maven-assertj = "3.24.2"
-maven-ktlint = "0.50.0"
+maven-ktlint = "1.0.0"
 maven-commons = "2.13.0"
 
 [libraries]
