@@ -22,6 +22,8 @@ internal val androidManifest =
 
 internal val editorConfig =
     """
+    root = true
+    
     [*.kt]
     
     """.trimIndent()

@@ -3,6 +3,7 @@ package io.github.usefulness.pluginapplier
 import com.android.build.api.dsl.AndroidSourceDirectorySet
 import com.android.build.api.dsl.AndroidSourceSet
 import com.android.build.api.variant.AndroidComponentsExtension
+import io.github.usefulness.KtlintGradleExtension
 import io.github.usefulness.SourceSetAction
 import io.github.usefulness.SourceSetApplier
 import io.github.usefulness.id
@@ -11,7 +12,7 @@ import org.gradle.api.file.FileTree
 
 internal object AndroidSourceSetApplier : SourceSetApplier {
 
-    override fun applyToAll(project: Project, action: SourceSetAction) {
+    override fun applyToAll(project: Project, extension: KtlintGradleExtension, action: SourceSetAction) {
         val android = project.extensions.findByName("androidComponents") as? AndroidComponentsExtension<*, *, *> ?: return
         android.finalizeDsl { commonExtension ->
             commonExtension.sourceSets.configureEach { sourceSet ->
