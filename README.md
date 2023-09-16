@@ -66,6 +66,7 @@ ktlint {
     ktlintVersion = "1.0.0-SNAPSHOT"
     chunkSize = 50
     baselineFile.set(file("config/ktlint_baseline.xml"))
+    ignoreKspGeneratedSources = true
 }
 ```
 
@@ -81,7 +82,8 @@ ktlint {
   provided `ktlint` version isn't compatible with the latest ktlint apis.
 
 - `chunkSize` - defines how many files will be processed by a single gradle worker in parallel
-- `baselineFile` - points at location of baseline file containing _known_ offenses that will be ignored during `lintKotlin` task execution  
+- `baselineFile` - points at location of baseline file containing _known_ offenses that will be ignored during `lintKotlin` task execution
+- `ignoreKspGeneratedSources` - indicates if the plugin should automatically register tasks for KSP generated sources (hence triggering compilation tasks). This is an incubating, rather primitive workaround for the issue reported: https://github.com/google/ksp/issues/1261. 
 
 ### Customizing Tasks
 

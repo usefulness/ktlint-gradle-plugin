@@ -7,5 +7,5 @@ import org.gradle.api.provider.Provider
 internal typealias SourceSetAction = (String, Provider<FileTree>) -> Unit
 
 internal interface SourceSetApplier {
-    fun applyToAll(project: Project, action: SourceSetAction)
+    fun applyToAll(project: Project, extension: KtlintGradleExtension, action: SourceSetAction)
 }

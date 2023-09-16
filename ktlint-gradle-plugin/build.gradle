@@ -41,6 +41,7 @@ dependencies {
 
     testRuntimeDependencies(libs.kotlin.gradle)
     testRuntimeDependencies(libs.agp.gradle)
+    testRuntimeDependencies(libs.google.ksp.gradle)
 }
 
 kotlin {

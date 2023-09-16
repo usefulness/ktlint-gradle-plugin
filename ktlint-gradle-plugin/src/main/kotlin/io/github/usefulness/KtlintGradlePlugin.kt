@@ -45,7 +45,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     task.chunkSize.set(pluginExtension.chunkSize)
                 }
 
-                sourceResolver.applyToAll(this) { id, resolvedSources ->
+                sourceResolver.applyToAll(this, pluginExtension) { id, resolvedSources ->
                     val checkWorker = tasks.register(
                         "lintKotlin${id.capitalize()}",
                         LintTask::class.java,
