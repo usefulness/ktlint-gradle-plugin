@@ -7,7 +7,7 @@ google-ksp = "1.9.10-1.0.13"
 maven-junit = "5.10.0"
 maven-assertj = "3.24.2"
 maven-ktlint = "1.0.0"
-maven-commons = "2.13.0"
+maven-commons = "2.14.0"
 
 [libraries]
 agp-gradle = { module = "com.android.tools.build:gradle", version.ref = "google-agp" }
