@@ -18,6 +18,9 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                 // language=groovy
                 writeText(
                     """
+                    import org.gradle.api.JavaVersion
+                    import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+                    
                     plugins {
                         id 'org.jetbrains.kotlin.jvm'
                         id 'com.google.devtools.ksp'
@@ -27,7 +30,19 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     repositories.mavenCentral()
                     
                     dependencies {
-                        ksp "com.google.dagger:dagger-compiler:2.48"
+                        ksp "com.google.dagger:dagger-compiler:2.48.1"
+                    }
+                    
+                    kotlin {
+                        jvmToolchain(21)
+                    }
+                    
+                    def targetJavaVersion = JavaVersion.VERSION_17
+                    tasks.withType(JavaCompile).configureEach {
+                        options.release.set(targetJavaVersion.majorVersion.toInteger())
+                    }
+                    tasks.withType(KotlinCompile).configureEach {
+                        kotlinOptions.jvmTarget = targetJavaVersion
                     }
                     
                     """.trimIndent(),
@@ -96,7 +111,6 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                         }
                     }
                             
-                    
                     repositories.mavenCentral()
                     
                     dependencies {
