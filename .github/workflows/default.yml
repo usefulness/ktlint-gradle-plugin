@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 20
+          java-version: 21
 
       - uses: gradle/wrapper-validation-action@v1
 
@@ -62,7 +62,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         gradle: [ current, release-candidate ]
-        java: [ 17, 20 ]
+        java: [ 17, 21 ]
         include:
           - os: ubuntu-latest
             gradle: 7.6
@@ -146,7 +146,7 @@ jobs:
       fail-fast: false
       matrix:
         gradle: [ current, release-candidate ]
-        java: [ 20 ]
+        java: [ 21 ]
         agp: ${{ fromJSON(needs.provide-agp-version-matrix.outputs.agp-versions) }}
 
     name: '[android] Gradle: ${{ matrix.gradle }}, Java: ${{ matrix.java }}, AGP: ${{ matrix.agp }}'
