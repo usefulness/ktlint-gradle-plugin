@@ -26,7 +26,7 @@ jacoco {
 }
 
 dependencies {
-    compileOnly(libs.kotlin.gradle)
+    compileOnly(libs.kotlin.gradle.api)
     compileOnly(libs.agp.gradle)
     compileOnly(libs.ktlint.rule.engine)
     compileOnly(libs.ktlint.cli.ruleset.core)
@@ -39,7 +39,7 @@ dependencies {
     testImplementation(libs.commons.io)
     testImplementation(libs.assertj.core)
 
-    testRuntimeDependencies(libs.kotlin.gradle)
+    testRuntimeDependencies(libs.kotlin.gradle.impl)
     testRuntimeDependencies(libs.agp.gradle)
     testRuntimeDependencies(libs.google.ksp.gradle)
 }
@@ -66,8 +66,8 @@ tasks.named("processResources") {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        apiVersion = "1.4"
-        languageVersion = "1.4"
+        apiVersion = "1.8"
+        languageVersion = "1.8"
     }
 }
 tasks.withType(Test).configureEach {

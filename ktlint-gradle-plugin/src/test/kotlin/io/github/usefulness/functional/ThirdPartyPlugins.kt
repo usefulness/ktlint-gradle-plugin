@@ -5,12 +5,10 @@ import io.github.usefulness.functional.utils.kotlinClass
 import io.github.usefulness.functional.utils.resolve
 import io.github.usefulness.functional.utils.settingsFile
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ThirdPartyPlugins : WithGradleTest.Android() {
 
-    @Disabled("This doesn't work with Kotlin 1.9.20 :/ https://github.com/google/ksp/pull/1558")
     @Test
     fun kspKotlin() {
         testProjectDir.apply {
@@ -32,7 +30,9 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     repositories.mavenCentral()
                     
                     dependencies {
+                        implementation "com.google.dagger:dagger:2.48.1"
                         ksp "com.google.dagger:dagger-compiler:2.48.1"
+
                     }
                     
                     kotlin {
@@ -53,7 +53,24 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
             resolve("src/main/kotlin/KotlinClass.kt") {
                 writeText(kotlinClass("KotlinClass"))
             }
+            resolve("src/test/kotlin/KotlinTestClass.kt") {
+                writeText(kotlinClass("KotlinTestClass"))
+            }
+            resolve("src/main/kotlin/FooModule.kt") {
+                writeText(
+                    // language=kotlin
+                    """
+                        @dagger.Module
+                        object FooModule {
+                            @dagger.Provides
+                            fun foo(): String = ""
+                        }
+                        
+                    """.trimIndent(),
+                )
+            }
         }
+        build("assemble") // generate files under `build` directory
 
         val result = build("lintKotlin")
 
@@ -79,9 +96,9 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
 
         assertThat(onlyMain.tasks.map { it.path }).containsAll(
             listOf(
+                ":kspKotlin",
                 ":compileKotlin",
                 ":compileJava",
-                ":lintKotlinGeneratedByKspTestKotlin",
                 ":lintKotlinTest",
                 ":lintKotlinMain",
                 ":lintKotlin",
@@ -116,7 +133,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     repositories.mavenCentral()
                     
                     dependencies {
-                        ksp "com.google.dagger:dagger-compiler:2.48"
+                        ksp "com.google.dagger:dagger-compiler:2.48.1"
                     }
                     
                     """.trimIndent(),

@@ -17,12 +17,12 @@ internal object AndroidSourceSetApplier : SourceSetApplier {
         android.finalizeDsl { commonExtension ->
             commonExtension.sourceSets.configureEach { sourceSet ->
                 val id = sourceSet.name.id
-                action(id, project.provider { getKotlinFiles(project, sourceSet) })
+                action(id, getKotlinFiles(project, sourceSet))
             }
         }
     }
 
-    private fun getKotlinFiles(project: Project, sourceSet: AndroidSourceSet): FileTree? {
+    private fun getKotlinFiles(project: Project, sourceSet: AndroidSourceSet): FileTree {
         val javaSources = sourceSet.java.srcDirs
         val kotlinSources = sourceSet.kotlin.srcDirs
 

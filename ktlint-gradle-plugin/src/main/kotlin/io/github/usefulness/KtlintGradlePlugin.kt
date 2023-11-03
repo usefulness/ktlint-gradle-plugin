@@ -47,7 +47,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
 
                 sourceResolver.applyToAll(this, pluginExtension) { id, resolvedSources ->
                     val checkWorker = tasks.register(
-                        "lintKotlin${id.capitalize()}",
+                        "lintKotlin${id.replaceFirstChar(Char::titlecase)}",
                         LintTask::class.java,
                     ) { task ->
                         task.source(resolvedSources)
@@ -67,7 +67,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     lintKotlin.configure { it.dependsOn(checkWorker) }
 
                     val formatWorker = tasks.register(
-                        "formatKotlin${id.capitalize()}",
+                        "formatKotlin${id.replaceFirstChar(Char::titlecase)}",
                         FormatTask::class.java,
                     ) { task ->
                         task.source(resolvedSources)
