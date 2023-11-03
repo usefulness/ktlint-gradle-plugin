@@ -11,7 +11,8 @@ maven-commons = "2.15.0"
 
 [libraries]
 agp-gradle = { module = "com.android.tools.build:gradle", version.ref = "google-agp" }
-kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
+kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api" }
+kotlin-gradle-impl = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "maven-ktlint" }
 ktlint-cli-ruleset-core = { module = "com.pinterest.ktlint:ktlint-cli-ruleset-core", version.ref = "maven-ktlint" }
 ktlint-cli-reporter-core = { module = "com.pinterest.ktlint:ktlint-cli-reporter-core", version.ref = "maven-ktlint" }
