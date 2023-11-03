@@ -6,7 +6,10 @@ import java.io.File
 import java.io.PrintStream
 import java.util.ServiceLoader
 
-internal enum class ReporterType(val id: String, val fileExtension: String) {
+internal enum class ReporterType(
+    val id: String,
+    val fileExtension: String,
+) {
     Checkstyle(id = "checkstyle", fileExtension = "xml"),
     Html(id = "html", fileExtension = "html"),
     Json(id = "json", fileExtension = "json"),

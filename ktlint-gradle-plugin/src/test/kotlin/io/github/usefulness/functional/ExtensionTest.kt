@@ -217,7 +217,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            val expectedMessage = "ClassNotFoundException: com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine"
+            val expectedMessage = "ClassNotFoundException: com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3"
             assertThat(output).contains(expectedMessage)
         }
         build("dependencies", "--configuration", "ktlint").apply {

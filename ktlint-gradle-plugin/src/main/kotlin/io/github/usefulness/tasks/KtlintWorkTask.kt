@@ -46,7 +46,8 @@ public abstract class KtlintWorkTask(
     private val projectLayout: ProjectLayout,
     objectFactory: ObjectFactory,
     private val patternFilterable: PatternFilterable = PatternSet(),
-) : DefaultTask(), PatternFilterable by patternFilterable {
+) : DefaultTask(),
+    PatternFilterable by patternFilterable {
 
     @Classpath
     public val ktlintClasspath: ConfigurableFileCollection = objectFactory.fileCollection()
@@ -76,6 +77,7 @@ public abstract class KtlintWorkTask(
     @Input
     public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
 
+    @Suppress("ktlint:standard:discouraged-comment-location")
     @Input
     public val jvmArgs: ListProperty<String> = objectFactory.listProperty(
         default = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED"), // https://youtrack.jetbrains.com/issue/KT-51619
