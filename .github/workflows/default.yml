@@ -65,12 +65,6 @@ jobs:
         java: [ 17, 21 ]
         include:
           - os: ubuntu-latest
-            gradle: 7.6
-            java: 11
-          - os: windows-latest
-            gradle: 7.6
-            java: 11
-          - os: ubuntu-latest
             gradle: 8.0.2
             java: 17
           - os: windows-latest
