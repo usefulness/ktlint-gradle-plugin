@@ -7,7 +7,5 @@ internal sealed class PluginError(
     cause: Throwable? = null,
 ) : GradleException(message, cause) {
 
-    class LintingError(
-        message: String,
-    ) : PluginError(message)
+    class LintingError(message: String) : PluginError(message)
 }
