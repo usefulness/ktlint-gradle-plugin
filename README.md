@@ -8,7 +8,7 @@ Gradle wrapper for [pinterest/ktlint](https://github.com/pinterest/ktlint)
 
 ### Installation
 
-Available on the:
+Available on:
 
 - [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
 - [Maven Central](https://mvnrepository.com/artifact/io.github.usefulness/ktlint-gradle-plugin)
@@ -25,7 +25,7 @@ plugins {
 
 | plugin version | min gradle version | min ktlint version |
 |----------------|--------------------|--------------------|
-| 0.6.2+         | 8.0                | 1.0.0              |
+| 0.7.0+         | 8.0                | 1.0.0              |
 | 0.5.0+         | 7.6                | 1.0.0              |
 | 0.4.0+         | 7.6                | 0.50.0             |
 | 0.3.0+         | 7.6                | 0.49.0             |
@@ -121,7 +121,7 @@ dependencies {
     ktlintRuleSet(files("libs/my-custom-ktlint-rules.jar"))
     ktlintRuleSet(project(":ktlint-custom-rules"))
     ktlintRuleSet("org.other.ktlint:custom-rules:1.0")
-    ktlintRuleSet("io.nlopez.compose.rules:ktlint:0.1.12")
+    ktlintRuleSet("io.nlopez.compose.rules:ktlint:0.3.3")
 }
 ```
 
