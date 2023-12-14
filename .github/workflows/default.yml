@@ -49,7 +49,7 @@ jobs:
 
       - run: git diff --exit-code
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: test-results-${{ matrix.os }}
@@ -115,7 +115,7 @@ jobs:
 
       - name: Upload reports
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "test-project-reports-${{ matrix.os }}-${{ matrix.gradle }}-${{ matrix.java }}"
           path: "${{ github.workspace }}/**/build/reports/ktlint"
@@ -184,7 +184,7 @@ jobs:
 
       - name: Upload reports
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "test-project-android-reports-${{ matrix.gradle }}-${{ matrix.java }}-${{ matrix.agp }}"
           path: "${{ github.workspace }}/**/build/reports/ktlint"
