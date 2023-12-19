@@ -6,7 +6,7 @@ google-agp = "8.2.0"
 google-ksp = "1.9.21-1.0.16"
 maven-junit = "5.10.1"
 maven-assertj = "3.24.2"
-maven-ktlint = "1.0.1"
+maven-ktlint = "1.1.0"
 maven-commons = "2.15.1"
 
 [libraries]
