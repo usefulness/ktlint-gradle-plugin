@@ -77,7 +77,7 @@ public abstract class KtlintWorkTask(
     @Input
     public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
 
-    @Suppress("ktlint:standard:discouraged-comment-location")
+    @Suppress("ktlint:standard:value-argument-comment")
     @Input
     public val jvmArgs: ListProperty<String> = objectFactory.listProperty(
         default = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED"), // https://youtrack.jetbrains.com/issue/KT-51619
