@@ -134,8 +134,12 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
             writeText(kotlinClass("DifferentClassName"))
         }
-        build("lintKotlin").apply {
+        build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("resetting KtLint caches")
+        }
+        build("lintKotlin", "--info").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
         }
 
@@ -151,12 +155,20 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
             writeText(kotlinClass("FileName"))
         }
-        build("lintKotlin").apply {
+        build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("resetting KtLint caches")
+        }
+        build("lintKotlin", "--info").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
         }
-        build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+
+        projectRoot.resolve("src/main/kotlin/AnotherFile.kt") {
+            writeText(kotlinClass("AnotherFile"))
+        }
+        build("lintKotlin", "--info").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).doesNotContain("resetting KtLint caches")
         }
     }
