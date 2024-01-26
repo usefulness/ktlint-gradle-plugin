@@ -37,7 +37,7 @@ jobs:
 
       - uses: gradle/wrapper-validation-action@v1
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
 
       - run: ./gradlew assemble
 
@@ -89,7 +89,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         continue-on-error: true
         with:
           build-root-directory: test-project
@@ -107,7 +107,7 @@ jobs:
           fi
         shell: bash
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
@@ -161,7 +161,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         continue-on-error: true
         with:
           build-root-directory: test-project-android
@@ -176,7 +176,7 @@ jobs:
           grep 'op-spacing' test-lint.txt | grep -q 'OpSpacing.kt:5:16'
           grep 'no-newline-before-return-type' test-lint.txt | grep -q 'CustomRuleTest.kt:4:16'
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
