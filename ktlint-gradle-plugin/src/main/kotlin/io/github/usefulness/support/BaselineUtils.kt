@@ -1,12 +1,13 @@
 package io.github.usefulness.support
 
 import com.pinterest.ktlint.cli.reporter.baseline.Baseline
+import com.pinterest.ktlint.cli.reporter.baseline.BaselineErrorHandling
 import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
 import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
 import java.io.File
 
 internal fun File.readKtlintBaseline(): Map<String, List<KtlintCliError>>? {
-    val baseline = loadBaseline(absolutePath)
+    val baseline = loadBaseline(absolutePath, errorHandling = BaselineErrorHandling.LOG)
     when (baseline.status) {
         Baseline.Status.VALID -> Unit
         Baseline.Status.NOT_FOUND,
