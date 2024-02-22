@@ -475,6 +475,34 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         }
     }
 
+    @Test
+    fun `behavior on non-compiling code`() {
+        settingsFile()
+        buildFile()
+
+        val className = "KotlinClass"
+        kotlinSourceFile(
+            "$className.kt",
+            """
+            class $className {
+                private fun hi() = // this does not compile
+            }
+
+            """.trimIndent(),
+        )
+
+        val expectedFilPath = "/src/main/kotlin/KotlinClass.kt".replace("/", File.separator)
+        buildAndFail("lintKotlin").apply {
+            assertThat(output).contains("ktlint failed when parsing file").contains(expectedFilPath)
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        }
+
+        buildAndFail("formatKotlin").apply {
+            assertThat(output).contains("ktlint failed when parsing file").contains(expectedFilPath)
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+        }
+    }
+
     private fun settingsFile() = settingsFile.apply {
         writeText("rootProject.name = 'ktlint-gradle-test-project'")
     }
