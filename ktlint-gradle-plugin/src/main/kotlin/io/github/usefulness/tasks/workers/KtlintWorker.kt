@@ -36,8 +36,10 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
             changedEditorconfigFiles = parameters.changedEditorConfigFiles,
             logger = logger,
         )
-        logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
-        logger.info("$name - executing against ${files.count()} file(s)")
+        if (logger.isInfoEnabled) {
+            logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
+            logger.info("$name - executing against ${files.count()} file(s)")
+        }
         if (logger.isDebugEnabled) {
             logger.debug(
                 "Resolved RuleSetProviders = ${ktLintEngine.ruleProviders.joinToString { it.createNewRuleInstance().ruleId.value }}",
@@ -56,31 +58,37 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
             }
 
             val fileErrors = mutableListOf<KtlintCliError>()
-            when (parameters.mode.get()) {
-                KtlintRunMode.Check,
-                null,
-                -> ktLintEngine.lint(
-                    code = Code.fromFile(file),
-                    callback = { fileErrors.add(it.toKtlintCliErrorForLint()) },
-                )
-
-                KtlintRunMode.Format -> {
-                    var fileFixed = false
-                    val fixedContent = ktLintEngine.format(
+            runCatching {
+                when (parameters.mode.get()) {
+                    KtlintRunMode.Check,
+                    null,
+                    -> ktLintEngine.lint(
                         code = Code.fromFile(file),
-                        callback = { error, corrected ->
-                            if (corrected) {
-                                fileFixed = true
-                            }
-                            fileErrors.add(error.toKtlintCliErrorForFormat(corrected))
-                        },
+                        callback = { fileErrors.add(it.toKtlintCliErrorForLint()) },
                     )
 
-                    if (fileFixed) {
-                        file.writeText(fixedContent)
+                    KtlintRunMode.Format -> {
+                        var fileFixed = false
+                        val fixedContent = ktLintEngine.format(
+                            code = Code.fromFile(file),
+                            callback = { error, corrected ->
+                                if (corrected) {
+                                    fileFixed = true
+                                }
+                                fileErrors.add(error.toKtlintCliErrorForFormat(corrected))
+                            },
+                        )
+
+                        if (fileFixed) {
+                            file.writeText(fixedContent)
+                        }
                     }
                 }
             }
+                .onFailure { throwable ->
+                    logger.quiet("ktlint failed when parsing file: ${file.path}")
+                    throw throwable
+                }
             if (fileErrors.isNotEmpty()) {
                 errors += KtlintErrorResult(
                     file = file,
