@@ -85,6 +85,7 @@ ktlint {
 - `chunkSize` - defines how many files will be processed by a single gradle worker in parallel
 - `baselineFile` - points at location of baseline file containing _known_ offenses that will be ignored during `lintKotlin` task execution
 - `ignoreFilesUnderBuildDir` - This allows to ignore generated sources. This is a workaround for https://youtrack.jetbrains.com/issue/KT-45161. Setting the value to `false` restores default behavior and will run ktlint against all sources returned by KGP  
+- `showEditorconfigWarnings` - Prints warnings when none of the _typical_ editorconfig location contain `root=true` entry. This is highly recommended to the builds are deterministic across machine  
 
 ### Customizing Tasks
 

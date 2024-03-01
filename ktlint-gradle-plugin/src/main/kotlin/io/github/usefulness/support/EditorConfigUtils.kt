@@ -9,7 +9,6 @@ import org.ec4j.core.model.Property
 import org.ec4j.core.model.PropertyType
 import org.ec4j.core.model.PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER
 import org.ec4j.core.model.Section
-import org.gradle.api.file.ProjectLayout
 import java.io.File
 
 internal fun editorConfigOverride(disabledRules: List<String>) = getPropertiesForDisabledRules(disabledRules)
@@ -69,19 +68,7 @@ private fun getKtlintRulePropertyName(ruleName: String) = if (ruleName.contains(
     "ktlint_standard_$ruleName"
 }
 
-internal fun ProjectLayout.findApplicableEditorConfigFiles(): Sequence<File> {
-    val projectEditorConfig = projectDirectory.file(".editorconfig").asFile
-
-    return generateSequence(seed = projectEditorConfig) { editorconfig ->
-        if (editorconfig.isRootEditorConfig) {
-            null
-        } else {
-            editorconfig.parentFile?.parentFile?.resolve(".editorconfig")
-        }
-    }
-}
-
-private val File.isRootEditorConfig: Boolean
+internal val File.isRootEditorConfig: Boolean
     get() {
         if (!isFile || !canRead()) return false
 

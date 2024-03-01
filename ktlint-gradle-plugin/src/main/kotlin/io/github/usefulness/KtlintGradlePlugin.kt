@@ -3,6 +3,7 @@ package io.github.usefulness
 import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
 import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
 import io.github.usefulness.support.ReporterType
+import io.github.usefulness.support.isRootEditorConfig
 import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.KtlintWorkTask
 import io.github.usefulness.tasks.LintTask
@@ -32,6 +33,9 @@ public class KtlintGradlePlugin : Plugin<Project> {
         val ktlintConfiguration = createKtlintConfiguration(pluginExtension)
         val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
         val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
+        val recognisedEditorConfigs = generateSequence(project) { it.parent }
+            .map { it.layout.projectDirectory.file(".editorconfig").asFile }
+            .toList()
 
         extendablePlugins.forEach { (pluginId, sourceResolver) ->
             pluginManager.withPlugin(pluginId) {
@@ -43,6 +47,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     task.ruleSetsClasspath.setFrom(ruleSetConfiguration)
                     task.reportersConfiguration.setFrom(reportersConfiguration)
                     task.chunkSize.set(pluginExtension.chunkSize)
+                    task.editorconfigFiles.from(recognisedEditorConfigs)
                 }
 
                 sourceResolver.applyToAll(this, pluginExtension) { id, resolvedSources ->
@@ -87,6 +92,14 @@ public class KtlintGradlePlugin : Plugin<Project> {
 
                     formatKotlin.configure { it.dependsOn(formatWorker) }
                 }
+            }
+        }
+
+        afterEvaluate {
+            if (pluginExtension.showEditorconfigWarnings.get() && recognisedEditorConfigs.none(File::isRootEditorConfig)) {
+                logger.warn(
+                    "None of recognised `.editorconfig` files contain `root=true` entry, this may result in non-deterministic builds.\n",
+                )
             }
         }
     }

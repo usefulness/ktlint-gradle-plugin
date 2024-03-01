@@ -42,4 +42,7 @@ public open class KtlintGradleExtension internal constructor(
     @Deprecated(message = "Will be removed in the next version", replaceWith = ReplaceWith(expression = "ignoreFilesUnderBuildDir"))
     @Incubating
     public val ignoreKspGeneratedSources: Property<Boolean> = ignoreFilesUnderBuildDir
+
+    @Incubating
+    public val showEditorconfigWarnings: Property<Boolean> = objectFactory.property(default = true)
 }

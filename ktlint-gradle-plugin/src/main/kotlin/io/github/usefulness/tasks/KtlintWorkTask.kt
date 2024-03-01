@@ -5,7 +5,6 @@ import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RUL
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_IGNORE_FAILURES
 import io.github.usefulness.support.KtlintRunMode
-import io.github.usefulness.support.findApplicableEditorConfigFiles
 import io.github.usefulness.tasks.workers.ConsoleReportWorker
 import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import io.github.usefulness.tasks.workers.KtlintWorker
@@ -70,9 +69,7 @@ public abstract class KtlintWorkTask(
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:Incremental
-    internal val editorconfigFiles = objectFactory.fileCollection().apply {
-        from(projectLayout.findApplicableEditorConfigFiles().toList())
-    }
+    internal val editorconfigFiles = objectFactory.fileCollection()
 
     @Input
     public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")

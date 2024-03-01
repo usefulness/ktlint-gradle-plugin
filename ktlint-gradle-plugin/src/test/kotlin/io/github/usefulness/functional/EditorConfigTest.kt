@@ -137,10 +137,12 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("resetting KtLint caches")
+            assertThat(output).contains("Calculating task graph as no cached configuration is available for tasks: lintKotlin")
         }
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
 
         projectRoot.resolve(".editorconfig") {
@@ -148,6 +150,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
         buildAndFail("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Reusing configuration cache.")
             assertThat(output).contains("[standard:filename] File 'FileName.kt' contains a single top level declaration")
             assertThat(output).contains("resetting KtLint caches")
         }
@@ -158,10 +161,12 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
 
         projectRoot.resolve("src/main/kotlin/AnotherFile.kt") {
@@ -170,6 +175,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).doesNotContain("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
     }
 
@@ -217,6 +223,52 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("Format could not fix")
             assertThat(output).contains("resetting KtLint caches")
+        }
+    }
+
+    @Test
+    fun `shows editorconfig warnings`() {
+        projectRoot.resolve(".editorconfig") {
+            writeText(
+                // language=editorconfig
+                """
+                    [*.{kt,kts}]
+                    indent_size = 4
+                """.trimIndent(),
+            )
+        }
+        projectRoot.resolve("src/main/kotlin/Foo.kt") {
+            // language=kotlin
+            val content =
+                """
+                object Foo {
+                    fun bar() = 2
+                }
+
+                """.trimIndent()
+
+            writeText(content)
+        }
+        build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("None of recognised `.editorconfig` files contain `root=true` entry")
+        }
+
+        projectRoot.resolve("build.gradle") {
+            // language=groovy
+            appendText(
+                """
+                
+                ktlint {
+                    showEditorconfigWarnings = false    
+                }
+                """.trimIndent(),
+            )
+        }
+
+        build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(output).doesNotContain("None of recognised `.editorconfig` files contain `root=true` entry")
         }
     }
 }
