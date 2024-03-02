@@ -69,7 +69,7 @@ public abstract class KtlintWorkTask(
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:Incremental
-    internal val editorconfigFiles = objectFactory.fileCollection()
+    internal val editorConfigFiles = objectFactory.fileCollection()
 
     @Input
     public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
@@ -189,10 +189,10 @@ internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Ma
     }
 
 internal fun KtlintWorkTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
-    inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
+    inputChanges.getFileChanges(editorConfigFiles).map(FileChange::getFile)
 
 internal fun KtlintWorkTask.getChangedSources(inputChanges: InputChanges) =
-    if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {
+    if (inputChanges.isIncremental && inputChanges.getFileChanges(editorConfigFiles).none()) {
         inputChanges.getFileChanges(source)
             .asSequence()
             .filter { it.fileType == FileType.FILE && it.changeType != ChangeType.REMOVED }
