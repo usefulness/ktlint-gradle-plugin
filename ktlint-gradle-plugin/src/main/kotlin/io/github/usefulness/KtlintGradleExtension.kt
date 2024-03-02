@@ -1,6 +1,6 @@
 package io.github.usefulness
 
-import io.github.usefulness.EditorConfigValidationMode.BuildFailure
+import io.github.usefulness.EditorConfigValidationMode.PrintWarningLogs
 import io.github.usefulness.support.versionProperties
 import io.github.usefulness.tasks.listProperty
 import io.github.usefulness.tasks.property
@@ -45,7 +45,7 @@ public open class KtlintGradleExtension internal constructor(
     public val ignoreKspGeneratedSources: Property<Boolean> = ignoreFilesUnderBuildDir
 
     @Incubating
-    public val editorConfigValidation: Property<EditorConfigValidationMode> = objectFactory.property(default = BuildFailure)
+    public val editorConfigValidation: Property<EditorConfigValidationMode> = objectFactory.property(default = PrintWarningLogs)
 
     @Incubating
     public fun editorConfigValidation(any: Any) {

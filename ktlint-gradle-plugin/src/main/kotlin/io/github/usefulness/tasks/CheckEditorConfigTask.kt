@@ -1,7 +1,9 @@
 package io.github.usefulness.tasks
 
 import io.github.usefulness.EditorConfigValidationMode
-import io.github.usefulness.EditorConfigValidationMode.*
+import io.github.usefulness.EditorConfigValidationMode.BuildFailure
+import io.github.usefulness.EditorConfigValidationMode.None
+import io.github.usefulness.EditorConfigValidationMode.PrintWarningLogs
 import io.github.usefulness.support.isRootEditorConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException

@@ -104,9 +104,9 @@ internal class EditorConfigValidationTest : WithGradleTest.Kotlin() {
         projectRoot.resolve(".editorconfig") {
             writeText(invalidEditorConfig)
         }
-        buildAndFail("lintKotlin").apply {
+        build("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":validateEditorConfigForKtlint")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":validateEditorConfigForKtlint")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains(failureMessage)
         }
     }
