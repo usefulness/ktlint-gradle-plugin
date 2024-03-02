@@ -7,6 +7,7 @@ plugins {
     id("com.starter.publishing")
     alias(libs.plugins.gradle.pluginpublish)
     alias(libs.plugins.starter.library.kotlin)
+    alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
 }
 
 description = "Lint and formatting for Kotlin using ktlint with configuration-free setup on JVM and Android projects"
