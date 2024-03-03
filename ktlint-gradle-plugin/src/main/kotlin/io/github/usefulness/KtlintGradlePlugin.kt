@@ -1,8 +1,10 @@
 package io.github.usefulness
 
+import io.github.usefulness.EditorConfigValidationMode.None
 import io.github.usefulness.pluginapplier.AndroidSourceSetApplier
 import io.github.usefulness.pluginapplier.KotlinSourceSetApplier
 import io.github.usefulness.support.ReporterType
+import io.github.usefulness.tasks.CheckEditorConfigTask
 import io.github.usefulness.tasks.FormatTask
 import io.github.usefulness.tasks.KtlintWorkTask
 import io.github.usefulness.tasks.LintTask
@@ -32,6 +34,14 @@ public class KtlintGradlePlugin : Plugin<Project> {
         val ktlintConfiguration = createKtlintConfiguration(pluginExtension)
         val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
         val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
+        val recognisedEditorConfigs = generateSequence(project) { it.parent }
+            .map { it.layout.projectDirectory.file(".editorconfig").asFile }
+            .toList()
+
+        tasks.register("validateEditorConfigForKtlint", CheckEditorConfigTask::class.java) {
+            it.editorConfigFiles.from(recognisedEditorConfigs)
+            it.mode.set(pluginExtension.editorConfigValidation)
+        }
 
         extendablePlugins.forEach { (pluginId, sourceResolver) ->
             pluginManager.withPlugin(pluginId) {
@@ -43,6 +53,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     task.ruleSetsClasspath.setFrom(ruleSetConfiguration)
                     task.reportersConfiguration.setFrom(reportersConfiguration)
                     task.chunkSize.set(pluginExtension.chunkSize)
+                    task.editorConfigFiles.from(recognisedEditorConfigs)
                 }
 
                 sourceResolver.applyToAll(this, pluginExtension) { id, resolvedSources ->
@@ -86,6 +97,15 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     }
 
                     formatKotlin.configure { it.dependsOn(formatWorker) }
+                }
+
+                tasks.named("lintKotlin") { task ->
+                    if (pluginExtension.editorConfigValidation.get() == None) return@named
+                    task.dependsOn("validateEditorConfigForKtlint")
+                }
+                tasks.named("formatKotlin") { task ->
+                    if (pluginExtension.editorConfigValidation.get() == None) return@named
+                    task.dependsOn("validateEditorConfigForKtlint")
                 }
             }
         }

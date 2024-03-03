@@ -30,8 +30,8 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     repositories.mavenCentral()
                     
                     dependencies {
-                        implementation "com.google.dagger:dagger:2.48.1"
-                        ksp "com.google.dagger:dagger-compiler:2.48.1"
+                        implementation "com.google.dagger:dagger:2.51"
+                        ksp "com.google.dagger:dagger-compiler:2.51"
 
                     }
                     
@@ -75,6 +75,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
         val result = build("lintKotlin")
 
         assertThat(result.tasks.map { it.path }).containsExactlyInAnyOrder(
+            ":validateEditorConfigForKtlint",
             ":lintKotlinTest",
             ":lintKotlinMain",
             ":lintKotlin",
@@ -96,6 +97,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
 
         assertThat(onlyMain.tasks.map { it.path }).containsAll(
             listOf(
+                ":validateEditorConfigForKtlint",
                 ":kspKotlin",
                 ":compileKotlin",
                 ":compileJava",
@@ -133,7 +135,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     repositories.mavenCentral()
                     
                     dependencies {
-                        ksp "com.google.dagger:dagger-compiler:2.48.1"
+                        ksp "com.google.dagger:dagger-compiler:2.51"
                     }
                     
                     """.trimIndent(),
@@ -147,6 +149,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
         val result = build("lintKotlin")
 
         assertThat(result.tasks.map { it.path }).containsExactlyInAnyOrder(
+            ":validateEditorConfigForKtlint",
             ":lintKotlinTestFixturesRelease",
             ":lintKotlinTestDebug",
             ":lintKotlinAndroidTest",
@@ -178,6 +181,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
         val onlyMain = build("lintKotlin")
 
         assertThat(onlyMain.tasks.map { it.path }).containsExactlyInAnyOrder(
+            ":validateEditorConfigForKtlint",
             ":lintKotlinTestFixturesRelease",
             ":lintKotlinTestDebug",
             ":lintKotlinAndroidTest",

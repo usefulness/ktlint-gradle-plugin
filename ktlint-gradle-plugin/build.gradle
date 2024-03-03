@@ -1,12 +1,12 @@
-import kotlin.Suppress
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapperKt
 
 plugins {
     id("java-gradle-plugin")
     id("com.starter.publishing")
     alias(libs.plugins.gradle.pluginpublish)
     alias(libs.plugins.starter.library.kotlin)
+    alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
 }
 
 description = "Lint and formatting for Kotlin using ktlint with configuration-free setup on JVM and Android projects"
@@ -65,9 +65,9 @@ tasks.named("processResources") {
 }
 
 tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        apiVersion = "1.8"
-        languageVersion = "1.8"
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_1_8
+        languageVersion = KotlinVersion.KOTLIN_1_8
     }
 }
 tasks.withType(Test).configureEach {

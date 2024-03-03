@@ -5,7 +5,6 @@ import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_DISABLED_RUL
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_EXPERIMENTAL_RULES
 import io.github.usefulness.KtlintGradleExtension.Companion.DEFAULT_IGNORE_FAILURES
 import io.github.usefulness.support.KtlintRunMode
-import io.github.usefulness.support.findApplicableEditorConfigFiles
 import io.github.usefulness.tasks.workers.ConsoleReportWorker
 import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import io.github.usefulness.tasks.workers.KtlintWorker
@@ -70,9 +69,7 @@ public abstract class KtlintWorkTask(
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     @get:Incremental
-    internal val editorconfigFiles = objectFactory.fileCollection().apply {
-        from(projectLayout.findApplicableEditorConfigFiles().toList())
-    }
+    internal val editorConfigFiles = objectFactory.fileCollection()
 
     @Input
     public val workerMaxHeapSize: Property<String> = objectFactory.property(default = "256m")
@@ -192,10 +189,10 @@ internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Ma
     }
 
 internal fun KtlintWorkTask.getChangedEditorconfigFiles(inputChanges: InputChanges) =
-    inputChanges.getFileChanges(editorconfigFiles).map(FileChange::getFile)
+    inputChanges.getFileChanges(editorConfigFiles).map(FileChange::getFile)
 
 internal fun KtlintWorkTask.getChangedSources(inputChanges: InputChanges) =
-    if (inputChanges.isIncremental && inputChanges.getFileChanges(editorconfigFiles).none()) {
+    if (inputChanges.isIncremental && inputChanges.getFileChanges(editorConfigFiles).none()) {
         inputChanges.getFileChanges(source)
             .asSequence()
             .filter { it.fileType == FileType.FILE && it.changeType != ChangeType.REMOVED }

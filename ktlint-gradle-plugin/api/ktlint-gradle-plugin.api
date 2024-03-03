@@ -1,0 +1,78 @@
+public final class io/github/usefulness/EditorConfigValidationMode : java/lang/Enum {
+	public static final field BuildFailure Lio/github/usefulness/EditorConfigValidationMode;
+	public static final field None Lio/github/usefulness/EditorConfigValidationMode;
+	public static final field PrintWarningLogs Lio/github/usefulness/EditorConfigValidationMode;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/usefulness/EditorConfigValidationMode;
+	public static fun values ()[Lio/github/usefulness/EditorConfigValidationMode;
+}
+
+public class io/github/usefulness/KtlintGradleExtension {
+	public static final field DEFAULT_CHUNK_SIZE I
+	public static final field DEFAULT_EXPERIMENTAL_RULES Z
+	public static final field DEFAULT_IGNORE_FAILURES Z
+	public final fun editorConfigValidation (Ljava/lang/Object;)V
+	public final fun getBaselineFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getChunkSize ()Lorg/gradle/api/provider/Property;
+	public final fun getDisabledRules ()Lorg/gradle/api/provider/ListProperty;
+	public final fun getEditorConfigValidation ()Lorg/gradle/api/provider/Property;
+	public final fun getExperimentalRules ()Lorg/gradle/api/provider/Property;
+	public final fun getIgnoreFailures ()Lorg/gradle/api/provider/Property;
+	public final fun getIgnoreFilesUnderBuildDir ()Lorg/gradle/api/provider/Property;
+	public final fun getIgnoreKspGeneratedSources ()Lorg/gradle/api/provider/Property;
+	public final fun getKtlintVersion ()Lorg/gradle/api/provider/Property;
+	public final fun getReporters ()Lorg/gradle/api/provider/ListProperty;
+}
+
+public final class io/github/usefulness/KtlintGradlePlugin : org/gradle/api/Plugin {
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public class io/github/usefulness/tasks/CheckEditorConfigTask : org/gradle/api/DefaultTask {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun getMode ()Lorg/gradle/api/provider/Property;
+	public final fun run ()V
+}
+
+public class io/github/usefulness/tasks/FormatTask : io/github/usefulness/tasks/KtlintWorkTask {
+	public fun <init> (Lorg/gradle/workers/WorkerExecutor;Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/file/ProjectLayout;)V
+	public final fun run (Lorg/gradle/work/InputChanges;)V
+}
+
+public abstract class io/github/usefulness/tasks/KtlintWorkTask : org/gradle/api/DefaultTask, org/gradle/api/tasks/util/PatternFilterable {
+	public fun <init> (Lorg/gradle/workers/WorkerExecutor;Lorg/gradle/api/file/ProjectLayout;Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternFilterable;)V
+	public synthetic fun <init> (Lorg/gradle/workers/WorkerExecutor;Lorg/gradle/api/file/ProjectLayout;Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternFilterable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun exclude (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun exclude ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public final fun getBaselineFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getChunkSize ()Lorg/gradle/api/provider/Property;
+	public final fun getDisabledRules ()Lorg/gradle/api/provider/ListProperty;
+	public fun getExcludes ()Ljava/util/Set;
+	public final fun getExperimentalRules ()Lorg/gradle/api/provider/Property;
+	public final fun getIgnoreFailures ()Lorg/gradle/api/provider/Property;
+	public fun getIncludes ()Ljava/util/Set;
+	public final fun getJvmArgs ()Lorg/gradle/api/provider/ListProperty;
+	public final fun getKtlintClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public final fun getReportersConfiguration ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public final fun getReports ()Lorg/gradle/api/provider/MapProperty;
+	public final fun getRuleSetsClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public final fun getSource ()Lorg/gradle/api/file/FileCollection;
+	public final fun getWorkerMaxHeapSize ()Lorg/gradle/api/provider/Property;
+	public fun include (Lgroovy/lang/Closure;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include (Lorg/gradle/api/specs/Spec;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun include ([Ljava/lang/String;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setExcludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public fun setIncludes (Ljava/lang/Iterable;)Lorg/gradle/api/tasks/util/PatternFilterable;
+	public final fun setSource (Ljava/lang/Object;)V
+	public final fun source ([Ljava/lang/Object;)Lio/github/usefulness/tasks/KtlintWorkTask;
+}
+
+public class io/github/usefulness/tasks/LintTask : io/github/usefulness/tasks/KtlintWorkTask {
+	public fun <init> (Lorg/gradle/workers/WorkerExecutor;Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/file/ProjectLayout;)V
+	public final fun run (Lorg/gradle/work/InputChanges;)V
+}
+

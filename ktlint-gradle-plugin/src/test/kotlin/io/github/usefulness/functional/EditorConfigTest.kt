@@ -137,10 +137,12 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("resetting KtLint caches")
+            assertThat(output).contains("Calculating task graph as no cached configuration is available for tasks: lintKotlin")
         }
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
 
         projectRoot.resolve(".editorconfig") {
@@ -148,6 +150,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         }
         buildAndFail("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(output).contains("Reusing configuration cache.")
             assertThat(output).contains("[standard:filename] File 'FileName.kt' contains a single top level declaration")
             assertThat(output).contains("resetting KtLint caches")
         }
@@ -158,10 +161,12 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
             assertThat(output).doesNotContain("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
 
         projectRoot.resolve("src/main/kotlin/AnotherFile.kt") {
@@ -170,6 +175,7 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
         build("lintKotlin", "--info").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).doesNotContain("resetting KtLint caches")
+            assertThat(output).contains("Reusing configuration cache.")
         }
     }
 
@@ -193,6 +199,8 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             writeText(
                 // language=editorconfig
                 """
+                    root = true
+                    
                     [*.{kt,kts}]
                     ktlint_standard_filename = disabled
                 """.trimIndent(),
@@ -208,6 +216,8 @@ internal class EditorConfigTest : WithGradleTest.Kotlin() {
             writeText(
                 // language=editorconfig
                 """
+                    root = true
+                    
                     [*.{kt,kts}]
                     indent_size = 2
                 """.trimIndent(),
