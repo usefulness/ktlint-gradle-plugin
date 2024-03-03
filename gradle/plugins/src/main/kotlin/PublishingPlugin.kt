@@ -4,6 +4,7 @@ import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
 import org.gradle.plugins.signing.SigningExtension
 
@@ -60,6 +61,9 @@ class PublishingPlugin : Plugin<Project> {
             extensions.configure<JavaPluginExtension> {
                 withSourcesJar()
             }
+            tasks.named("processResources", ProcessResources::class.java) { processResources ->
+                processResources.from(rootProject.file("LICENSE"))
+            }
             extensions.configure<PublishingExtension> {
                 publications.configureEach { publication ->
                     (publication as? MavenPublication)?.pom { pom ->
@@ -68,7 +72,7 @@ class PublishingPlugin : Plugin<Project> {
                         pom.url.set("https://github.com/usefulness/ktlint-gradle-plugin")
                         pom.licenses { licenses ->
                             licenses.license { license ->
-                                license.name.set("The Apache Software License, Version 2.0")
+                                license.name.set("Apache-2.0")
                                 license.url.set("https://github.com/usefulness/ktlint-gradle-plugin/blob/master/LICENSE")
                             }
                         }
