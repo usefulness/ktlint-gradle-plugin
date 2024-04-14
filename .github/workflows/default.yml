@@ -107,7 +107,7 @@ jobs:
           fi
         shell: bash
 
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
@@ -161,7 +161,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         continue-on-error: true
         with:
           build-root-directory: test-project-android
