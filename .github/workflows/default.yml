@@ -176,7 +176,7 @@ jobs:
           grep 'op-spacing' test-lint.txt | grep -q 'OpSpacing.kt:5:16'
           grep 'no-newline-before-return-type' test-lint.txt | grep -q 'CustomRuleTest.kt:4:16'
 
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
