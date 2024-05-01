@@ -41,12 +41,14 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
                     KtlintRunMode.Format -> {
                         when (lintError.status) {
                             Status.BASELINE_IGNORED -> Unit
+
                             Status.LINT_CAN_NOT_BE_AUTOCORRECTED -> {
                                 hasUncoveredErrors = true
                                 logger.warn(lintError.generateMessage(file = file, message = "Format could not fix"))
                             }
 
                             Status.FORMAT_IS_AUTOCORRECTED -> logger.quiet(lintError.generateMessage(file = file, message = "Format fixed"))
+
                             Status.LINT_CAN_BE_AUTOCORRECTED,
                             Status.KOTLIN_PARSE_EXCEPTION,
                             Status.KTLINT_RULE_ENGINE_EXCEPTION,

@@ -43,6 +43,7 @@ public open class CheckEditorConfigTask @Inject constructor(objectFactory: Objec
             resultsFile.get().asFile.writeText("Failure")
             when (mode.get()) {
                 None -> Unit
+
                 PrintWarningLogs -> logger.warn(messageFn())
 
                 BuildFailure,

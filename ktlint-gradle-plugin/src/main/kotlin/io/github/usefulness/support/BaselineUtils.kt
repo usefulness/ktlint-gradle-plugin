@@ -10,6 +10,7 @@ internal fun File.readKtlintBaseline(): Map<String, List<KtlintCliError>>? {
     val baseline = loadBaseline(absolutePath, errorHandling = BaselineErrorHandling.LOG)
     when (baseline.status) {
         Baseline.Status.VALID -> Unit
+
         Baseline.Status.NOT_FOUND,
         Baseline.Status.INVALID,
         Baseline.Status.DISABLED,
