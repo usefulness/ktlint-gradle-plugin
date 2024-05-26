@@ -515,7 +515,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         // language=groovy
         val buildscript =
             """
-            import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+            import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
             
             plugins {
                 id 'org.jetbrains.kotlin.jvm'
@@ -530,7 +530,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
             tasks.withType(JavaCompile).configureEach {
                 options.release.set(targetJavaVersion.majorVersion.toInteger())
             }
-            tasks.withType(KotlinCompile).configureEach {
+            tasks.withType(KotlinCompilationTask).configureEach {
                 kotlinOptions.jvmTarget = targetJavaVersion
             }
             """.trimIndent()

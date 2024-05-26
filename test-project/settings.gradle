@@ -16,7 +16,7 @@ develocity {
         termsOfUseAgree = "yes"
 
         uploadInBackground = System.getenv("CI") == null
-        publishing { onlyIf { false } }
+        publishing { onlyIf { System.getenv("CI") != null } }
     }
 }
 
