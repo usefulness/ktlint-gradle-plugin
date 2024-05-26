@@ -19,7 +19,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                 writeText(
                     """
                     import org.gradle.api.JavaVersion
-                    import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+                    import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
                     
                     plugins {
                         id 'org.jetbrains.kotlin.jvm'
@@ -43,7 +43,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     tasks.withType(JavaCompile).configureEach {
                         options.release.set(targetJavaVersion.majorVersion.toInteger())
                     }
-                    tasks.withType(KotlinCompile).configureEach {
+                    tasks.withType(KotlinCompilationTask).configureEach {
                         kotlinOptions.jvmTarget = targetJavaVersion
                     }
                     

@@ -111,7 +111,7 @@ jobs:
         with:
           build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin --scan --stacktrace --no-build-cache
+          arguments: formatKotlin lintKotlin --stacktrace --no-build-cache
 
       - name: Upload reports
         if: ${{ failure() }}
