@@ -28,7 +28,7 @@ Given the plugin is just a wrapper and follows its own release cycle, it may a g
 ktlint = "x.y.z"
 
 [libraries]
-ktlint-core = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } 
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } 
 ```
 \+ then 
 ```groovy
