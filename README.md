@@ -21,6 +21,23 @@ plugins {
 }
 ```
 
+##### (Optional) Managing `ktlint` version with Renovate/Dependaot
+Given the plugin is just a wrapper and follows its own release cycle, it may a good practice to manually control `ktlint` tool version. One can achieve it by defining full ktlint version dependency and passing resolved ktlint version to the `ktlint` extension. Version Catalog example:
+```toml
+[versions]
+ktlint = "x.y.z"
+
+[libraries]
+ktlint-core = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } 
+```
+\+ then 
+```groovy
+ktlint {
+    ktlinVersion = libs.versions.ktlint.get()
+}
+```
+
+
 ### Compatibility
 
 | plugin version | min gradle version | min ktlint version |
