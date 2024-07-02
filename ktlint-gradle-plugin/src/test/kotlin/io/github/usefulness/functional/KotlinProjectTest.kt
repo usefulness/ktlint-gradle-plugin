@@ -266,7 +266,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "CustomClass.kt",
             """
-            data class CustomClass(val value: Int)
+            data class CustomClass(
+                val value: Int,
+            )
             
             """.trimIndent(),
         )
@@ -281,7 +283,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "CustomClass.kt",
             """
-            data class CustomClass(val modified: Int)
+            data class CustomClass(
+                val modified: Int,
+            )
             
             """.trimIndent(),
         )
@@ -301,7 +305,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "CustomClass.kt",
             """
-            data class CustomClass(val modifiedEditorconfig: Int)
+            data class CustomClass(
+                val modifiedEditorconfig: Int,
+            )
             
             """.trimIndent(),
         )
@@ -313,7 +319,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "WrongFilename.kt",
             """
-            data class AnotherCustomClass(val modifiedEditorconfig: Int)
+            data class AnotherCustomClass(
+                val modifiedEditorconfig: Int,
+            )
             
             """.trimIndent(),
         )
@@ -338,7 +346,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "CustomClass.kt",
             """
-            data class CustomClass(val value: Int)
+            data class CustomClass(
+                val value: Int,
+            )
             
             """.trimIndent(),
         )
@@ -353,7 +363,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "CustomClass.kt",
             """
-            data class CustomClass(val modified: Int)
+            data class CustomClass(
+                val modified: Int,
+            )
             
             """.trimIndent(),
         )
@@ -373,7 +385,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "CustomClass.kt",
             """
-            data class CustomClass(val modifiedEditorconfig: Int)
+            data class CustomClass(
+                val modifiedEditorconfig: Int,
+            )
             
             """.trimIndent(),
         )
@@ -385,7 +399,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
         kotlinSourceFile(
             "WrongFilename.kt",
             """
-            data class AnotherCustomClass(val modifiedEditorconfig: Int)
+            data class AnotherCustomClass(
+                val modifiedEditorconfig: Int,
+            )
             
             """.trimIndent(),
         )
