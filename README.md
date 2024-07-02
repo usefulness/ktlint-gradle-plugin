@@ -33,7 +33,7 @@ ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint
 \+ then 
 ```groovy
 ktlint {
-    ktlinVersion = libs.versions.ktlint.get()
+    ktlintVersion = libs.versions.ktlint.get()
 }
 ```
 
@@ -81,7 +81,7 @@ ktlint {
     reporters = ["checkstyle", "html", "json", "plain", "sarif"]
     experimentalRules = true
     disabledRules = ["no-wildcard-imports", "experimental:annotation", "your-custom-rule:no-bugs"]
-    ktlintVersion = "1.0.0-SNAPSHOT"
+    ktlintVersion = "2.0.0-SNAPSHOT"
     chunkSize = 50
     baselineFile.set(file("config/ktlint_baseline.xml"))
     ignoreFilesUnderBuildDir = true
