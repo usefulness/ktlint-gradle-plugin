@@ -460,6 +460,39 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
     }
 
     @Test
+    fun `plugin is compatible with isolated projects`() {
+        settingsFile().apply {
+            appendText("include ':foo:bar'")
+        }
+        buildFile().also { it.copyTo(testProjectDir.resolve("foo/bar/build.gradle")) }
+        kotlinSourceFile(
+            "CustomObject.kt",
+            """
+            object CustomObject
+            
+            """.trimIndent(),
+        )
+
+        build("lintKotlin", "-Dorg.gradle.unsafe.isolated-projects=true").apply {
+            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Configuration cache entry stored")
+        }
+        build("lintKotlin", "-Dorg.gradle.unsafe.isolated-projects=true").apply {
+            assertThat(task(":lintKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(output).contains("Configuration cache entry reused.")
+        }
+
+        build("formatKotlin", "-Dorg.gradle.unsafe.isolated-projects=true").apply {
+            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Configuration cache entry stored")
+        }
+        build("formatKotlin", "-Dorg.gradle.unsafe.isolated-projects=true").apply {
+            assertThat(task(":formatKotlin")?.outcome).isEqualTo(TaskOutcome.UP_TO_DATE)
+            assertThat(output).contains("Configuration cache entry reused.")
+        }
+    }
+
+    @Test
     fun `plugin resolves dynamically loaded RuleSetProviders`() {
         settingsFile()
         buildFile()
@@ -520,7 +553,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
     }
 
     private fun settingsFile() = settingsFile.apply {
-        writeText("rootProject.name = 'ktlint-gradle-test-project'")
+        writeText("rootProject.name = 'ktlint-gradle-test-project'\n")
     }
 
     private fun editorConfig() = editorconfigFile.apply {
