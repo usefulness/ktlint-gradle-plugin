@@ -91,7 +91,7 @@ jobs:
         with:
           gradle-version: ${{ matrix.gradle }}
       
-      - run: ./gradlew lintKotlin --continue
+      - run: gradle lintKotlin --continue
         continue-on-error: true
         working-directory: test-project
 
@@ -110,7 +110,7 @@ jobs:
         with:
           gradle-version: ${{ matrix.gradle }}
 
-      - run: ./gradlew formatKotlin lintKotlin --stacktrace --no-build-cache
+      - run: gradle formatKotlin lintKotlin --stacktrace --no-build-cache
         working-directory: test-project
         
       - name: Upload reports
@@ -156,7 +156,7 @@ jobs:
         with:
           gradle-version: ${{ matrix.gradle }}
 
-      - run: ./gradlew lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --continue
+      - run: gradle lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --continue
         continue-on-error: true
         working-directory: test-project-android
 
@@ -172,7 +172,7 @@ jobs:
         with:
           gradle-version: ${{ matrix.gradle }}
 
-      - run: ./gradlew formatKotlin lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --no-build-cache
+      - run: gradle formatKotlin lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --no-build-cache
         working-directory: test-project-android
 
       - name: Upload reports
