@@ -35,9 +35,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
-      - uses: gradle/actions/wrapper-validation@v3
-
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
 
       - run: ./gradlew assemble
 
@@ -89,12 +87,13 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/actions/setup-gradle@v3
-        continue-on-error: true
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: lintKotlin --continue
+      
+      - run: gradle lintKotlin --continue
+        continue-on-error: true
+        working-directory: test-project
 
       - name: Assert fixes
         run: |
@@ -107,12 +106,13 @@ jobs:
           fi
         shell: bash
 
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin --stacktrace --no-build-cache
 
+      - run: gradle formatKotlin lintKotlin --stacktrace --no-build-cache
+        working-directory: test-project
+        
       - name: Upload reports
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -152,12 +152,13 @@ jobs:
         with:
           version-to-resolve: ${{ matrix.agp }}
 
-      - uses: gradle/actions/setup-gradle@v3
-        continue-on-error: true
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
-          arguments: lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --continue
+
+      - run: gradle lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --continue
+        continue-on-error: true
+        working-directory: test-project-android
 
       - name: Assert fixes
         run: |
@@ -167,11 +168,12 @@ jobs:
           grep 'op-spacing' test-lint.txt | grep -q 'OpSpacing.kt:5:16'
           grep 'no-newline-before-return-type' test-lint.txt | grep -q 'CustomRuleTest.kt:4:16'
 
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --no-build-cache
+
+      - run: gradle formatKotlin lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --no-build-cache
+        working-directory: test-project-android
 
       - name: Upload reports
         if: ${{ failure() }}
