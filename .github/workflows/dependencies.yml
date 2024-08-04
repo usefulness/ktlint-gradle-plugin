@@ -38,8 +38,8 @@ jobs:
           java-version: 21
 
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          arguments: assemble -m
+      
+      - run: ./gradlew assemble -m    
 
       - id: dependency-diff
         name: Generate dependency diff
