@@ -35,8 +35,6 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
-      - uses: gradle/actions/wrapper-validation@v4
-
       - uses: gradle/actions/setup-gradle@v4
 
       - run: ./gradlew assemble
@@ -90,11 +88,12 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - uses: gradle/actions/setup-gradle@v4
-        continue-on-error: true
         with:
-          build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: lintKotlin --continue
+      
+      - run: ./gradlew lintKotlin --continue
+        continue-on-error: true
+        working-directory: test-project
 
       - name: Assert fixes
         run: |
@@ -109,10 +108,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: test-project
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin --stacktrace --no-build-cache
 
+      - run: ./gradlew formatKotlin lintKotlin --stacktrace --no-build-cache
+        working-directory: test-project
+        
       - name: Upload reports
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -153,11 +153,12 @@ jobs:
           version-to-resolve: ${{ matrix.agp }}
 
       - uses: gradle/actions/setup-gradle@v4
-        continue-on-error: true
         with:
-          build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
-          arguments: lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --continue
+
+      - run: ./gradlew lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --continue
+        continue-on-error: true
+        working-directory: test-project-android
 
       - name: Assert fixes
         run: |
@@ -169,9 +170,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: test-project-android
           gradle-version: ${{ matrix.gradle }}
-          arguments: formatKotlin lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --no-build-cache
+
+      - run: ./gradlew formatKotlin lintKotlin -PagpVersion=${{ steps.agp-version-finder.outputs.resolved-version }} --no-build-cache
+        working-directory: test-project-android
 
       - name: Upload reports
         if: ${{ failure() }}
