@@ -34,8 +34,8 @@ public class KtlintGradlePlugin : Plugin<Project> {
         val ktlintConfiguration = createKtlintConfiguration(pluginExtension)
         val ruleSetConfiguration = createRuleSetConfiguration(ktlintConfiguration)
         val reportersConfiguration = createReportersConfiguration(ktlintConfiguration)
-        val recognisedEditorConfigs = generateSequence(project) { it.parent }
-            .map { it.layout.projectDirectory.file(".editorconfig").asFile }
+        val recognisedEditorConfigs = generateSequence(projectDir) { if (it == rootProject.projectDir) null else it.parentFile }
+            .map { it.resolve(".editorconfig") }
             .toList()
 
         tasks.register("validateEditorConfigForKtlint", CheckEditorConfigTask::class.java) {
