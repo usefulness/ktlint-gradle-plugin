@@ -7,7 +7,7 @@ google-ksp = "2.0.21-1.0.28"
 maven-junit = "5.11.3"
 maven-assertj = "3.26.3"
 maven-ktlint = "1.4.1"
-maven-commons = "2.17.0"
+maven-commons = "2.18.0"
 maven-binarycompatibilityvalidator = "0.16.3"
 
 [libraries]
