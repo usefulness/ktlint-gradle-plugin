@@ -20,6 +20,7 @@ ktlint-cli-reporter-core = { module = "com.pinterest.ktlint:ktlint-cli-reporter-
 ktlint-cli-reporter-baseline = { module = "com.pinterest.ktlint:ktlint-cli-reporter-baseline", version.ref = "maven-ktlint" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "maven-junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "maven-junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "maven-assertj" }
 commons-io = { module = "commons-io:commons-io", version.ref = "maven-commons" }
 google-ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "google-ksp" }
