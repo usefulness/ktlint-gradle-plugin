@@ -36,7 +36,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     }
                     
                     kotlin {
-                        jvmToolchain(21)
+                        jvmToolchain(23)
                     }
                     
                     def targetJavaVersion = JavaVersion.VERSION_17

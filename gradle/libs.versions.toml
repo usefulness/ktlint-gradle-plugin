@@ -4,7 +4,7 @@ gradle-pluginpublish = "1.3.1"
 gradle-doctor = "0.10.0"
 google-agp = "8.8.2"
 google-ksp = "2.1.10-1.0.31"
-maven-junit = "5.11.4"
+maven-junit = "5.12.0"
 maven-assertj = "3.27.3"
 maven-ktlint = "1.5.0"
 maven-commons = "2.18.0"
@@ -20,6 +20,7 @@ ktlint-cli-reporter-core = { module = "com.pinterest.ktlint:ktlint-cli-reporter-
 ktlint-cli-reporter-baseline = { module = "com.pinterest.ktlint:ktlint-cli-reporter-baseline", version.ref = "maven-ktlint" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "maven-junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "maven-junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "maven-assertj" }
 commons-io = { module = "commons-io:commons-io", version.ref = "maven-commons" }
 google-ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "google-ksp" }
