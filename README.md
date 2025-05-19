@@ -1,6 +1,6 @@
 # ktlint-gradle-plugin
 
-[![Build Status](https://github.com/usefulness/ktlint-gradle-plugin/workflows/Build%20Project/badge.svg)](https://github.com/usefulness/ktlint-gradle-plugin/actions)
+[![Build Status](https://github.com/usefulness/ktlint-gradle-plugin/actions/workflows/default.yml/badge.svg?branch=master)](https://github.com/usefulness/ktlint-gradle-plugin/actions/workflows/default.yml)
 [![Latest Version](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/usefulness/ktlint-gradle-plugin/maven-metadata.xml?label=gradle)](https://plugins.gradle.org/plugin/io.github.usefulness.ktlint-gradle-plugin)
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.usefulness/ktlint-gradle-plugin)
 
