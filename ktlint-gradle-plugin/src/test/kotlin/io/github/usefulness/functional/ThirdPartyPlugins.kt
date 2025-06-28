@@ -36,7 +36,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     }
                     
                     kotlin {
-                        jvmToolchain(23)
+                        jvmToolchain(24)
                     }
                     
                     def targetJavaVersion = JavaVersion.VERSION_17
@@ -126,7 +126,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     
                     android {
                         namespace 'io.github.usefulness'
-                        compileSdk 33
+                        compileSdk 35
                         defaultConfig {
                             minSdkVersion 23
                         }

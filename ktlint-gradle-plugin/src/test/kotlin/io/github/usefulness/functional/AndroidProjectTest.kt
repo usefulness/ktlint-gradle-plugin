@@ -44,9 +44,9 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
                         
                         android {
                             namespace 'io.github.usefulness'
-                            compileSdk 33
+                            compileSdk 35
                             defaultConfig {
-                                minSdkVersion 23
+                                minSdkVersion 24
                             }
                             
                             flavorDimensions 'customFlavor'

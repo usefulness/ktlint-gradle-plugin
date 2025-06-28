@@ -67,8 +67,8 @@ tasks.named("processResources") {
 
 tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_1_8
-        languageVersion = KotlinVersion.KOTLIN_1_8
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
     }
 }
 tasks.withType(Test).configureEach {
