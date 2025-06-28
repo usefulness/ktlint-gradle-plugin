@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.osacky.doctor)
 }
 
-
 kotlin {
     jvmToolchain(24)
 }
@@ -26,4 +25,9 @@ gradlePlugin {
             implementationClass = 'PublishingPlugin'
         }
     }
+}
+
+dependencies {
+    implementation(libs.vanniktech.maven.publish)
+    implementation(libs.jetbrains.dokka)
 }

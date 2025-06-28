@@ -63,10 +63,10 @@ jobs:
         java: [ 21, 24 ]
         include:
           - os: ubuntu-latest
-            gradle: 8.0.2
+            gradle: 8.5
             java: 17
           - os: windows-latest
-            gradle: 8.0.2
+            gradle: 8.5
             java: 17
 
     name: '[${{ matrix.os }}] Gradle: ${{ matrix.gradle }}, Java: ${{ matrix.java }}'

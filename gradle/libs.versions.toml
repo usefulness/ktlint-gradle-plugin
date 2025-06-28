@@ -9,6 +9,8 @@ maven-assertj = "3.27.3"
 maven-ktlint = "1.6.0"
 maven-commons = "2.19.0"
 maven-binarycompatibilityvalidator = "0.18.0"
+maven-dokka = "2.0.0"
+maven-vanniktech-maven-publish = "0.33.0"
 
 [libraries]
 agp-gradle = { module = "com.android.tools.build:gradle", version.ref = "google-agp" }
@@ -24,6 +26,8 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "maven-assertj" }
 commons-io = { module = "commons-io:commons-io", version.ref = "maven-commons" }
 google-ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "google-ksp" }
+jetbrains-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "maven-dokka" }
+vanniktech-maven-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-vanniktech-maven-publish" }
 
 [plugins]
 starter-config = { id = "com.starter.config", version.ref = "gradle-starter" }

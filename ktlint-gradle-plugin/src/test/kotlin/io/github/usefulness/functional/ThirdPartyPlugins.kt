@@ -128,7 +128,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                         namespace 'io.github.usefulness'
                         compileSdk 35
                         defaultConfig {
-                            minSdkVersion 23
+                            minSdkVersion 31
                         }
                     }
                             
