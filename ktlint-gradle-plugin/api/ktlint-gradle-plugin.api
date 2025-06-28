@@ -2,6 +2,7 @@ public final class io/github/usefulness/EditorConfigValidationMode : java/lang/E
 	public static final field BuildFailure Lio/github/usefulness/EditorConfigValidationMode;
 	public static final field None Lio/github/usefulness/EditorConfigValidationMode;
 	public static final field PrintWarningLogs Lio/github/usefulness/EditorConfigValidationMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/github/usefulness/EditorConfigValidationMode;
 	public static fun values ()[Lio/github/usefulness/EditorConfigValidationMode;
 }

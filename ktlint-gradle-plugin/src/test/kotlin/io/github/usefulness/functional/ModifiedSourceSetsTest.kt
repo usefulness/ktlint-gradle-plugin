@@ -45,9 +45,9 @@ internal class ModifiedSourceSetsTest : WithGradleTest.Android() {
                         
                         android {
                             namespace 'io.github.usefulness'
-                            compileSdk 31
+                            compileSdk 35
                             defaultConfig {
-                                minSdkVersion 23
+                                minSdkVersion 31
                             }
                             sourceSets {
                                 main.java.srcDirs += "src/main/kotlin"

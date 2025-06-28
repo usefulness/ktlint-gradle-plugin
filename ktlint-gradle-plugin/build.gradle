@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java-gradle-plugin")
-    id("com.starter.publishing")
     alias(libs.plugins.gradle.pluginpublish)
+    id("com.starter.publishing")
     alias(libs.plugins.starter.library.kotlin)
     alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
 }
@@ -67,8 +67,8 @@ tasks.named("processResources") {
 
 tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_1_8
-        languageVersion = KotlinVersion.KOTLIN_1_8
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
     }
 }
 tasks.withType(Test).configureEach {

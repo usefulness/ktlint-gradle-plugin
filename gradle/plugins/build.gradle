@@ -6,9 +6,8 @@ plugins {
     alias(libs.plugins.osacky.doctor)
 }
 
-
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(24)
 }
 
 def targetJavaVersion = JavaVersion.VERSION_11
@@ -26,4 +25,9 @@ gradlePlugin {
             implementationClass = 'PublishingPlugin'
         }
     }
+}
+
+dependencies {
+    implementation(libs.vanniktech.maven.publish)
+    implementation(libs.jetbrains.dokka)
 }
