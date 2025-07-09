@@ -9,6 +9,7 @@ import io.github.usefulness.tasks.workers.ConsoleReportWorker
 import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import io.github.usefulness.tasks.workers.KtlintWorker
 import org.gradle.api.DefaultTask
+import org.gradle.api.JavaVersion
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
@@ -77,7 +78,11 @@ public abstract class KtlintWorkTask(
     @Suppress("ktlint:standard:value-argument-comment")
     @Input
     public val jvmArgs: ListProperty<String> = objectFactory.listProperty(
-        default = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED"), // https://youtrack.jetbrains.com/issue/KT-51619
+        default = if (JavaVersion.current() >= JavaVersion.VERSION_24) {
+            listOf("--sun-misc-unsafe-memory-access=allow") // // https://youtrack.jetbrains.com/issue/IJPL-191435
+        } else {
+            emptyList()
+        },
     )
 
     @Input
@@ -170,20 +175,20 @@ public abstract class KtlintWorkTask(
     }
 }
 
-internal inline fun <reified T> ObjectFactory.property(default: T? = null): Property<T> = property(T::class.java).apply {
+internal inline fun <reified T : Any> ObjectFactory.property(default: T? = null): Property<T> = property(T::class.java).apply {
     convention(default)
 }
 
-internal inline fun <reified T> ObjectFactory.property(default: Provider<T>): Property<T> = property(T::class.java).apply {
+internal inline fun <reified T : Any> ObjectFactory.property(default: Provider<T>): Property<T> = property(T::class.java).apply {
     convention(default)
 }
 
-internal inline fun <reified T> ObjectFactory.listProperty(default: Iterable<T> = emptyList()): ListProperty<T> =
+internal inline fun <reified T : Any> ObjectFactory.listProperty(default: Iterable<T> = emptyList()): ListProperty<T> =
     listProperty(T::class.java).apply {
         convention(default)
     }
 
-internal inline fun <reified K, reified V> ObjectFactory.mapProperty(default: Map<K, V> = emptyMap()): MapProperty<K, V> =
+internal inline fun <reified K : Any, reified V : Any> ObjectFactory.mapProperty(default: Map<K, V> = emptyMap()): MapProperty<K, V> =
     mapProperty(K::class.java, V::class.java).apply {
         convention(default)
     }
