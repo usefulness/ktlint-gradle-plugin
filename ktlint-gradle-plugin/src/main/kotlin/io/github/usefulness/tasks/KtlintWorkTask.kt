@@ -9,6 +9,7 @@ import io.github.usefulness.tasks.workers.ConsoleReportWorker
 import io.github.usefulness.tasks.workers.GenerateReportsWorker
 import io.github.usefulness.tasks.workers.KtlintWorker
 import org.gradle.api.DefaultTask
+import org.gradle.api.JavaVersion
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileType
@@ -77,7 +78,11 @@ public abstract class KtlintWorkTask(
     @Suppress("ktlint:standard:value-argument-comment")
     @Input
     public val jvmArgs: ListProperty<String> = objectFactory.listProperty(
-        default = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED"), // https://youtrack.jetbrains.com/issue/KT-51619
+        default = if (JavaVersion.current() >= JavaVersion.VERSION_24) {
+            listOf("--sun-misc-unsafe-memory-access=allow") // // https://youtrack.jetbrains.com/issue/IJPL-191435
+        } else {
+            emptyList()
+        },
     )
 
     @Input
