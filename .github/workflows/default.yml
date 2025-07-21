@@ -5,6 +5,11 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      ktlint_version:
+        description: 'ktlint version. e.g. 2.3.4-SNAPSHOT'
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,6 +33,10 @@ jobs:
           mkdir -p ~/.gradle
           printf "org.gradle.jvmargs=-Xmx3G -XX:+UseParallelGC\n" >> ~/.gradle/gradle.properties
           printf "org.gradle.vfs.watch=false\n" >> ~/.gradle/gradle.properties
+        shell: bash
+
+      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.gradle
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
       - uses: actions/setup-java@v4
@@ -80,6 +89,10 @@ jobs:
           mkdir -p ~/.gradle
           printf "org.gradle.jvmargs=-Xmx3G -XX:+UseParallelGC\n" >> ~/.gradle/gradle.properties
           printf "org.gradle.vfs.watch=false\n" >> ~/.gradle/gradle.properties
+        shell: bash
+
+      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.gradle
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
       - uses: actions/setup-java@v4
@@ -140,6 +153,10 @@ jobs:
           mkdir -p ~/.gradle
           printf "org.gradle.jvmargs=-Xmx3G -XX:+UseParallelGC\n" >> ~/.gradle/gradle.properties
           printf "org.gradle.vfs.watch=false\n" >> ~/.gradle/gradle.properties
+        shell: bash
+
+      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.gradle
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
       - uses: actions/setup-java@v4
