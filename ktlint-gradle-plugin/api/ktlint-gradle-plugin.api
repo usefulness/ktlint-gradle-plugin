@@ -19,7 +19,6 @@ public class io/github/usefulness/KtlintGradleExtension {
 	public final fun getExperimentalRules ()Lorg/gradle/api/provider/Property;
 	public final fun getIgnoreFailures ()Lorg/gradle/api/provider/Property;
 	public final fun getIgnoreFilesUnderBuildDir ()Lorg/gradle/api/provider/Property;
-	public final fun getIgnoreKspGeneratedSources ()Lorg/gradle/api/provider/Property;
 	public final fun getKtlintVersion ()Lorg/gradle/api/provider/Property;
 	public final fun getReporters ()Lorg/gradle/api/provider/ListProperty;
 }

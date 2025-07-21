@@ -86,7 +86,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                 """
                 
                 ktlint {
-                    ignoreKspGeneratedSources = false 
+                    ignoreFilesUnderBuildDir = false 
                 }
                 
                 """.trimIndent(),
@@ -171,7 +171,7 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                 """
                 
                 ktlint {
-                    ignoreKspGeneratedSources = false 
+                    ignoreFilesUnderBuildDir = false 
                 }
                 
                 """.trimIndent(),
