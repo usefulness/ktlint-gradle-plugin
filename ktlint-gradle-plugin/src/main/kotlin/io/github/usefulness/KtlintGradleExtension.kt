@@ -37,19 +37,14 @@ public open class KtlintGradleExtension internal constructor(
 
     public val baselineFile: RegularFileProperty = objectFactory.fileProperty()
 
-    @Incubating
     public val ignoreFilesUnderBuildDir: Property<Boolean> = objectFactory.property(default = true)
-
-    @Deprecated(message = "Will be removed in the next version", replaceWith = ReplaceWith(expression = "ignoreFilesUnderBuildDir"))
-    @Incubating
-    public val ignoreKspGeneratedSources: Property<Boolean> = ignoreFilesUnderBuildDir
 
     @Incubating
     public val editorConfigValidation: Property<EditorConfigValidationMode> = objectFactory.property(default = PrintWarningLogs)
 
     @Incubating
     public fun editorConfigValidation(any: Any) {
-        val value = EditorConfigValidationMode.values().firstOrNull { it.name.equals(any.toString(), ignoreCase = true) }
-        editorConfigValidation.set(checkNotNull(value) { "Has to be one of ${EditorConfigValidationMode.values()}, was=$any" })
+        val value = EditorConfigValidationMode.entries.firstOrNull { it.name.equals(any.toString(), ignoreCase = true) }
+        editorConfigValidation.set(checkNotNull(value) { "Has to be one of ${EditorConfigValidationMode.entries}, was=$any" })
     }
 }
