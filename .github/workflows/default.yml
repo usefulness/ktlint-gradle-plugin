@@ -35,7 +35,7 @@ jobs:
           printf "org.gradle.vfs.watch=false\n" >> ~/.gradle/gradle.properties
         shell: bash
 
-      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.gradle
+      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.toml
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
@@ -55,6 +55,7 @@ jobs:
       - run: ./gradlew publishPlugins -m
 
       - run: git diff --exit-code
+        if: ${{ github.event_name != 'workflow_dispatch' }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -91,7 +92,7 @@ jobs:
           printf "org.gradle.vfs.watch=false\n" >> ~/.gradle/gradle.properties
         shell: bash
 
-      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.gradle
+      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.toml
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
@@ -155,7 +156,7 @@ jobs:
           printf "org.gradle.vfs.watch=false\n" >> ~/.gradle/gradle.properties
         shell: bash
 
-      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.gradle
+      - run: sed -i -E 's/maven-ktlint = "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+"+/maven-ktlint = "${{ inputs.ktlint_version }}"/g' gradle/libs.versions.toml
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
