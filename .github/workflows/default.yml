@@ -39,7 +39,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: 24
@@ -96,7 +96,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
@@ -160,7 +160,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
