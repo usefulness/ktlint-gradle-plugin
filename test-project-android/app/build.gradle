@@ -2,8 +2,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     id("io.github.usefulness.ktlint-gradle-plugin")
+}
+
+if (androidComponents.pluginVersion.major < 9) {
+    apply plugin: "org.jetbrains.kotlin.android"
 }
 
 ktlint {
@@ -12,17 +15,17 @@ ktlint {
 android {
     namespace = "com.ktint_gradle_plugin.example"
     defaultConfig {
-        compileSdk 35
-        minSdkVersion 31
+        compileSdk = 36
+        minSdk = 31
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
+        jvmTarget = JvmTarget.JVM_11
     }
 }
 

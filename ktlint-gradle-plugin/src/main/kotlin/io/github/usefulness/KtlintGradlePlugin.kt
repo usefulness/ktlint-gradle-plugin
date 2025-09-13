@@ -25,7 +25,10 @@ public class KtlintGradlePlugin : Plugin<Project> {
         "org.jetbrains.kotlin.jvm" to KotlinSourceSetApplier,
         "org.jetbrains.kotlin.multiplatform" to KotlinSourceSetApplier,
         "org.jetbrains.kotlin.js" to KotlinSourceSetApplier,
-        "kotlin-android" to AndroidSourceSetApplier,
+        "com.android.library" to AndroidSourceSetApplier,
+        "com.android.application" to AndroidSourceSetApplier,
+        "com.android.dynamic-feature" to AndroidSourceSetApplier,
+        "com.android.kotlin.multiplatform.library" to AndroidSourceSetApplier,
     )
 
     public override fun apply(project: Project): Unit = with(project) {
