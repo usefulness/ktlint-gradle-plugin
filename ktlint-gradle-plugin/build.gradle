@@ -21,10 +21,6 @@ configurations {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.13"
-}
-
 dependencies {
     compileOnly(libs.kotlin.gradle.api)
     compileOnly(libs.agp.gradle)
