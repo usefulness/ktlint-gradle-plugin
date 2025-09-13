@@ -130,7 +130,6 @@ public class KtlintGradlePlugin : Plugin<Project> {
         configurations.maybeCreate(KTLINT_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
             isCanBeConsumed = false
-            isVisible = false
 
             val dependencyProvider = provider {
                 val ktlintVersion = pluginExtension.ktlintVersion.get()
@@ -150,7 +149,6 @@ public class KtlintGradlePlugin : Plugin<Project> {
         configurations.maybeCreate(RULE_SET_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
             isCanBeConsumed = false
-            isVisible = false
 
             shouldResolveConsistentlyWith(ktlintConfiguration)
         }
@@ -160,7 +158,6 @@ public class KtlintGradlePlugin : Plugin<Project> {
         configurations.maybeCreate(REPORTERS_CONFIGURATION_NAME).apply {
             isCanBeResolved = true
             isCanBeConsumed = false
-            isVisible = false
 
             shouldResolveConsistentlyWith(ktlintConfiguration)
         }
