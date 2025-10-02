@@ -44,7 +44,7 @@ jobs:
           distribution: 'temurin'
           java-version: 24
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew assemble
 
@@ -101,7 +101,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: ${{ matrix.gradle }}
       
@@ -120,7 +120,7 @@ jobs:
           fi
         shell: bash
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: ${{ matrix.gradle }}
 
@@ -170,7 +170,7 @@ jobs:
         with:
           version-to-resolve: ${{ matrix.agp }}
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: ${{ matrix.gradle }}
 
@@ -186,7 +186,7 @@ jobs:
           grep 'op-spacing' test-lint.txt | grep -q 'OpSpacing.kt:5:16'
           grep 'no-newline-before-return-type' test-lint.txt | grep -q 'CustomRuleTest.kt:4:16'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: ${{ matrix.gradle }}
 
