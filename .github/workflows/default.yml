@@ -57,7 +57,7 @@ jobs:
       - run: git diff --exit-code
         if: ${{ github.event_name != 'workflow_dispatch' }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ always() }}
         with:
           name: test-results-${{ matrix.os }}
@@ -129,7 +129,7 @@ jobs:
         
       - name: Upload reports
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: "test-project-reports-${{ matrix.os }}-${{ matrix.gradle }}-${{ matrix.java }}"
           path: "${{ github.workspace }}/**/build/reports/ktlint"
@@ -195,7 +195,7 @@ jobs:
 
       - name: Upload reports
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: "test-project-android-reports-${{ matrix.gradle }}-${{ matrix.java }}-${{ matrix.agp }}"
           path: "${{ github.workspace }}/**/build/reports/ktlint"
