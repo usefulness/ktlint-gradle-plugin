@@ -10,7 +10,7 @@ maven-ktlint = "1.7.1"
 maven-commons = "2.21.0"
 maven-binarycompatibilityvalidator = "0.18.1"
 maven-dokka = "2.1.0"
-maven-vanniktech-maven-publish = "0.34.0"
+maven-vanniktech-maven-publish = "0.35.0"
 
 [libraries]
 agp-gradle = { module = "com.android.tools.build:gradle", version.ref = "google-agp" }
