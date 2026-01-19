@@ -47,12 +47,7 @@ kotlin {
 
 tasks.register("generateVersionProperties", WriteProperties) { writeProps ->
     def propertiesFile = new File(sourceSets.main.output.resourcesDir, "ktlint-gradle-plugin.properties")
-    if (GradleVersion.current() >= GradleVersion.version("8.1")) {
-        writeProps.destinationFile = propertiesFile
-    } else {
-        //noinspection GrDeprecatedAPIUsage
-        writeProps.outputFile = propertiesFile
-    }
+    writeProps.destinationFile = propertiesFile
     writeProps.property("kltint_gradle_plugin_version", provider { version })
     writeProps.property("ktlint_version", libs.versions.maven.ktlint)
 }
@@ -63,8 +58,8 @@ tasks.named("processResources") {
 
 tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_2_0
-        languageVersion = KotlinVersion.KOTLIN_2_0
+        apiVersion = KotlinVersion.KOTLIN_2_2
+        languageVersion = KotlinVersion.KOTLIN_2_2
     }
 }
 tasks.withType(Test).configureEach {
