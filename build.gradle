@@ -8,7 +8,7 @@ plugins {
 }
 
 commonConfig {
-    javaVersion JavaVersion.VERSION_11
+    javaVersion JavaVersion.VERSION_17
 }
 
 allprojects {
@@ -22,7 +22,7 @@ allprojects {
             }
         }
         kotlin {
-            jvmToolchain(24)
+            jvmToolchain(25)
         }
     }
     pluginManager.withPlugin("java") {

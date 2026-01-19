@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 24
+          java-version: 25
 
       - uses: gradle/actions/setup-gradle@v5
 
@@ -70,13 +70,13 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         gradle: [ current, release-candidate ]
-        java: [ 21, 24 ]
+        java: [ 21, 25 ]
         include:
           - os: ubuntu-latest
-            gradle: 8.5
+            gradle: "9.1.0"
             java: 17
           - os: windows-latest
-            gradle: 8.5
+            gradle: "9.1.0"
             java: 17
 
     name: '[${{ matrix.os }}] Gradle: ${{ matrix.gradle }}, Java: ${{ matrix.java }}'
@@ -140,7 +140,7 @@ jobs:
       fail-fast: false
       matrix:
         gradle: [ current, release-candidate ]
-        java: [ 24 ]
+        java: [ 25 ]
         agp: [ stable, alpha ]
 
     name: '[android] Gradle: ${{ matrix.gradle }}, Java: ${{ matrix.java }}, AGP: ${{ matrix.agp }}'
