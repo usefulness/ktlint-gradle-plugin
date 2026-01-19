@@ -575,7 +575,7 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
                 mavenCentral()
             }
             
-            def targetJavaVersion = JavaVersion.VERSION_11
+            def targetJavaVersion = JavaVersion.VERSION_17
             tasks.withType(JavaCompile).configureEach {
                 options.release.set(targetJavaVersion.majorVersion.toInteger())
             }
