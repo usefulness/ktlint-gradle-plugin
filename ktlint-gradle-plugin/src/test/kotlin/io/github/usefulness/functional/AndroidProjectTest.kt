@@ -38,15 +38,14 @@ internal class AndroidProjectTest : WithGradleTest.Android() {
                         """
                         plugins {
                             id 'com.android.library'
-                            id 'kotlin-android'
                             id 'io.github.usefulness.ktlint-gradle-plugin'
                         }
                         
                         android {
                             namespace 'io.github.usefulness'
-                            compileSdk 35
+                            compileSdk 36
                             defaultConfig {
-                                minSdkVersion 24
+                                minSdkVersion 32
                             }
                             
                             flavorDimensions 'customFlavor'

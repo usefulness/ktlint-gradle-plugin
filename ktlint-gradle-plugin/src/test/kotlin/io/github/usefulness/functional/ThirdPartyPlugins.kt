@@ -119,23 +119,22 @@ class ThirdPartyPlugins : WithGradleTest.Android() {
                     """
                     plugins {
                         id 'com.android.library'
-                        id 'org.jetbrains.kotlin.android'
                         id 'com.google.devtools.ksp'
                         id 'io.github.usefulness.ktlint-gradle-plugin'
                     }
                     
                     android {
                         namespace 'io.github.usefulness'
-                        compileSdk 35
+                        compileSdk 36
                         defaultConfig {
-                            minSdkVersion 31
+                            minSdkVersion 32
                         }
                     }
                             
                     repositories.mavenCentral()
                     
                     dependencies {
-                        ksp "com.google.dagger:dagger-compiler:2.51"
+                        ksp "com.google.dagger:dagger-compiler:2.58"
                     }
                     
                     """.trimIndent(),

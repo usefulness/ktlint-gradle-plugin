@@ -61,7 +61,6 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
             runCatching {
                 when (parameters.mode.get()) {
                     KtlintRunMode.Check,
-                    null,
                     -> ktLintEngine.lint(
                         code = Code.fromFile(file),
                         callback = { fileErrors.add(it.toKtlintCliErrorForLint()) },
