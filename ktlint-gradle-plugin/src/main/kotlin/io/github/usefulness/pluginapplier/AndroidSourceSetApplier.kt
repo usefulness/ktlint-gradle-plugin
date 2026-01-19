@@ -16,7 +16,7 @@ internal object AndroidSourceSetApplier : SourceSetApplier {
     override fun applyToAll(project: Project, extension: KtlintGradleExtension, action: SourceSetAction) {
         val android = project.extensions.findByName("androidComponents") as? AndroidComponentsExtension<*, *, *> ?: return
         android.finalizeDsl { commonExtension ->
-            commonExtension as CommonExtension<*, *, *, *, *, *>
+            commonExtension as CommonExtension
             commonExtension.sourceSets.configureEach { sourceSet ->
                 val id = sourceSet.name.id
                 action(id, getKotlinFiles(project, sourceSet))
