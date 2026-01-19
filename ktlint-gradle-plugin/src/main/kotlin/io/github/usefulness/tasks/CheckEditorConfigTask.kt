@@ -47,7 +47,6 @@ public open class CheckEditorConfigTask @Inject constructor(objectFactory: Objec
                 PrintWarningLogs -> logger.warn(messageFn())
 
                 BuildFailure,
-                null,
                 -> throw GradleException(messageFn())
             }
         } else {
