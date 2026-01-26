@@ -1,6 +1,5 @@
 package io.github.usefulness.pluginapplier
 
-import com.android.build.api.dsl.AndroidSourceDirectorySet
 import com.android.build.api.dsl.AndroidSourceSet
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
@@ -25,8 +24,8 @@ internal object AndroidSourceSetApplier : SourceSetApplier {
     }
 
     private fun getKotlinFiles(project: Project, sourceSet: AndroidSourceSet): FileTree {
-        val javaSources = sourceSet.java.srcDirs
-        val kotlinSources = sourceSet.kotlin.srcDirs
+        val javaSources = sourceSet.java.directories
+        val kotlinSources = sourceSet.kotlin.directories
 
         val emptyFileTree = project.files().asFileTree
 
@@ -36,6 +35,3 @@ internal object AndroidSourceSetApplier : SourceSetApplier {
     }
 }
 
-@Suppress("DEPRECATION") // https://issuetracker.google.com/issues/170650362
-internal val AndroidSourceDirectorySet.srcDirs
-    get() = (this as com.android.build.gradle.api.AndroidSourceDirectorySet).srcDirs
