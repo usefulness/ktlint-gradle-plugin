@@ -2,7 +2,6 @@ package io.github.usefulness.functional
 
 import io.github.usefulness.functional.utils.editorConfig
 import org.assertj.core.api.Assertions.assertThat
-import org.gradle.internal.impldep.org.bouncycastle.asn1.x500.style.RFC4519Style.name
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled

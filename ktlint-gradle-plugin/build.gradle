@@ -15,15 +15,15 @@ configurations {
     register("testRuntimeDependencies") {
         attributes {
             // KGP publishes multiple variants https://kotlinlang.org/docs/whatsnew17.html#support-for-gradle-plugin-variants
-            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.class, Usage.JAVA_RUNTIME))
-            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.class, Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.class, Usage.JAVA_RUNTIME))
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.class, Category.LIBRARY))
         }
     }
 }
 
 dependencies {
     compileOnly(libs.kotlin.gradle.api)
-    compileOnly(libs.agp.gradle)
+    compileOnly(libs.agp.api)
     compileOnly(libs.ktlint.rule.engine)
     compileOnly(libs.ktlint.cli.ruleset.core)
     compileOnly(libs.ktlint.cli.reporter.core)
@@ -37,7 +37,7 @@ dependencies {
     testImplementation(libs.assertj.core)
 
     testRuntimeDependencies(libs.kotlin.gradle.impl)
-    testRuntimeDependencies(libs.agp.gradle)
+    testRuntimeDependencies(libs.agp.impl)
     testRuntimeDependencies(libs.google.ksp.gradle)
 }
 

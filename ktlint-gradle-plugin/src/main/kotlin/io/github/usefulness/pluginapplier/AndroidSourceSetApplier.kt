@@ -34,4 +34,3 @@ internal object AndroidSourceSetApplier : SourceSetApplier {
             .fold(emptyFileTree) { merged, tree -> merged + tree }
     }
 }
-
