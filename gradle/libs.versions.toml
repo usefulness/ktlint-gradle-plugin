@@ -13,7 +13,8 @@ maven-dokka = "2.1.0"
 maven-vanniktech-maven-publish = "0.36.0"
 
 [libraries]
-agp-gradle = { module = "com.android.tools.build:gradle", version.ref = "google-agp" }
+agp-impl = { module = "com.android.tools.build:gradle", version.ref = "google-agp" }
+agp-api = { module = "com.android.tools.build:gradle-api", version.ref = "google-agp" }
 kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api" }
 kotlin-gradle-impl = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "maven-ktlint" }
