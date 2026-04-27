@@ -20,6 +20,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
@@ -34,6 +35,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.work.ChangeType
+import org.gradle.work.DisableCachingByDefault
 import org.gradle.work.FileChange
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
@@ -41,6 +43,7 @@ import org.gradle.workers.WorkerExecutor
 import java.io.File
 import java.util.concurrent.Callable
 
+@CacheableTask
 public abstract class KtlintWorkTask(
     private val workerExecutor: WorkerExecutor,
     private val projectLayout: ProjectLayout,
