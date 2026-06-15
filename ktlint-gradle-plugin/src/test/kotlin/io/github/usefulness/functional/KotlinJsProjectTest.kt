@@ -22,12 +22,12 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
                 writeText(
                     """
                     plugins {
-                        id 'org.jetbrains.kotlin.js'
+                        id 'org.jetbrains.kotlin.multiplatform'
                         id 'io.github.usefulness.ktlint-gradle-plugin'
                     }
-                    
+
                     repositories.mavenCentral()
-                    
+
                     kotlin {
                         js(IR) {
                             browser()
@@ -42,34 +42,34 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
 
     @Test
     fun `lintKotlin passes when on valid kotlin files`() {
-        projectRoot.resolve("src/main/kotlin/FixtureFileName.kt") {
+        projectRoot.resolve("src/jsMain/kotlin/FixtureFileName.kt") {
             writeText(kotlinClass("FixtureFileName"))
         }
-        projectRoot.resolve("src/test/kotlin/TestFileName.kt") {
+        projectRoot.resolve("src/jsTest/kotlin/TestFileName.kt") {
             writeText(kotlinClass("TestFileName"))
         }
 
         build("lintKotlin").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinJsMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":lintKotlinJsTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
     @Test
     fun `lintKotlin fails when lint errors detected`() {
-        projectRoot.resolve("src/main/kotlin/FixtureFileName.kt") {
+        projectRoot.resolve("src/jsMain/kotlin/FixtureFileName.kt") {
             writeText(kotlinClass("DifferentClassName"))
         }
-        projectRoot.resolve("src/test/kotlin/FixtureTestFileName.kt") {
+        projectRoot.resolve("src/jsTest/kotlin/FixtureTestFileName.kt") {
             writeText(kotlinClass("DifferentTestClassName"))
         }
 
         buildAndFail("lintKotlin", "--continue").apply {
-            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinJsMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains(
                 "Lint error > [standard:filename] File 'FixtureFileName.kt' contains a single top level declaration",
             )
-            assertThat(task(":lintKotlinTest")?.outcome).isEqualTo(TaskOutcome.FAILED)
+            assertThat(task(":lintKotlinJsTest")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains(
                 "Lint error > [standard:filename] File 'FixtureTestFileName.kt' contains a single top level declaration",
             )
@@ -78,7 +78,7 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
 
     @Test
     fun `formatKotlin reports formatted and unformatted files`() {
-        projectRoot.resolve("src/main/kotlin/FixtureClass.kt") {
+        projectRoot.resolve("src/jsMain/kotlin/FixtureClass.kt") {
             // language=kotlin
             val kotlinClass =
                 """
@@ -92,7 +92,7 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
                 """.trimIndent()
             writeText(kotlinClass)
         }
-        projectRoot.resolve("src/test/kotlin/FixtureTestClass.kt") {
+        projectRoot.resolve("src/jsTest/kotlin/FixtureTestClass.kt") {
             // language=kotlin
             val kotlinClass =
                 """
@@ -107,10 +107,10 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
             writeText(kotlinClass)
         }
         build("formatKotlin").apply {
-            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinJsMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("FixtureClass.kt:3:19: Format fixed > [standard:curly-spacing] Missing spacing before \"{\"")
             assertThat(output).contains("FixtureClass.kt:1:1: Format could not fix > [standard:no-wildcard-imports] Wildcard import")
-            assertThat(task(":formatKotlinTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(task(":formatKotlinJsTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
             assertThat(output).contains("FixtureTestClass.kt:3:23: Format fixed > [standard:curly-spacing] Missing spacing before \"{\"")
             assertThat(output).contains("FixtureTestClass.kt:1:1: Format could not fix > [standard:no-wildcard-imports] Wildcard import")
         }
