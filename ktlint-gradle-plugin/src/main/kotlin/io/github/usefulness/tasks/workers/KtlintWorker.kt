@@ -4,6 +4,7 @@ import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
 import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError.Status
 import com.pinterest.ktlint.rule.engine.api.Code
 import com.pinterest.ktlint.rule.engine.api.LintError
+import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
 import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.createKtlintEngine
@@ -68,15 +69,19 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
 
                     KtlintRunMode.Format -> {
                         var fileFixed = false
-                        val fixedContent = ktLintEngine.format(
-                            code = Code.fromFile(file),
-                            callback = { error, corrected ->
-                                if (corrected) {
-                                    fileFixed = true
-                                }
-                                fileErrors.add(error.toKtlintCliErrorForFormat(corrected))
-                            },
-                        )
+                        val fixedContent = ktLintEngine.format(code = Code.fromFile(file)) { error ->
+                            val corrected = error.canBeAutoCorrected
+                            if (corrected) {
+                                fileFixed = true
+                            }
+                            fileErrors.add(error.toKtlintCliErrorForFormat(corrected))
+
+                            if (corrected) {
+                                AutocorrectDecision.ALLOW_AUTOCORRECT
+                            } else {
+                                AutocorrectDecision.NO_AUTOCORRECT
+                            }
+                        }
 
                         if (fileFixed) {
                             file.writeText(fixedContent)
