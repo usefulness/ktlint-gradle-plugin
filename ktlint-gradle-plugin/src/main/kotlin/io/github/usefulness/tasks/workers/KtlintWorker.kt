@@ -1,14 +1,9 @@
 package io.github.usefulness.tasks.workers
 
-import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError
-import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError.Status
-import io.github.ktlint.core.rule.engine.api.Code
-import io.github.ktlint.core.rule.engine.api.LintError
-import io.github.ktlint.core.rule.engine.core.api.AutocorrectDecision
+import io.github.usefulness.support.KtlintError
 import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.KtlintRunMode
-import io.github.usefulness.support.createKtlintEngine
-import io.github.usefulness.support.resetEditorconfigCacheIfNeeded
+import io.github.usefulness.support.api.resolveKtlintApi
 import io.github.usefulness.support.writeTo
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -18,7 +13,7 @@ import org.gradle.api.provider.Property
 import org.gradle.internal.logging.slf4j.DefaultContextAwareTaskLogger
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
-import org.jetbrains.kotlin.utils.addToStdlib.applyIf
+import java.io.File
 
 internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
     private val logger = DefaultContextAwareTaskLogger(Logging.getLogger(KtlintWorker::class.java))
@@ -29,22 +24,21 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
         val projectDir = parameters.projectDirectory.asFile.get()
         val files = parameters.files
 
-        val ktLintEngine = createKtlintEngine(
+        val ktLintEngine = resolveKtlintApi().createEngine(
             disabledRules = parameters.disabledRules.get(),
             experimentalRules = parameters.experimentalRules.get(),
         )
-        ktLintEngine.resetEditorconfigCacheIfNeeded(
-            changedEditorconfigFiles = parameters.changedEditorConfigFiles,
-            logger = logger,
-        )
+        val changedEditorconfigFiles = parameters.changedEditorConfigFiles.files
+        if (changedEditorconfigFiles.any()) {
+            logger.info("Editorconfig changed, resetting KtLint caches")
+            changedEditorconfigFiles.map(File::toPath).forEach(ktLintEngine::reloadEditorConfigFile)
+        }
         if (logger.isInfoEnabled) {
-            logger.info("$name - resolved ${ktLintEngine.ruleProviders.size} RuleProviders")
+            logger.info("$name - resolved ${ktLintEngine.ruleProvidersCount} RuleProviders")
             logger.info("$name - executing against ${files.count()} file(s)")
         }
         if (logger.isDebugEnabled) {
-            logger.debug(
-                "Resolved RuleSetProviders = ${ktLintEngine.ruleProviders.joinToString { it.createNewRuleInstance().ruleId.value }}",
-            )
+            logger.debug("Resolved RuleSetProviders = ${ktLintEngine.ruleIds().joinToString()}")
         }
 
         val errors = mutableListOf<KtlintErrorResult>()
@@ -58,32 +52,15 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
                 return@forEach
             }
 
-            val fileErrors = mutableListOf<KtlintCliError>()
+            val fileErrors = mutableListOf<KtlintError>()
             runCatching {
                 when (parameters.mode.get()) {
-                    KtlintRunMode.Check,
-                    -> ktLintEngine.lint(
-                        code = Code.fromFile(file),
-                        callback = { fileErrors.add(it.toKtlintCliErrorForLint()) },
-                    )
+                    KtlintRunMode.Check -> ktLintEngine.lint(file, callback = fileErrors::add)
 
                     KtlintRunMode.Format -> {
-                        var fileFixed = false
-                        val fixedContent = ktLintEngine.format(code = Code.fromFile(file)) { error ->
-                            val corrected = error.canBeAutoCorrected
-                            if (corrected) {
-                                fileFixed = true
-                            }
-                            fileErrors.add(error.toKtlintCliErrorForFormat(corrected))
+                        val fixedContent = ktLintEngine.format(file, callback = fileErrors::add)
 
-                            if (corrected) {
-                                AutocorrectDecision.ALLOW_AUTOCORRECT
-                            } else {
-                                AutocorrectDecision.NO_AUTOCORRECT
-                            }
-                        }
-
-                        if (fileFixed) {
+                        if (fileErrors.any { it.status == KtlintError.Status.FORMAT_IS_AUTOCORRECTED }) {
                             file.writeText(fixedContent)
                         }
                     }
@@ -115,29 +92,5 @@ internal abstract class KtlintWorker : WorkAction<KtlintWorker.Parameters> {
         val mode: Property<KtlintRunMode>
     }
 }
-
-private fun LintError.toKtlintCliErrorForLint() = KtlintCliError(
-    line = line,
-    col = col,
-    ruleId = ruleId.value,
-    detail = detail,
-    status = if (canBeAutoCorrected) {
-        Status.LINT_CAN_BE_AUTOCORRECTED
-    } else {
-        Status.LINT_CAN_NOT_BE_AUTOCORRECTED
-    },
-)
-
-private fun LintError.toKtlintCliErrorForFormat(corrected: Boolean): KtlintCliError = KtlintCliError(
-    line = line,
-    col = col,
-    ruleId = ruleId.value,
-    detail = detail.applyIf(!corrected) { "$this (cannot be auto-corrected)" },
-    status = if (corrected) {
-        Status.FORMAT_IS_AUTOCORRECTED
-    } else {
-        Status.LINT_CAN_NOT_BE_AUTOCORRECTED
-    },
-)
 
 private val supportedExtensions = setOf("kt", "kts")

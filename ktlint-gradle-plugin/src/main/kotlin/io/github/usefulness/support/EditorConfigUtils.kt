@@ -1,66 +1,34 @@
 package io.github.usefulness.support
 
-import io.github.ktlint.core.rule.engine.api.EditorConfigDefaults
-import io.github.ktlint.core.rule.engine.api.EditorConfigOverride
-import io.github.ktlint.core.rule.engine.core.api.editorconfig.EditorConfigProperty
 import org.ec4j.core.model.EditorConfig
 import org.ec4j.core.model.Glob
 import org.ec4j.core.model.Property
-import org.ec4j.core.model.PropertyType
-import org.ec4j.core.model.PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER
 import org.ec4j.core.model.Section
 import java.io.File
 
-internal fun editorConfigOverride(disabledRules: List<String>) = getPropertiesForDisabledRules(disabledRules)
-    .let(::buildEditorConfigOverride)
+/**
+ * `.editorconfig` property name/value pairs disabling given rules. They are meant to be applied as `EditorConfigOverride`
+ */
+internal fun disabledRulesProperties(disabledRules: List<String>): List<Pair<String, String>> = disabledRules
+    .map { ruleName -> getKtlintRulePropertyName(ruleName) to "disabled" }
 
-internal fun editorConfigDefaults(includeExperimentalRules: Boolean) = getPropertiesForExperimentalRules(includeExperimentalRules)
-    .let(::buildEditorConfigDefaults)
-
-private fun getPropertiesForDisabledRules(disabledRules: List<String>) = if (disabledRules.isEmpty()) {
-    emptyList()
-} else {
-    disabledRules
-        .asSequence()
-        .map(::getKtlintRulePropertyName)
-        .map { propertyName ->
-            EditorConfigProperty(
-                type = PropertyType(propertyName, "Rule to be disabled", IDENTITY_VALUE_PARSER),
-                defaultValue = "disabled",
-            )
-        }
-        .map { it to "disabled" }
-        .toList()
-}
-
-private fun getPropertiesForExperimentalRules(includeExperimentalRules: Boolean) = Property
+/**
+ * `.editorconfig` model toggling experimental rules. It is meant to be applied as `EditorConfigDefaults`
+ */
+internal fun experimentalRulesEditorConfig(includeExperimentalRules: Boolean): EditorConfig = EditorConfig
     .builder()
-    .name("ktlint_experimental")
-    .value(if (includeExperimentalRules) "enabled" else "disabled")
-    .let(::listOf)
-
-private fun buildEditorConfigOverride(editorConfigProperties: List<Pair<EditorConfigProperty<String>, String>>) =
-    if (editorConfigProperties.isEmpty()) {
-        EditorConfigOverride.EMPTY_EDITOR_CONFIG_OVERRIDE
-    } else {
-        EditorConfigOverride.from(*editorConfigProperties.toTypedArray())
-    }
-
-private fun buildEditorConfigDefaults(kotlinSectionProperties: List<Property.Builder>) = if (kotlinSectionProperties.isEmpty()) {
-    EditorConfigDefaults.EMPTY_EDITOR_CONFIG_DEFAULTS
-} else {
-    EditorConfigDefaults(
-        EditorConfig
+    .section(
+        Section
             .builder()
-            .section(
-                Section
+            .glob(Glob("*.{kt,kts}"))
+            .properties(
+                Property
                     .builder()
-                    .glob(Glob("*.{kt,kts}"))
-                    .properties(kotlinSectionProperties),
-            )
-            .build(),
+                    .name("ktlint_experimental")
+                    .value(if (includeExperimentalRules) "enabled" else "disabled"),
+            ),
     )
-}
+    .build()
 
 private fun getKtlintRulePropertyName(ruleName: String) = if (ruleName.contains(':')) { // Rule from a non-standard rule set
     "ktlint_${ruleName.replace(':', '_')}"

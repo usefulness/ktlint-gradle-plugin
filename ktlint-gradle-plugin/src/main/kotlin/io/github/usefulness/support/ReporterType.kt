@@ -1,10 +1,6 @@
 package io.github.usefulness.support
 
-import io.github.ktlint.core.cli.reporter.core.api.ReporterV2
-import io.github.ktlint.core.cli.reporter.core.api.ReporterProviderV2
 import java.io.File
-import java.io.PrintStream
-import java.util.ServiceLoader
 
 internal enum class ReporterType(
     val id: String,
@@ -33,20 +29,7 @@ internal fun reporterPathFor(reporterType: ReporterType, output: File, relativeR
     ReporterType.Sarif -> output.absolutePath
 }
 
-internal fun resolveReporters(enabled: Map<ReporterType, File>): Map<ReporterType, ReporterV2> {
-    val allReporterProviders = defaultReporters().associateBy { it.id }
-
-    return enabled
-        .filter { (type, _) -> allReporterProviders.containsKey(type.id) }
-        .mapValues { (type, output) ->
-            allReporterProviders.getValue(type.id).get(
-                out = PrintStream(output),
-                opt = type.generateOpt(),
-            )
-        }
-}
-
-private fun ReporterType.generateOpt() = when (this) {
+internal fun ReporterType.reporterOptions() = when (this) {
     ReporterType.Checkstyle,
     ReporterType.Html,
     ReporterType.Json,
@@ -55,5 +38,3 @@ private fun ReporterType.generateOpt() = when (this) {
 
     ReporterType.Plain -> mapOf("color_name" to "DARK_GRAY")
 }
-
-private fun defaultReporters(): List<ReporterProviderV2<*>> = ServiceLoader.load(ReporterProviderV2::class.java).toList()
