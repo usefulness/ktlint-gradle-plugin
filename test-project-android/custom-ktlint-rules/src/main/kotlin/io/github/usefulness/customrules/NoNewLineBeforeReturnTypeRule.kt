@@ -1,7 +1,10 @@
 package io.github.usefulness.customrules
 
+import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
 import com.pinterest.ktlint.rule.engine.core.api.Rule
+import com.pinterest.ktlint.rule.engine.core.api.RuleAutocorrectApproveHandler
 import com.pinterest.ktlint.rule.engine.core.api.RuleId
+import com.pinterest.ktlint.rule.engine.core.api.ifAutocorrectAllowed
 import com.pinterest.ktlint.rule.engine.core.api.isPartOfComment
 import com.pinterest.ktlint.rule.engine.core.api.isPartOfString
 import com.pinterest.ktlint.rule.engine.core.api.nextLeaf
@@ -14,12 +17,11 @@ import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 class NoNewLineBeforeReturnTypeRule : Rule(
     ruleId = RuleId("custom-ktlint-rules:no-newline-before-return-type"),
     about = About()
-) {
+), RuleAutocorrectApproveHandler {
 
     override fun beforeVisitChildNodes(
         node: ASTNode,
-        autoCorrect: Boolean,
-        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> Unit,
+        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision,
     ) {
         if (
             node !is LeafPsiElement
@@ -41,9 +43,7 @@ class NoNewLineBeforeReturnTypeRule : Rule(
             nextLeaf.startOffset,
             "Unexpected new-line before return type definition.",
             true,
-        )
-
-        if (autoCorrect) {
+        ).ifAutocorrectAllowed {
             (nextLeaf as LeafPsiElement).rawReplaceWithText(" ")
         }
     }
