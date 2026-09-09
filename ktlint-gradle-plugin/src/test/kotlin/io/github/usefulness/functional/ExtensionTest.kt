@@ -41,7 +41,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         projectRoot.resolve("src/main/kotlin/SomeClass.kt") {
             writeText(
                 """
-                data class SomeClass(val value : String)
+                val someClass : String = ""
                 
                 """.trimIndent(),
             )
@@ -83,13 +83,13 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         buildAndFail("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("FileName.kt:1:1: Format could not fix > [standard:filename]")
-            assertThat(output).contains("SomeClass.kt:1:32: Format fixed > [standard:colon-spacing]")
+            assertThat(output).contains("SomeClass.kt:1:15: Format fixed > [standard:colon-spacing]")
         }
 
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
             writeText(
                 """
-                data class FileName(val value : String)
+                val fileName : String = ""
                 
                 """.trimIndent(),
             )
@@ -97,7 +97,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         build("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("FileName.kt:1:31: Format fixed > [standard:colon-spacing]")
+            assertThat(output).contains("FileName.kt:1:14: Format fixed > [standard:colon-spacing]")
         }
     }
 
@@ -217,7 +217,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            val expectedMessage = "ClassNotFoundException: com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3"
+            val expectedMessage = "ClassNotFoundException: io.github.ktlint.core.cli.ruleset.core.api.RuleSetV2Provider"
             assertThat(output).contains(expectedMessage)
         }
         build("dependencies", "--configuration", "ktlint").apply {

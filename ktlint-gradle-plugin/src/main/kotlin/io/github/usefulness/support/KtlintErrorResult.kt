@@ -1,6 +1,6 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError
 import java.io.File
 import java.io.Serializable
 

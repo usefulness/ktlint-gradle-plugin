@@ -1,11 +1,11 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
-import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
-import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
+import io.github.ktlint.core.cli.ruleset.core.api.RuleSetV2Provider
+import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
+import io.github.ktlint.core.rule.engine.core.api.RuleSetId
 import java.util.ServiceLoader
 
-internal fun resolveRuleProviders(providers: Iterable<RuleSetProviderV3>): Set<RuleProvider> = providers
+internal fun resolveRuleProviders(providers: Iterable<RuleSetV2Provider>): Set<RuleV2Provider> = providers
     .asSequence()
     .sortedWith(
         compareBy {
@@ -15,10 +15,10 @@ internal fun resolveRuleProviders(providers: Iterable<RuleSetProviderV3>): Set<R
             }
         },
     )
-    .map(RuleSetProviderV3::getRuleProviders)
+    .map(RuleSetV2Provider::getRuleProviders)
     .flatten()
     .toSet()
 
 // statically resolve providers from plugin classpath. ServiceLoader#load alone resolves classes lazily which fails when run in parallel
-internal val defaultRuleSetProviders: List<RuleSetProviderV3> =
-    ServiceLoader.load(RuleSetProviderV3::class.java).toList()
+internal val defaultRuleSetProviders: List<RuleSetV2Provider> =
+    ServiceLoader.load(RuleSetV2Provider::class.java).toList()

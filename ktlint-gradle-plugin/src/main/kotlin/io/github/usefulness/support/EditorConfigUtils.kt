@@ -1,8 +1,8 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.rule.engine.api.EditorConfigDefaults
-import com.pinterest.ktlint.rule.engine.api.EditorConfigOverride
-import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
+import io.github.ktlint.core.rule.engine.api.EditorConfigDefaults
+import io.github.ktlint.core.rule.engine.api.EditorConfigOverride
+import io.github.ktlint.core.rule.engine.core.api.editorconfig.EditorConfigProperty
 import org.ec4j.core.model.EditorConfig
 import org.ec4j.core.model.Glob
 import org.ec4j.core.model.Property

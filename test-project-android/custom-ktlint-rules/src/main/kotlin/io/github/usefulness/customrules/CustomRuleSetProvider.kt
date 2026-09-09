@@ -1,12 +1,12 @@
 package io.github.usefulness.customrules
 
-import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
-import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
-import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
+import io.github.ktlint.core.cli.ruleset.core.api.RuleSetV2Provider
+import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
+import io.github.ktlint.core.rule.engine.core.api.RuleSetId
 
-class CustomRuleSetProvider : RuleSetProviderV3(RuleSetId("custom-ktlint-rules")) {
+class CustomRuleSetProvider : RuleSetV2Provider(RuleSetId("custom-ktlint-rules")) {
 
     override fun getRuleProviders() = setOf(
-        RuleProvider { NoNewLineBeforeReturnTypeRule() },
+        RuleV2Provider { NoNewLineBeforeReturnTypeRule() },
     )
 }

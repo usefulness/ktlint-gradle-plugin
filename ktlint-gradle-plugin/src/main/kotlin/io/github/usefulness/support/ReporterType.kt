@@ -1,7 +1,7 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.cli.reporter.core.api.ReporterV2
-import com.pinterest.ktlint.cli.reporter.core.api.ReporterProviderV2
+import io.github.ktlint.core.cli.reporter.core.api.ReporterV2
+import io.github.ktlint.core.cli.reporter.core.api.ReporterProviderV2
 import java.io.File
 import java.io.PrintStream
 import java.util.ServiceLoader

@@ -1,8 +1,8 @@
 package io.github.usefulness.tasks.workers
 
-import com.pinterest.ktlint.cli.reporter.baseline.doesNotContain
-import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
-import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError.Status
+import io.github.ktlint.core.cli.reporter.baseline.doesNotContain
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError.Status
 import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.getBaselineKey
 import io.github.usefulness.support.readKtlintBaseline

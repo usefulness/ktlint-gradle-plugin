@@ -137,8 +137,9 @@ internal class KotlinProjectTest : WithGradleTest.Kotlin() {
                 assertThat(File(filePath)).exists()
             }
             assertThat(output).contains("Format could not fix > [standard:no-wildcard-imports] Wildcard import (cannot be auto-corrected)")
-            assertThat(output).contains("KotlinClass.kt:1:1: Format fixed > [standard:final-newline] File must end with a newline")
-            assertThat(output).contains("KotlinClass.kt:3:18: Format fixed > [standard:curly-spacing] Missing spacing before \"{\"")
+            assertThat(output).contains("KotlinClass.kt:7:1: Format fixed > [standard:final-newline] File must end with a newline")
+            assertThat(output)
+                .contains("KotlinClass.kt:3:18: Format fixed > [standard:class-signature] Expected a single space before class body")
 
             // language=kotlin
             val expected =

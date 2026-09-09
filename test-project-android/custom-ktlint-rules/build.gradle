@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    compileOnly("com.pinterest.ktlint:ktlint-cli-ruleset-core:1.8.0")
+    compileOnly("io.github.ktlint.core:ktlint-cli-ruleset-core:2.0.0-ALPHA-4")
 }

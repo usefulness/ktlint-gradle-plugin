@@ -105,7 +105,7 @@ class ReportersTest : WithGradleTest.Kotlin() {
 
                 ktlint {
                     reporters = ['sarif']
-                    ktlintVersion = "0.49.0"
+                    ktlintVersion = "2.0.0-ALPHA-4"
                 }
 
                 """
@@ -114,8 +114,8 @@ class ReportersTest : WithGradleTest.Kotlin() {
 
         build("lintKotlin").apply {
             val reportContent = projectRoot.resolve("build/reports/ktlint/main-lint.sarif.json")
-            assertThat(reportContent).content().contains(""""version": "0.49.0"""")
-            assertThat(reportContent).content().contains(""""semanticVersion": "0.49.0"""")
+            assertThat(reportContent).content().contains(""""version": "2.0.0-ALPHA-4"""")
+            assertThat(reportContent).content().contains(""""semanticVersion": "2.0.0-ALPHA-4"""")
         }
     }
 

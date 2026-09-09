@@ -1,9 +1,9 @@
 package io.github.usefulness.support
 
-import com.pinterest.ktlint.cli.reporter.baseline.Baseline
-import com.pinterest.ktlint.cli.reporter.baseline.BaselineErrorHandling
-import com.pinterest.ktlint.cli.reporter.baseline.loadBaseline
-import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
+import io.github.ktlint.core.cli.reporter.baseline.Baseline
+import io.github.ktlint.core.cli.reporter.baseline.BaselineErrorHandling
+import io.github.ktlint.core.cli.reporter.baseline.loadBaseline
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError
 import java.io.File
 
 internal fun File.readKtlintBaseline(): Map<String, List<KtlintCliError>>? {

@@ -108,10 +108,12 @@ class KotlinJsProjectTest : WithGradleTest.Kotlin() {
         }
         build("formatKotlin").apply {
             assertThat(task(":formatKotlinJsMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("FixtureClass.kt:3:19: Format fixed > [standard:curly-spacing] Missing spacing before \"{\"")
+            assertThat(output)
+                .contains("FixtureClass.kt:3:19: Format fixed > [standard:class-signature] Expected a single space before class body")
             assertThat(output).contains("FixtureClass.kt:1:1: Format could not fix > [standard:no-wildcard-imports] Wildcard import")
             assertThat(task(":formatKotlinJsTest")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("FixtureTestClass.kt:3:23: Format fixed > [standard:curly-spacing] Missing spacing before \"{\"")
+            assertThat(output)
+                .contains("FixtureTestClass.kt:3:23: Format fixed > [standard:class-signature] Expected a single space before class body")
             assertThat(output).contains("FixtureTestClass.kt:1:1: Format could not fix > [standard:no-wildcard-imports] Wildcard import")
         }
     }

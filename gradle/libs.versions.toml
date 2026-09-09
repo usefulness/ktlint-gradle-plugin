@@ -6,7 +6,7 @@ google-agp = "9.4.0"
 google-ksp = "2.3.11"
 maven-junit = "6.1.3"
 maven-assertj = "3.27.7"
-maven-ktlint = "1.8.0"
+maven-ktlint = "2.0.0-ALPHA-4"
 maven-commons = "2.22.0"
 maven-binarycompatibilityvalidator = "0.18.2"
 maven-dokka = "2.2.0"
@@ -17,10 +17,10 @@ agp-impl = { module = "com.android.tools.build:gradle", version.ref = "google-ag
 agp-api = { module = "com.android.tools.build:gradle-api", version.ref = "google-agp" }
 kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api" }
 kotlin-gradle-impl = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
-ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "maven-ktlint" }
-ktlint-cli-ruleset-core = { module = "com.pinterest.ktlint:ktlint-cli-ruleset-core", version.ref = "maven-ktlint" }
-ktlint-cli-reporter-core = { module = "com.pinterest.ktlint:ktlint-cli-reporter-core", version.ref = "maven-ktlint" }
-ktlint-cli-reporter-baseline = { module = "com.pinterest.ktlint:ktlint-cli-reporter-baseline", version.ref = "maven-ktlint" }
+ktlint-rule-engine = { module = "io.github.ktlint.core:ktlint-rule-engine", version.ref = "maven-ktlint" }
+ktlint-cli-ruleset-core = { module = "io.github.ktlint.core:ktlint-cli-ruleset-core", version.ref = "maven-ktlint" }
+ktlint-cli-reporter-core = { module = "io.github.ktlint.core:ktlint-cli-reporter-core", version.ref = "maven-ktlint" }
+ktlint-cli-reporter-baseline = { module = "io.github.ktlint.core:ktlint-cli-reporter-baseline", version.ref = "maven-ktlint" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "maven-junit" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "maven-junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }

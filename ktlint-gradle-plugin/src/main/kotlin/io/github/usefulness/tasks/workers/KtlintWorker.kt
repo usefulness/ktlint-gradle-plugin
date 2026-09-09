@@ -1,10 +1,10 @@
 package io.github.usefulness.tasks.workers
 
-import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError
-import com.pinterest.ktlint.cli.reporter.core.api.KtlintCliError.Status
-import com.pinterest.ktlint.rule.engine.api.Code
-import com.pinterest.ktlint.rule.engine.api.LintError
-import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError.Status
+import io.github.ktlint.core.rule.engine.api.Code
+import io.github.ktlint.core.rule.engine.api.LintError
+import io.github.ktlint.core.rule.engine.core.api.AutocorrectDecision
 import io.github.usefulness.support.KtlintErrorResult
 import io.github.usefulness.support.KtlintRunMode
 import io.github.usefulness.support.createKtlintEngine

@@ -158,7 +158,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
                 		<error line="1" column="1" source="standard:filename" />
                 	</file>
                 	<file name="src/main/kotlin/CustomClass.kt">
-                		<error line="2" column="21" source="standard:curly-spacing" />
+                		<error line="2" column="21" source="standard:function-signature" />
                 	</file>
                 </baseline>
 
@@ -166,7 +166,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
             )
         }
         build("formatKotlin").apply {
-            assertThat(output).contains("CustomClass.kt:2:21: Format fixed > [standard:curly-spacing]")
+            assertThat(output).contains("CustomClass.kt:2:21: Format fixed > [standard:function-signature]")
         }
 
         projectRoot.resolve("src/main/kotlin/CustomClass.kt") {
@@ -201,7 +201,7 @@ class BaselineTest : WithGradleTest.Kotlin() {
             )
         }
         build("formatKotlin").apply {
-            assertThat(output).contains("CustomClass.kt:2:22: Format fixed > [standard:no-multi-spaces]")
+            assertThat(output).contains("CustomClass.kt:2:23: Format fixed > [standard:function-signature]")
         }
     }
 }
