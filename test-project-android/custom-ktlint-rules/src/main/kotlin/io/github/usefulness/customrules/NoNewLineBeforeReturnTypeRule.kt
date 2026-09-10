@@ -1,23 +1,22 @@
 package io.github.usefulness.customrules
 
-import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
-import com.pinterest.ktlint.rule.engine.core.api.Rule
-import com.pinterest.ktlint.rule.engine.core.api.RuleAutocorrectApproveHandler
-import com.pinterest.ktlint.rule.engine.core.api.RuleId
-import com.pinterest.ktlint.rule.engine.core.api.ifAutocorrectAllowed
-import com.pinterest.ktlint.rule.engine.core.api.isPartOfComment
-import com.pinterest.ktlint.rule.engine.core.api.isPartOfString
-import com.pinterest.ktlint.rule.engine.core.api.nextLeaf
+import io.github.ktlint.core.rule.engine.core.api.AutocorrectDecision
+import io.github.ktlint.core.rule.engine.core.api.RuleId
+import io.github.ktlint.core.rule.engine.core.api.RuleV2
+import io.github.ktlint.core.rule.engine.core.api.ifAutocorrectAllowed
+import io.github.ktlint.core.rule.engine.core.api.isPartOfComment
+import io.github.ktlint.core.rule.engine.core.api.isPartOfString
+import io.github.ktlint.core.rule.engine.core.api.nextLeaf
 import org.jetbrains.kotlin.com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 
-class NoNewLineBeforeReturnTypeRule : Rule(
+class NoNewLineBeforeReturnTypeRule : RuleV2(
     ruleId = RuleId("custom-ktlint-rules:no-newline-before-return-type"),
     about = About()
-), RuleAutocorrectApproveHandler {
+) {
 
     override fun beforeVisitChildNodes(
         node: ASTNode,
@@ -26,8 +25,8 @@ class NoNewLineBeforeReturnTypeRule : Rule(
         if (
             node !is LeafPsiElement
             || !node.textMatches(":")
-            || node.isPartOfComment()
-            || node.isPartOfString()
+            || node.isPartOfComment
+            || node.isPartOfString
         ) return
 
         if (
@@ -36,7 +35,7 @@ class NoNewLineBeforeReturnTypeRule : Rule(
             || node.parent is KtPrimaryConstructor
         ) return
 
-        val nextLeaf = node.nextLeaf()
+        val nextLeaf = node.nextLeaf { true }
         if (nextLeaf?.textContains('\n') != true) return
 
         emit(

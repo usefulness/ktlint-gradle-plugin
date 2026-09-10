@@ -41,7 +41,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         projectRoot.resolve("src/main/kotlin/SomeClass.kt") {
             writeText(
                 """
-                data class SomeClass(val value : String)
+                val someClass : String = ""
                 
                 """.trimIndent(),
             )
@@ -83,13 +83,13 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         buildAndFail("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
             assertThat(output).contains("FileName.kt:1:1: Format could not fix > [standard:filename]")
-            assertThat(output).contains("SomeClass.kt:1:32: Format fixed > [standard:colon-spacing]")
+            assertThat(output).contains("SomeClass.kt:1:15: Format fixed > [standard:colon-spacing]")
         }
 
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
             writeText(
                 """
-                data class FileName(val value : String)
+                val fileName : String = ""
                 
                 """.trimIndent(),
             )
@@ -97,7 +97,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
 
         build("formatKotlin").apply {
             assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-            assertThat(output).contains("FileName.kt:1:31: Format fixed > [standard:colon-spacing]")
+            assertThat(output).contains("FileName.kt:1:14: Format fixed > [standard:colon-spacing]")
         }
     }
 
@@ -205,7 +205,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                 }
                 
                 ktlint {
-                    ktlintVersion = "0.32.0"
+                    ktlintVersion = "1.0.0"
                 }
                 
                 """.trimIndent()
@@ -214,14 +214,28 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
         projectRoot.resolve("src/main/kotlin/FileName.kt") {
             writeText(kotlinClass("FileName"))
         }
+        projectRoot.resolve("src/main/kotlin/Unformatted.kt") {
+            writeText(
+                """
+                val unformatted : String = ""
+                
+                """.trimIndent(),
+            )
+        }
 
+        build("dependencies", "--configuration", "ktlint").apply {
+            assertThat(output).contains("com.pinterest.ktlint:ktlint-cli:1.0.0")
+        }
         buildAndFail("lintKotlin").apply {
             assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.FAILED)
-            val expectedMessage = "ClassNotFoundException: com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3"
-            assertThat(output).contains(expectedMessage)
+            assertThat(output).contains("Unformatted.kt:1:17: Lint error > [standard:colon-spacing]")
         }
-        build("dependencies", "--configuration", "ktlint").apply {
-            assertThat(output).contains("com.pinterest:ktlint:0.32.0")
+        build("formatKotlin").apply {
+            assertThat(task(":formatKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+            assertThat(output).contains("Unformatted.kt:1:17: Format fixed > [standard:colon-spacing]")
+        }
+        build("lintKotlin").apply {
+            assertThat(task(":lintKotlinMain")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         }
     }
 
@@ -245,7 +259,7 @@ internal class ExtensionTest : WithGradleTest.Kotlin() {
                     reporters = ["checkstyle", "html", "json", "plain", "sarif"]
                     experimentalRules = true
                     disabledRules = ["no-wildcard-imports", "experimental:annotation", "your-custom-rule:no-bugs"]
-                    ktlintVersion = "0.49.0"
+                    ktlintVersion = "1.8.0"
                     chunkSize = 50
                     baselineFile.set(file("config/ktlint_baseline.xml"))
                 }
