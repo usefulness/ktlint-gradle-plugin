@@ -96,8 +96,8 @@ ktlint {
 - `experimentalRules` - enables rules from ktlint [Experimental](https://pinterest.github.io/ktlint/rules/experimental/)
   ruleset.
 - `disabledRules` - can include an array of rule ids you wish to disable
-- `ktlintVersion` There is a basic support for overriding ktlint version. Both ktlint `1.x` (`com.pinterest.ktlint`) and
-  `2.x` (`io.github.ktlint.core`) are supported, but the plugin doesn't guarantee backwards compatibility with all `ktlint` versions.
+- `ktlintVersion` There is a basic support for overriding ktlint version, but the plugin doesn't guarantee backwards
+  compatibility with all `ktlint` versions.
   Errors like `java.lang.NoSuchMethodError:` or `com/pinterest/ktlint/core/KtLint$Params` can be thrown if
   provided `ktlint` version isn't compatible with the latest ktlint apis.
 

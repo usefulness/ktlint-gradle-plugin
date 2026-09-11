@@ -1,11 +1,12 @@
 package io.github.usefulness.tasks.workers
 
+import io.github.ktlint.core.cli.reporter.baseline.doesNotContain
 import io.github.usefulness.support.ReporterType
-import io.github.usefulness.support.api.resolveKtlintApi
-import io.github.usefulness.support.doesNotContain
 import io.github.usefulness.support.getBaselineKey
+import io.github.usefulness.support.readKtlintBaseline
 import io.github.usefulness.support.readKtlintErrors
 import io.github.usefulness.support.reporterPathFor
+import io.github.usefulness.support.resolveReporters
 import io.github.usefulness.tasks.LintTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -22,11 +23,10 @@ internal abstract class GenerateReportsWorker : WorkAction<GenerateReportsWorker
     override fun execute() {
         val projectDir = parameters.projectDirectory.get().asFile
 
-        val ktlint = resolveKtlintApi()
         val discoveredErrors = parameters.errorsContainer.readKtlintErrors()
-        val baselineContent = parameters.baselineFile.orNull?.asFile?.let(ktlint::loadBaseline).orEmpty()
+        val baselineContent = parameters.baselineFile.orNull?.asFile?.readKtlintBaseline().orEmpty()
 
-        val reporters = ktlint.createReporters(enabled = getReports())
+        val reporters = resolveReporters(enabled = getReports())
         logger.info("resolved ${reporters.size} Reporters")
 
         reporters.onEach { (_, reporter) -> reporter.beforeAll() }

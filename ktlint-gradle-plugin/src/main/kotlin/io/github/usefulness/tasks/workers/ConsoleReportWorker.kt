@@ -1,11 +1,11 @@
 package io.github.usefulness.tasks.workers
 
-import io.github.usefulness.support.KtlintError
-import io.github.usefulness.support.KtlintError.Status
+import io.github.ktlint.core.cli.reporter.baseline.doesNotContain
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError
+import io.github.ktlint.core.cli.reporter.core.api.KtlintCliError.Status
 import io.github.usefulness.support.KtlintRunMode
-import io.github.usefulness.support.api.resolveKtlintApi
-import io.github.usefulness.support.doesNotContain
 import io.github.usefulness.support.getBaselineKey
+import io.github.usefulness.support.readKtlintBaseline
 import io.github.usefulness.support.readKtlintErrors
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -25,7 +25,7 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
         val projectDir = parameters.projectDirectory.get().asFile
 
         val discoveredErrors = parameters.errorsContainer.readKtlintErrors()
-        val baselineContent = parameters.baselineFile.orNull?.asFile?.let(resolveKtlintApi()::loadBaseline).orEmpty()
+        val baselineContent = parameters.baselineFile.orNull?.asFile?.readKtlintBaseline().orEmpty()
 
         var hasUncoveredErrors = false
         discoveredErrors.forEach { (file, errors) ->
@@ -70,7 +70,7 @@ internal abstract class ConsoleReportWorker : WorkAction<ConsoleReportWorker.Par
         }
     }
 
-    private fun KtlintError.generateMessage(file: File, message: String) = "${file.path}:$line:$col: $message > [$ruleId] $detail"
+    private fun KtlintCliError.generateMessage(file: File, message: String) = "${file.path}:$line:$col: $message > [$ruleId] $detail"
 
     interface Parameters : WorkParameters {
         val errorsContainer: DirectoryProperty
