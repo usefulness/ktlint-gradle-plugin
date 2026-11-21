@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.starter.library.kotlin)
-    alias(libs.plugins.osacky.doctor)
 }
 
 kotlin {
@@ -24,10 +23,15 @@ gradlePlugin {
             id = 'com.starter.publishing'
             implementationClass = 'PublishingPlugin'
         }
+        conventionsPlugin {
+            id = 'com.starter.conventions'
+            implementationClass = 'ConventionsPlugin'
+        }
     }
 }
 
 dependencies {
     implementation(libs.vanniktech.maven.publish)
     implementation(libs.jetbrains.dokka)
+    compileOnly(libs.kotlin.gradle.impl)
 }

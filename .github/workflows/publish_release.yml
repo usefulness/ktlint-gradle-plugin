@@ -37,8 +37,8 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - run: ./gradlew publishAllPublicationsToGithubRepository --no-configuration-cache
+      - run: ./gradlew publishAllPublicationsToGithubRepository
 
-      - run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache
+      - run: ./gradlew publishAllPublicationsToMavenCentralRepository
 
       - run: ./gradlew publishPlugins -Pgradle.publish.key=${{ secrets.gradle_publish_key }} -Pgradle.publish.secret=${{ secrets.gradle_publish_secret }}
