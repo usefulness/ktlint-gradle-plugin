@@ -97,6 +97,7 @@ public class KtlintGradlePlugin : Plugin<Project> {
                     }
 
                     formatKotlin.configure { it.dependsOn(formatWorker) }
+                    checkWorker.configure { it.mustRunAfter(formatWorker) }
                 }
 
                 tasks.named("lintKotlin") { task ->
