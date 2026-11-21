@@ -14,7 +14,7 @@ class PublishingPlugin : Plugin<Project> {
 
         pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
             tasks.named("processResources", ProcessResources::class.java) { processResources ->
-                processResources.from(rootProject.file("LICENSE"))
+                processResources.from(isolated.rootProject.projectDirectory.file("LICENSE"))
             }
         }
 
@@ -83,5 +83,5 @@ class PublishingPlugin : Plugin<Project> {
 }
 
 private fun Project.findConfig(key: String): String {
-    return findProperty(key)?.toString() ?: System.getenv(key) ?: ""
+    return providers.gradleProperty(key).orNull ?: System.getenv(key) ?: ""
 }

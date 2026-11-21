@@ -5,6 +5,7 @@ plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.gradle.pluginpublish)
     id("com.starter.publishing")
+    id("com.starter.conventions")
     alias(libs.plugins.starter.library.kotlin)
     alias(libs.plugins.kotlinx.binarycompatibilityvalidator)
 }
