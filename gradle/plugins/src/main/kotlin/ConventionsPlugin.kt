@@ -25,7 +25,7 @@ class ConventionsPlugin : Plugin<Project> {
         }
 
         pluginManager.withPlugin("java") {
-            if (hasProperty("skipJarVersion")) {
+            if (providers.gradleProperty("skipJarVersion").isPresent) {
                 val projectName = target.name
                 tasks.named("jar", Jar::class.java) { jar ->
                     jar.archiveFileName.set("$projectName.jar")

@@ -83,5 +83,5 @@ class PublishingPlugin : Plugin<Project> {
 }
 
 private fun Project.findConfig(key: String): String {
-    return findProperty(key)?.toString() ?: System.getenv(key) ?: ""
+    return providers.gradleProperty(key).orNull ?: System.getenv(key) ?: ""
 }
